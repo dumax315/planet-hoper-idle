@@ -1,11 +1,13 @@
 import kaboom from "kaboom";
 
 
-//stat track 
+//stat track FPS counter?
 (function() { var script = document.createElement('script'); script.onload = function() { var stats = new Stats(); document.body.appendChild(stats.dom); requestAnimationFrame(function loop() { stats.update(); requestAnimationFrame(loop) }); }; script.src = '//mrdoob.github.io/stats.js/build/stats.min.js'; document.head.appendChild(script); })()
 
 // initialize context
 kaboom();
+
+
 
 // load assets
 
@@ -27,8 +29,8 @@ loadPedit("stars1", "sprites/stars_1.pedit");
 let angleOfMovement = 0;
 //scale by screen size
 const mapScale = 1.5;
-const block_size = 64 * mapScale;
-const background_size = 64 * mapScale * 6;
+const blockSize = 64 * mapScale;
+const backgroundSize = 64 * mapScale * 6;
 const numberOfBackTiles = 48;
 
 let planets = [
@@ -46,7 +48,7 @@ layers([
   "ui",
 ], "game");
 
-
+// generate map
 const map = addLevel([
   "        ",
   "        ",
@@ -57,11 +59,11 @@ const map = addLevel([
   "        ",
   "        ",
 ], {
-  width: background_size,
-  height: background_size,
-  pos: vec2(width() / 2 - 10 * background_size, height() / 2 - 10 * background_size),
+  width: backgroundSize,
+  height: backgroundSize,
+  pos: vec2(width() / 2 - 10 * backgroundSize, height() / 2 - 10 * backgroundSize),
   "=": () => [
-    rect(background_size, background_size),
+    rect(backgroundSize, backgroundSize),
     color(255, 0, 0),
     area(),
     origin("center"),
@@ -73,7 +75,7 @@ const map = addLevel([
     }
   ],
   " ": () => [
-    rect(background_size, background_size),
+    rect(backgroundSize, backgroundSize),
     sprite("stars"),
     scale(0.5484 * mapScale),
     // color(0,0,0),
@@ -109,12 +111,12 @@ const planetHome = add([
 // 	sprite("planet2"),
 // 	area(),
 // 	solid(),
-// 	pos(9*block_size,3*block_size),
+// 	pos(9*blockSize,3*blockSize),
 // 	scale(2*mapScale),
 // 	origin("center"),
 // 	"planet",
 // 	{
-//   	realPos: [9*block_size,3*block_size],
+//   	realPos: [9*blockSize,3*blockSize],
 //   },
 // ]);
 
@@ -124,8 +126,8 @@ planetsVars.push(add([
   solid(),
   // color(255,0,0),
   pos(
-    30 * block_size,
-    15 * block_size),
+    30 * blockSize,
+    15 * blockSize),
 
   scale(mapScale),
   layer("game"),
@@ -133,11 +135,11 @@ planetsVars.push(add([
   "planet",
   {
     realPos: [
-      20 * block_size,
-      15 * block_size],
+      20 * blockSize,
+      15 * blockSize],
     startingPos: [
-      20 * block_size,
-      15 * block_size],
+      20 * blockSize,
+      15 * blockSize],
     name: "white",
     passengers: [],
   },
@@ -148,14 +150,14 @@ planetsVars.push(add([
   area(),
   solid(),
   color(255, 0, 0),
-  pos(12 * block_size, 6 * block_size),
+  pos(12 * blockSize, 6 * blockSize),
   scale(mapScale),
   layer("game"),
   origin("center"),
   "planet",
   {
-    realPos: [12 * block_size, 6 * block_size],
-    startingPos: [12 * block_size, 6 * block_size],
+    realPos: [12 * blockSize, 6 * blockSize],
+    startingPos: [12 * blockSize, 6 * blockSize],
     name: "red",
     passengers: [],
   },
@@ -167,16 +169,16 @@ planetsVars.push(add([
   solid(),
   color(0, 0, 255),
   rotate(90),
-  pos(15 * block_size, 40 * block_size),
+  pos(15 * blockSize, 40 * blockSize),
   scale(mapScale),
   layer("game"),
   origin("center"),
   "planet",
   {
     realPos: [
-      15 * block_size,
-      20 * block_size],
-    startingPos: [15 * block_size, 20 * block_size],
+      15 * blockSize,
+      20 * blockSize],
+    startingPos: [15 * blockSize, 20 * blockSize],
     name: "blue",
     passengers: [],
     size: 1,
@@ -190,19 +192,19 @@ planetsVars.push(add([
   color(0, 255, 0),
   rotate(90),
   pos(
-    15 * block_size,
-    40 * block_size),
+    15 * blockSize,
+    40 * blockSize),
   scale(mapScale),
   layer("game"),
   origin("center"),
   "planet",
   {
     realPos: [
-      7 * block_size,
-      12 * block_size],
+      7 * blockSize,
+      12 * blockSize],
     startingPos: [
-      7 * block_size,
-      12 * block_size],
+      7 * blockSize,
+      12 * blockSize],
     name: "green",
     passengers: [],
     size: 1,
@@ -455,7 +457,7 @@ player.collides("planet", (planet) => {
     //move ship pass to planet
     let playerPassesToRemove = [];
     for (let i = 0; i < player.passengers.length; i++) {
-      if (player.passengers[i].destanation == player.planetAt) {
+      if (player.passengers[i].destination == player.planetAt) {
         moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true);
         player.passengersSprite[i].moving = true;
         playerPassesToRemove.push(i);
@@ -564,20 +566,20 @@ let calcRealPos = obj => {
   obj.realPos[1] += (Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed);
   // debug.log(obj.realPos[0])
   // debug.log(obj.realPos[1])
-  if (obj.realPos[0] >= (numberOfBackTiles / 2 * block_size)) {
-    obj.realPos[0] = obj.realPos[0] - (numberOfBackTiles * block_size)
+  if (obj.realPos[0] >= (numberOfBackTiles / 2 * blockSize)) {
+    obj.realPos[0] = obj.realPos[0] - (numberOfBackTiles * blockSize)
   };
 
-  if (obj.realPos[1] >= (numberOfBackTiles / 2 * block_size)) {
-    obj.realPos[1] = obj.realPos[1] - (numberOfBackTiles * block_size)
+  if (obj.realPos[1] >= (numberOfBackTiles / 2 * blockSize)) {
+    obj.realPos[1] = obj.realPos[1] - (numberOfBackTiles * blockSize)
   };
 
-  if (obj.realPos[0] <= -1 * (numberOfBackTiles / 2 * block_size)) {
-    obj.realPos[0] = obj.realPos[0] + (numberOfBackTiles * block_size)
+  if (obj.realPos[0] <= -1 * (numberOfBackTiles / 2 * blockSize)) {
+    obj.realPos[0] = obj.realPos[0] + (numberOfBackTiles * blockSize)
   };
 
-  if (obj.realPos[1] <= -1 * (numberOfBackTiles / 2 * block_size)) {
-    obj.realPos[1] = obj.realPos[1] + (numberOfBackTiles * block_size)
+  if (obj.realPos[1] <= -1 * (numberOfBackTiles / 2 * blockSize)) {
+    obj.realPos[1] = obj.realPos[1] + (numberOfBackTiles * blockSize)
   };
 }
 
@@ -625,20 +627,20 @@ let move = (x, y, slow) => {
 action("background", (background) => {
   background.pos.x += (-1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed);
   background.pos.y += (Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed);
-  if (background.pos.x >= (numberOfBackTiles / 2 * block_size) + width() / 2) {
-    background.pos.x = background.pos.x - (numberOfBackTiles * block_size)
-  } else if (background.pos.x <= -1 * (numberOfBackTiles / 2 * block_size) + width() / 2) {
-    background.pos.x = background.pos.x + (numberOfBackTiles * block_size)
+  if (background.pos.x >= (numberOfBackTiles / 2 * blockSize) + width() / 2) {
+    background.pos.x = background.pos.x - (numberOfBackTiles * blockSize)
+  } else if (background.pos.x <= -1 * (numberOfBackTiles / 2 * blockSize) + width() / 2) {
+    background.pos.x = background.pos.x + (numberOfBackTiles * blockSize)
   }
-  if (background.pos.y >= (numberOfBackTiles / 2 * block_size) + height() / 2) {
-    background.pos.y = background.pos.y - (numberOfBackTiles * block_size)
-  } else if (background.pos.y <= -1 * (numberOfBackTiles / 2 * block_size) + height() / 2) {
-    background.pos.y = background.pos.y + (numberOfBackTiles * block_size)
+  if (background.pos.y >= (numberOfBackTiles / 2 * blockSize) + height() / 2) {
+    background.pos.y = background.pos.y - (numberOfBackTiles * blockSize)
+  } else if (background.pos.y <= -1 * (numberOfBackTiles / 2 * blockSize) + height() / 2) {
+    background.pos.y = background.pos.y + (numberOfBackTiles * blockSize)
   }
 
 
-  // background.pos.x = background.pos.x % (26 * block_size);
-  // background.pos.y = background.pos.y % (26 * block_size);
+  // background.pos.x = background.pos.x % (26 * blockSize);
+  // background.pos.y = background.pos.y % (26 * blockSize);
 });
 
 action("planet", (planet) => {
@@ -718,13 +720,13 @@ function generatepassengers(planet, ammount) {
           break;
       }
       planet.passengers.push({
-        destanation: otherPlanets[generatedPassId],
+        destination: otherPlanets[generatedPassId],
         color: genPassColor,
         sprite: genPassSprite,
       })
       // if(planet.name == "blue"){
       // 	debug.log(planet.name)
-      // 	debug.log(planet.passengers[i].destanation)
+      // 	debug.log(planet.passengers[i].destination)
       // 	debug.log(generatedPassId)
       // 	debug.log(otherPlanets)
       // 	debug.log(otherPlanets[generatedPassId])

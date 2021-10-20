@@ -2376,8 +2376,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   loadPedit("stars1", "sprites/stars_1.pedit");
   var angleOfMovement = 0;
   var mapScale = 1.5;
-  var block_size = 64 * mapScale;
-  var background_size = 64 * mapScale * 6;
+  var blockSize = 64 * mapScale;
+  var backgroundSize = 64 * mapScale * 6;
   var numberOfBackTiles = 48;
   var planets = [
     "white",
@@ -2401,11 +2401,11 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     "        ",
     "        "
   ], {
-    width: background_size,
-    height: background_size,
-    pos: vec2(width() / 2 - 10 * background_size, height() / 2 - 10 * background_size),
+    width: backgroundSize,
+    height: backgroundSize,
+    pos: vec2(width() / 2 - 10 * backgroundSize, height() / 2 - 10 * backgroundSize),
     "=": () => [
-      rect(background_size, background_size),
+      rect(backgroundSize, backgroundSize),
       color(255, 0, 0),
       area(),
       origin("center"),
@@ -2416,7 +2416,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       }
     ],
     " ": () => [
-      rect(background_size, background_size),
+      rect(backgroundSize, backgroundSize),
       sprite("stars"),
       scale(0.5484 * mapScale),
       area(),
@@ -2448,19 +2448,19 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     sprite("planetWhite"),
     area(),
     solid(),
-    pos(30 * block_size, 15 * block_size),
+    pos(30 * blockSize, 15 * blockSize),
     scale(mapScale),
     layer("game"),
     origin("center"),
     "planet",
     {
       realPos: [
-        20 * block_size,
-        15 * block_size
+        20 * blockSize,
+        15 * blockSize
       ],
       startingPos: [
-        20 * block_size,
-        15 * block_size
+        20 * blockSize,
+        15 * blockSize
       ],
       name: "white",
       passengers: []
@@ -2471,14 +2471,14 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     area(),
     solid(),
     color(255, 0, 0),
-    pos(12 * block_size, 6 * block_size),
+    pos(12 * blockSize, 6 * blockSize),
     scale(mapScale),
     layer("game"),
     origin("center"),
     "planet",
     {
-      realPos: [12 * block_size, 6 * block_size],
-      startingPos: [12 * block_size, 6 * block_size],
+      realPos: [12 * blockSize, 6 * blockSize],
+      startingPos: [12 * blockSize, 6 * blockSize],
       name: "red",
       passengers: []
     }
@@ -2489,17 +2489,17 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     solid(),
     color(0, 0, 255),
     rotate(90),
-    pos(15 * block_size, 40 * block_size),
+    pos(15 * blockSize, 40 * blockSize),
     scale(mapScale),
     layer("game"),
     origin("center"),
     "planet",
     {
       realPos: [
-        15 * block_size,
-        20 * block_size
+        15 * blockSize,
+        20 * blockSize
       ],
-      startingPos: [15 * block_size, 20 * block_size],
+      startingPos: [15 * blockSize, 20 * blockSize],
       name: "blue",
       passengers: [],
       size: 1
@@ -2511,19 +2511,19 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     solid(),
     color(0, 255, 0),
     rotate(90),
-    pos(15 * block_size, 40 * block_size),
+    pos(15 * blockSize, 40 * blockSize),
     scale(mapScale),
     layer("game"),
     origin("center"),
     "planet",
     {
       realPos: [
-        7 * block_size,
-        12 * block_size
+        7 * blockSize,
+        12 * blockSize
       ],
       startingPos: [
-        7 * block_size,
-        12 * block_size
+        7 * blockSize,
+        12 * blockSize
       ],
       name: "green",
       passengers: [],
@@ -2777,20 +2777,20 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   var calcRealPos = /* @__PURE__ */ __name((obj) => {
     obj.realPos[0] += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed;
     obj.realPos[1] += Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed;
-    if (obj.realPos[0] >= numberOfBackTiles / 2 * block_size) {
-      obj.realPos[0] = obj.realPos[0] - numberOfBackTiles * block_size;
+    if (obj.realPos[0] >= numberOfBackTiles / 2 * blockSize) {
+      obj.realPos[0] = obj.realPos[0] - numberOfBackTiles * blockSize;
     }
     ;
-    if (obj.realPos[1] >= numberOfBackTiles / 2 * block_size) {
-      obj.realPos[1] = obj.realPos[1] - numberOfBackTiles * block_size;
+    if (obj.realPos[1] >= numberOfBackTiles / 2 * blockSize) {
+      obj.realPos[1] = obj.realPos[1] - numberOfBackTiles * blockSize;
     }
     ;
-    if (obj.realPos[0] <= -1 * (numberOfBackTiles / 2 * block_size)) {
-      obj.realPos[0] = obj.realPos[0] + numberOfBackTiles * block_size;
+    if (obj.realPos[0] <= -1 * (numberOfBackTiles / 2 * blockSize)) {
+      obj.realPos[0] = obj.realPos[0] + numberOfBackTiles * blockSize;
     }
     ;
-    if (obj.realPos[1] <= -1 * (numberOfBackTiles / 2 * block_size)) {
-      obj.realPos[1] = obj.realPos[1] + numberOfBackTiles * block_size;
+    if (obj.realPos[1] <= -1 * (numberOfBackTiles / 2 * blockSize)) {
+      obj.realPos[1] = obj.realPos[1] + numberOfBackTiles * blockSize;
     }
     ;
   }, "calcRealPos");
@@ -2817,15 +2817,15 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   action("background", (background) => {
     background.pos.x += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed;
     background.pos.y += Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed;
-    if (background.pos.x >= numberOfBackTiles / 2 * block_size + width() / 2) {
-      background.pos.x = background.pos.x - numberOfBackTiles * block_size;
-    } else if (background.pos.x <= -1 * (numberOfBackTiles / 2 * block_size) + width() / 2) {
-      background.pos.x = background.pos.x + numberOfBackTiles * block_size;
+    if (background.pos.x >= numberOfBackTiles / 2 * blockSize + width() / 2) {
+      background.pos.x = background.pos.x - numberOfBackTiles * blockSize;
+    } else if (background.pos.x <= -1 * (numberOfBackTiles / 2 * blockSize) + width() / 2) {
+      background.pos.x = background.pos.x + numberOfBackTiles * blockSize;
     }
-    if (background.pos.y >= numberOfBackTiles / 2 * block_size + height() / 2) {
-      background.pos.y = background.pos.y - numberOfBackTiles * block_size;
-    } else if (background.pos.y <= -1 * (numberOfBackTiles / 2 * block_size) + height() / 2) {
-      background.pos.y = background.pos.y + numberOfBackTiles * block_size;
+    if (background.pos.y >= numberOfBackTiles / 2 * blockSize + height() / 2) {
+      background.pos.y = background.pos.y - numberOfBackTiles * blockSize;
+    } else if (background.pos.y <= -1 * (numberOfBackTiles / 2 * blockSize) + height() / 2) {
+      background.pos.y = background.pos.y + numberOfBackTiles * blockSize;
     }
   });
   action("planet", (planet) => {
