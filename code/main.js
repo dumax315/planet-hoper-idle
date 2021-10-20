@@ -149,12 +149,19 @@ function getRandomPaletteColor() {
 // planets
 const planetHome = add([
   sprite(getRandomPlanet()),
+  // hit box? (should be build into kaboom)
   area(),
+  // impermeable
   solid(),
   pos(0, 0),
   scale(mapScale),
   layer("game"),
+	//yo, we can't do 2 brances on the same replit
+	//can you see this yes weird okay well just work in experimental for now then
+	//let me connect to github ok ill j  chill
+	//you can keep working now (on experimental) swag
   origin("center"),
+  // tags
   "planet",
   {
     realPos: [0, 0],
@@ -804,6 +811,8 @@ function generatepassengers(planet, ammount) {
         color: genPassColor,
         sprite: genPassSprite,
       })
+			//yo, we can't do too brances on the same replit
+			//can you see this
       // if(planet.name == "blue"){
       // 	debug.log(planet.name)
       // 	debug.log(planet.passengers[i].destination)
