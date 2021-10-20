@@ -2365,6 +2365,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   })();
   kaboom_default();
   loadSprite("bean", "sprites/bean.png");
+  loadPedit("ship_1", "sprites/ship_1.pedit");
   loadSprite("arrow", "sprites/arrow.png");
   loadSprite("planet1", "sprites/planet1.png");
   loadSprite("planet2", "sprites/planet 2.png");
@@ -2530,10 +2531,10 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
   ]));
   var player = add([
-    sprite("bean"),
+    sprite("ship_1"),
     pos(width() / 2, height() / 2),
     rotate(0),
-    scale(0.4),
+    scale(2),
     area(),
     layer("game"),
     origin("center"),
@@ -2544,16 +2545,19 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       acceleration: 0.05,
       deceleration: 4,
       animation_frame: 0,
+      money: 100,
       capacityMax: 6,
-      capacity: 6,
+      capacity: 30,
       passengers: [],
       realPos: [0, 0],
       onPlanet: false,
       startingPos: [width() / 2, height() / 2],
       passengersSprite: [],
-      planetAt: "home"
+      planetAt: "home",
+      anim: "thrust"
     }
   ]);
+  player.play("thrust");
   var movementArrow = add([
     sprite("arrow"),
     pos(40, 80),
@@ -2580,6 +2584,20 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     layer("ui")
   ]);
   add([
+    text("Money:", 8),
+    scale(0.3),
+    pos(5, 90),
+    origin("topleft"),
+    layer("ui")
+  ]);
+  var moneyText = add([
+    text(player.money, 8),
+    scale(0.3),
+    pos(100, 90),
+    origin("topleft"),
+    layer("ui")
+  ]);
+  add([
     text("Speed: ", 8),
     scale(0.3),
     pos(5, 70),
@@ -2596,21 +2614,21 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   add([
     text("Capacity:", 8),
     scale(0.3),
-    pos(5, 90),
+    pos(5, 110),
     origin("topleft"),
     layer("ui")
   ]);
   var capacityText = add([
     text(player.capacity, 8),
     scale(0.3),
-    pos(130, 90),
+    pos(130, 110),
     origin("topleft"),
     layer("ui")
   ]);
   add([
     text("passengers:", 8),
     scale(0.3),
-    pos(5, 110),
+    pos(5, 130),
     origin("topleft"),
     layer("ui")
   ]);
@@ -2623,7 +2641,6 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   }
   __name(arrowRotateFromMouse, "arrowRotateFromMouse");
   mouseClick(() => {
-    angleOfMovement = movementArrow.angle;
     player.speed = 1;
     player.onPlanet = false;
     player.planetAt = "none";
@@ -2639,7 +2656,6 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   });
   function moveToSlow(x, y, objToMove, speed, delAfter) {
     let moveAmountX = -1 * (objToMove.pos.x - x) / speed;
-    debug.log(moveAmountX);
     let moveAmountY = -1 * (objToMove.pos.y - y) / speed;
     let timerreset = 0;
     let intervalID = setInterval(function() {
@@ -2660,7 +2676,6 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         todestroy.destroy();
       }
     });
-    debug.log(player.passengers.length);
     for (let i = 0; i < player.passengers.length; i++) {
       let newPassDataShip = player.passengers[i];
       player.passengersSprite.push(add([
@@ -2695,6 +2710,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
           moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true);
           player.passengersSprite[i].moving = true;
           playerPassesToRemove.push(i);
+          player.money += 50;
+          moneyText.text = player.money;
         }
       }
       for (let i = playerPassesToRemove.length - 1; i >= 0; i--) {
@@ -2840,6 +2857,9 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       player.speed = Math.min(player.speed + player.acceleration, player.max_thrust);
     }
     speedText.text = Math.round(player.speed);
+    debug.log(angleOfMovement);
+    angleOfMovement = (movementArrow.angle + angleOfMovement * 20) / 21;
+    player.angle = angleOfMovement;
     calcRealPos(player);
   });
   function generatepassengers(planet, ammount) {

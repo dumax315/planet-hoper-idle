@@ -10,6 +10,7 @@ kaboom();
 // load assets
 
 loadSprite("bean", "sprites/bean.png");
+loadPedit("ship_1", "sprites/ship_1.pedit");
 loadSprite("arrow", "sprites/arrow.png");
 loadSprite("planet1", "sprites/planet1.png");
 loadSprite("planet2", "sprites/planet 2.png");
@@ -24,7 +25,7 @@ loadPedit("stars1", "sprites/stars_1.pedit");
 
 
 let angleOfMovement = 0;
-
+//scale by screen size
 const mapScale = 1.5;
 const block_size = 64 * mapScale;
 const background_size = 64 * mapScale * 6;
@@ -210,10 +211,10 @@ planetsVars.push(add([
 
 // The player
 const player = add([
-  sprite("bean"),
+  sprite("ship_1"),
   pos(width() / 2, height() / 2),
   rotate(0),
-  scale(.4),
+  scale(2),
   area(),
   layer("game"),
   origin("center"),
@@ -224,17 +225,19 @@ const player = add([
     acceleration: .05,
     deceleration: 4,
     animation_frame: 0,
+		money: 100,
     capacityMax: 6,
-    capacity: 6,
+    capacity: 30,
     passengers: [],
     realPos: [0, 0],
     onPlanet: false,
     startingPos: [width() / 2, height() / 2],
     passengersSprite: [],
     planetAt: "home",
+		anim: "thrust",
   }
 ]);
-
+player.play("thrust");
 // The arrow
 const movementArrow = add([
   sprite("arrow"),
@@ -266,6 +269,24 @@ const planetText = add([
   origin("topleft"),
   layer("ui"),
 ]);
+
+//planet indicator
+add([
+  text("Money:", 8),
+  scale(.3),
+  pos(5, 90),
+  origin("topleft"),
+  layer("ui"),
+]);
+
+const moneyText = add([
+  text(player.money, 8),
+  scale(.3),
+  pos(100, 90),
+  origin("topleft"),
+  layer("ui"),
+]);
+
 //speed
 add([
   text("Speed: ", 8),
@@ -282,12 +303,13 @@ const speedText = add([
   origin("topleft"),
   layer("ui"),
 ]);
+
 //capacity
 
 add([
   text("Capacity:", 8),
   scale(.3),
-  pos(5, 90),
+  pos(5, 110),
   origin("topleft"),
   layer("ui"),
 ]);
@@ -295,7 +317,7 @@ add([
 const capacityText = add([
   text(player.capacity, 8),
   scale(.3),
-  pos(130, 90),
+  pos(130, 110),
   origin("topleft"),
   layer("ui"),
 ]);
@@ -303,7 +325,7 @@ const capacityText = add([
 add([
   text("passengers:", 8),
   scale(.3),
-  pos(5, 110),
+  pos(5, 130),
   origin("topleft"),
   layer("ui"),
 ]);
@@ -338,7 +360,7 @@ function arrowRotateFromMouse() {
 // });
 
 mouseClick(() => {
-  angleOfMovement = movementArrow.angle
+  // angleOfMovement = movementArrow.angle;
   player.speed = 1;
   player.onPlanet = false;
   player.planetAt = "none";
@@ -363,7 +385,7 @@ movementArrow.action(() => {
 
 function moveToSlow(x, y, objToMove, speed, delAfter) {
   let moveAmountX = -1 * (objToMove.pos.x - x) / speed;
-  debug.log(moveAmountX)
+  // debug.log(moveAmountX)
   let moveAmountY = -1 * (objToMove.pos.y - y) / speed;
   let timerreset = 0;
   let intervalID = setInterval(function() {
@@ -387,7 +409,7 @@ function refomatePassOnShip() {
       todestroy.destroy();
     }
   });
-	debug.log(player.passengers.length)
+	// debug.log(player.passengers.length)
   for (let i = 0; i < player.passengers.length; i++) {
     let newPassDataShip = player.passengers[i]
     player.passengersSprite.push(add([
@@ -437,6 +459,8 @@ player.collides("planet", (planet) => {
         moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true);
         player.passengersSprite[i].moving = true;
         playerPassesToRemove.push(i);
+				player.money +=50;
+				moneyText.text = player.money;
 
       }
     }
@@ -459,6 +483,7 @@ player.collides("planet", (planet) => {
         color(newPassData.color[0], newPassData.color[1], newPassData.color[2]),
         origin("center"),
         area(),
+				
         layer("game"),
         "passenger",
         "onPlanetPass",
@@ -653,6 +678,10 @@ action("player", () => {
     player.speed = Math.min(player.speed + player.acceleration, player.max_thrust);
   }
   speedText.text = Math.round(player.speed);
+	//new movement system
+	debug.log(angleOfMovement)
+	angleOfMovement = (movementArrow.angle+angleOfMovement*20)/21;
+	player.angle = angleOfMovement;
   calcRealPos(player)
   // debug.log(player.realPos)
 })
