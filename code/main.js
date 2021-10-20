@@ -16,20 +16,21 @@ loadSprite("planet2", "sprites/planet 2.png");
 loadSprite("stars", "sprites/stars repeting.jpg");
 loadSprite("planetWhite", "sprites/planetWhite.png");
 
-// cargo
+loadPedit("arrow_1", "sprites/arrow_1.pedit");
+
 loadPedit("passenger", "sprites/cargo.pedit");
 
-// planets
 loadPedit("planet_1", "sprites/planet_1.pedit");
 loadPedit("planet_2", "sprites/planet_2.pedit");
 loadPedit("planet_3", "sprites/planet_3.pedit");
 
-// ship stages
 loadPedit("ship_1", "sprites/ship_1.pedit");
 
-// stars
-loadPedit("stars1", "sprites/stars_1.pedit");
+loadPedit("stars_1", "sprites/stars_1.pedit");
+loadPedit("stars_2", "sprites/stars_2.pedit");
+loadPedit("stars_3", "sprites/stars_3.pedit");
 
+loadPedit("void_1", "sprites/void_1.pedit")
 
 // colorPalette
 const ColorPalette = {
@@ -61,6 +62,7 @@ const ColorPaletteAlias = {
 let angleOfMovement = 0;
 // scale by screen size
 const mapScale = 1.5;
+const planetScale = 10;
 const blockSize = 64 * mapScale;
 const backgroundSize = 64 * mapScale * 6;
 const numberOfBackTiles = 48;
@@ -76,7 +78,7 @@ const planetNames = [
   
 let planetsVars = [];
 
-
+// game layers
 layers([
   "bg",
   "game",
@@ -109,11 +111,12 @@ const map = addLevel([
       startingPos: [0, 0],
     }
   ],
+
   " ": () => [
     rect(backgroundSize, backgroundSize),
-    sprite("stars"),
-    // where does this number come from
-    scale(0.5484 * mapScale),
+    sprite("void_1"),
+    // scale to match image size: 0.5484
+    scale(400 * mapScale),
     // color(0,0,0),
     area(),
     origin("center"),
@@ -121,12 +124,10 @@ const map = addLevel([
     "background",
     {
       startingPos: [0, 0],
-    }
+    },
   ],
-});
 
-// what level of randomizatoin can we add to the planet?
-// consider using kaboom funcitons like every or get
+});
 
 /**
  * Generate a random planet path from planet_ 1 to 3
@@ -137,29 +138,32 @@ function getRandomPlanet() {
 }
 
 /**
- * Pick a random color from the ColorPalette
+ * Pick a random color rgb list from the ColorPalette
  * @returns {number[]} 
  */
-function getRandomPaletteColor() {
+function getRandomPaletteColorList() {
   return ColorPalette[
     Object.keys(ColorPalette)[
       (Math.floor(Math.random() * ColorPaletteKeys.length))]];
 }
 
+/**
+ * Pick a random color from the ColorPalette
+ * @returns {string}
+ */
+function getRandomPaletteColor() {
+  return Object.keys(ColorPalette)[
+      (Math.floor(Math.random() * ColorPaletteKeys.length))];
+}
+
 // planets
 const planetHome = add([
   sprite(getRandomPlanet()),
-  // hit box? (should be build into kaboom)
-  area(),
-  // impermeable
-  solid(),
   pos(0, 0),
-  scale(mapScale),
+  scale(planetScale),
+  area({ scale: 1.5 }),
+  solid(),
   layer("game"),
-	//yo, we can't do 2 brances on the same replit
-	//can you see this yes weird okay well just work in experimental for now then
-	//let me connect to github ok ill j  chill
-	//you can keep working now (on experimental) swag
   origin("center"),
   // tags
   "planet",
@@ -184,8 +188,11 @@ const planetHome = add([
 //   },
 // ]);
 
+
+//TODO: randomize position of planets
+
 planetsVars.push(add([
-  sprite("planetWhite"),
+  sprite(getRandomPlanet()),
   area(),
   solid(),
   // color(255,0,0),
@@ -193,7 +200,7 @@ planetsVars.push(add([
     30 * blockSize,
     15 * blockSize),
   color(),
-  scale(mapScale),
+  scale(planetScale),
   layer("game"),
   origin("center"),
   "planet",
@@ -210,12 +217,12 @@ planetsVars.push(add([
 ]));
 
 planetsVars.push(add([
-  sprite("planetWhite"),
+  sprite(getRandomPlanet()),
   area(),
   solid(),
   color(255, 0, 0),
   pos(12 * blockSize, 6 * blockSize),
-  scale(mapScale),
+  scale(planetScale),
   layer("game"),
   origin("center"),
   "planet",
@@ -228,13 +235,13 @@ planetsVars.push(add([
 ]));
 
 planetsVars.push(add([
-  sprite("planetWhite"),
+  sprite(getRandomPlanet()),
   area(),
   solid(),
   color(0, 0, 255),
   rotate(90),
   pos(15 * blockSize, 40 * blockSize),
-  scale(mapScale),
+  scale(planetScale),
   layer("game"),
   origin("center"),
   "planet",
@@ -250,7 +257,7 @@ planetsVars.push(add([
 ]));
 
 planetsVars.push(add([
-  sprite("planetWhite"),
+  sprite(getRandomPlanet()),
   area(),
   solid(),
   color(0, 255, 0),
@@ -258,7 +265,7 @@ planetsVars.push(add([
   pos(
     15 * blockSize,
     40 * blockSize),
-  scale(mapScale),
+  scale(planetScale),
   layer("game"),
   origin("center"),
   "planet",
@@ -280,7 +287,7 @@ const player = add([
   sprite("ship_1"),
   pos(width() / 2, height() / 2),
   rotate(0),
-  scale(2),
+  scale(3),
   area(),
   layer("game"),
   origin("center"),
@@ -301,22 +308,25 @@ const player = add([
     passengersSprite: [],
     planetAt: "home",
 		anim: "thrust",
-  }
+  },
 ]);
 player.play("thrust");
+
 // The arrow
 const movementArrow = add([
-  sprite("arrow"),
+  sprite("arrow_1"),
   pos(40, 80),
   rotate(0),
-  // scale(2),
+  scale(3),
   layer("game"),
   origin("center"),
   "arrow",
   {
     animation_frame: 0,
-  }
+    anim: "spin",
+  },
 ]);
+movementArrow.play("spin")
 
 //ui
 //planet indicator
@@ -496,8 +506,9 @@ function refomatePassOnShip() {
 
 }
 
+// when player collides with planet
 player.collides("planet", (planet) => {
-  // debug.log("yo");
+
   if (player.onPlanet) {
     return
   }
@@ -514,18 +525,16 @@ player.collides("planet", (planet) => {
 
 
 
-  //move pass to ship
-
-
+  // move passenger to ship
   if (planets.includes(player.planetAt)) {
-    //move ship pass to planet
+    // move ship passenger to planet
     let playerPassesToRemove = [];
     for (let i = 0; i < player.passengers.length; i++) {
       if (player.passengers[i].destination == player.planetAt) {
         moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true);
         player.passengersSprite[i].moving = true;
         playerPassesToRemove.push(i);
-				player.money +=50;
+				player.money += 50;
 				moneyText.text = player.money;
 
       }
@@ -559,6 +568,7 @@ player.collides("planet", (planet) => {
 });
 
 let passengerMoveSpeed = 400;
+
 //move passengers into ship
 action("onPlanetPass", (passenger) => {
   if (player.capacity > 0) {
@@ -569,14 +579,14 @@ action("onPlanetPass", (passenger) => {
 });
 
 player.collides("onPlanetPass", (passenger) => {
-  // debug.log("asdf")
+
   //update player object
   player.passengers.push(planetsVars[planets.indexOf(player.planetAt)].passengers[0])
   player.capacity -= 1;
   capacityText.text = player.capacity
-  //render in passengerarea
+  //render in passenger area
 
-  //reneder for pass in ship
+  //render for pass in ship
 	let newPassDataShip = player.passengers[player.passengers.length-1]
 	player.passengersSprite.push(add([
 		sprite(newPassDataShip.sprite),
@@ -599,9 +609,7 @@ player.collides("onPlanetPass", (passenger) => {
 
 
   //generate and render new passenger
-	
-
-  generatepassengers(planetsVars[planets.indexOf(player.planetAt)], 1)
+  generatePassengers(planetsVars[planets.indexOf(player.planetAt)], 1);
   let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[planetsVars[planets.indexOf(player.planetAt)].passengers.length - 1]
   add([
     sprite(newPassData.sprite),
@@ -612,7 +620,7 @@ player.collides("onPlanetPass", (passenger) => {
     area(),
     layer("game"),
     "passenger",
-    "onPlanetPass"
+    "onPlanetPass",
   ]);
 
 });
@@ -624,28 +632,31 @@ player.collides("onPlanetPass", (passenger) => {
 // track distance to count fuel
 
 
-//calcualte real position
+// calcualte real position of object
 let calcRealPos = obj => {
+
   obj.realPos[0] += (-1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed);
   obj.realPos[1] += (Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed);
   // debug.log(obj.realPos[0])
   // debug.log(obj.realPos[1])
+
+  // can you not do +=/-=?
   if (obj.realPos[0] >= (numberOfBackTiles / 2 * blockSize)) {
-    obj.realPos[0] = obj.realPos[0] - (numberOfBackTiles * blockSize)
+    obj.realPos[0] = obj.realPos[0] - (numberOfBackTiles * blockSize);
   };
 
   if (obj.realPos[1] >= (numberOfBackTiles / 2 * blockSize)) {
-    obj.realPos[1] = obj.realPos[1] - (numberOfBackTiles * blockSize)
+    obj.realPos[1] = obj.realPos[1] - (numberOfBackTiles * blockSize);
   };
 
   if (obj.realPos[0] <= -1 * (numberOfBackTiles / 2 * blockSize)) {
-    obj.realPos[0] = obj.realPos[0] + (numberOfBackTiles * blockSize)
+    obj.realPos[0] = obj.realPos[0] + (numberOfBackTiles * blockSize);
   };
 
   if (obj.realPos[1] <= -1 * (numberOfBackTiles / 2 * blockSize)) {
-    obj.realPos[1] = obj.realPos[1] + (numberOfBackTiles * blockSize)
+    obj.realPos[1] = obj.realPos[1] + (numberOfBackTiles * blockSize);
   };
-}
+};
 
 // need a move function this isnt working
 let move = (x, y, slow) => {
@@ -708,6 +719,7 @@ action("background", (background) => {
 });
 
 action("planet", (planet) => {
+
   calcRealPos(planet);
 
   if (planet.realPos[0] <= 0) {
@@ -728,21 +740,17 @@ action("planet", (planet) => {
 
   // debug.log(planet.pos.x !== planet.realPos[0] || planet.pos.y !== planet.realPos[1])
 
-  // when you're done make sure you go to the main branch or make another branch to work in.
-  // i can make my own experimental branch I just don't want to cause any conflicts with what you're doing
+  // TODO: update to allow for individual planet scaling
   if (planet.pos.x !== planet.realPos[0] || planet.pos.y !== planet.realPos[1]) {
-    planet.scaleTo(mapScale / 2);
+    // TODO: make animation gradual
+    planet.scaleTo(planetScale / 2);
   } else {
-    planet.scaleTo(mapScale);
+    planet.scaleTo(planetScale);
   }
 
 
 });
 
-// we can talk about it later on discord
-// trying and failing to average angles, it sucks because they wrap around
-// https://rosettacode.org/wiki/Averages/Mean_angle#JavaScript idk
-//i'm going to have my math teacher do it; swag, i don't know what you're trying to do exactly but if he can help then that's good
 
 function sum(a,angle2Off) {
     var s = a[0]+a[1]*angle2Off;
@@ -775,7 +783,7 @@ action("player", () => {
   // debug.log(player.realPos)
 })
 
-function generatepassengers(planet, ammount) {
+function generatePassengers(planet, ammount) {
 
   if (planets.includes(planet.name)) {
     // debug.log(planets)
@@ -811,8 +819,7 @@ function generatepassengers(planet, ammount) {
         color: genPassColor,
         sprite: genPassSprite,
       })
-			//yo, we can't do too brances on the same replit
-			//can you see this
+
       // if(planet.name == "blue"){
       // 	debug.log(planet.name)
       // 	debug.log(planet.passengers[i].destination)
@@ -831,7 +838,7 @@ let onStart = () => {
     background.startingPos[1] = background.pos.y;
   })
   every("planet", (planet) => {
-    generatepassengers(planet, 10)
+    generatePassengers(planet, 10)
   })
   move(width() / 2, height() / 2, 1)
 }

@@ -2371,14 +2371,19 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   loadSprite("planet2", "sprites/planet 2.png");
   loadSprite("stars", "sprites/stars repeting.jpg");
   loadSprite("planetWhite", "sprites/planetWhite.png");
+  loadPedit("arrow_1", "sprites/arrow_1.pedit");
   loadPedit("passenger", "sprites/cargo.pedit");
   loadPedit("planet_1", "sprites/planet_1.pedit");
   loadPedit("planet_2", "sprites/planet_2.pedit");
   loadPedit("planet_3", "sprites/planet_3.pedit");
   loadPedit("ship_1", "sprites/ship_1.pedit");
-  loadPedit("stars1", "sprites/stars_1.pedit");
+  loadPedit("stars_1", "sprites/stars_1.pedit");
+  loadPedit("stars_2", "sprites/stars_2.pedit");
+  loadPedit("stars_3", "sprites/stars_3.pedit");
+  loadPedit("void_1", "sprites/void_1.pedit");
   var angleOfMovement = 0;
   var mapScale = 1.5;
+  var planetScale = 10;
   var blockSize = 64 * mapScale;
   var backgroundSize = 64 * mapScale * 6;
   var numberOfBackTiles = 48;
@@ -2420,8 +2425,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     ],
     " ": () => [
       rect(backgroundSize, backgroundSize),
-      sprite("stars"),
-      scale(0.5484 * mapScale),
+      sprite("void_1"),
+      scale(400 * mapScale),
       area(),
       origin("center"),
       layer("bg"),
@@ -2437,10 +2442,10 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   __name(getRandomPlanet, "getRandomPlanet");
   var planetHome = add([
     sprite(getRandomPlanet()),
-    area(),
-    solid(),
     pos(0, 0),
-    scale(mapScale),
+    scale(planetScale),
+    area({ scale: 1.5 }),
+    solid(),
     layer("game"),
     origin("center"),
     "planet",
@@ -2452,12 +2457,12 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
   ]);
   planetsVars.push(add([
-    sprite("planetWhite"),
+    sprite(getRandomPlanet()),
     area(),
     solid(),
     pos(30 * blockSize, 15 * blockSize),
     color(),
-    scale(mapScale),
+    scale(planetScale),
     layer("game"),
     origin("center"),
     "planet",
@@ -2475,12 +2480,12 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
   ]));
   planetsVars.push(add([
-    sprite("planetWhite"),
+    sprite(getRandomPlanet()),
     area(),
     solid(),
     color(255, 0, 0),
     pos(12 * blockSize, 6 * blockSize),
-    scale(mapScale),
+    scale(planetScale),
     layer("game"),
     origin("center"),
     "planet",
@@ -2492,13 +2497,13 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
   ]));
   planetsVars.push(add([
-    sprite("planetWhite"),
+    sprite(getRandomPlanet()),
     area(),
     solid(),
     color(0, 0, 255),
     rotate(90),
     pos(15 * blockSize, 40 * blockSize),
-    scale(mapScale),
+    scale(planetScale),
     layer("game"),
     origin("center"),
     "planet",
@@ -2514,13 +2519,13 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
   ]));
   planetsVars.push(add([
-    sprite("planetWhite"),
+    sprite(getRandomPlanet()),
     area(),
     solid(),
     color(0, 255, 0),
     rotate(90),
     pos(15 * blockSize, 40 * blockSize),
-    scale(mapScale),
+    scale(planetScale),
     layer("game"),
     origin("center"),
     "planet",
@@ -2542,7 +2547,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     sprite("ship_1"),
     pos(width() / 2, height() / 2),
     rotate(0),
-    scale(2),
+    scale(3),
     area(),
     layer("game"),
     origin("center"),
@@ -2567,16 +2572,19 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   ]);
   player.play("thrust");
   var movementArrow = add([
-    sprite("arrow"),
+    sprite("arrow_1"),
     pos(40, 80),
     rotate(0),
+    scale(3),
     layer("game"),
     origin("center"),
     "arrow",
     {
-      animation_frame: 0
+      animation_frame: 0,
+      anim: "spin"
     }
   ]);
+  movementArrow.play("spin");
   add([
     text("Planet: ", 8),
     scale(0.3),
@@ -2769,7 +2777,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     ]));
     passenger.destroy();
     planetsVars[planets.indexOf(player.planetAt)].passengers.shift();
-    generatepassengers(planetsVars[planets.indexOf(player.planetAt)], 1);
+    generatePassengers(planetsVars[planets.indexOf(player.planetAt)], 1);
     let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[planetsVars[planets.indexOf(player.planetAt)].passengers.length - 1];
     add([
       sprite(newPassData.sprite),
@@ -2855,9 +2863,9 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
     ;
     if (planet.pos.x !== planet.realPos[0] || planet.pos.y !== planet.realPos[1]) {
-      planet.scaleTo(mapScale / 2);
+      planet.scaleTo(planetScale / 2);
     } else {
-      planet.scaleTo(mapScale);
+      planet.scaleTo(planetScale);
     }
   });
   function sum(a, angle2Off) {
@@ -2883,7 +2891,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     player.angle = angleOfMovement;
     calcRealPos(player);
   });
-  function generatepassengers(planet, ammount) {
+  function generatePassengers(planet, ammount) {
     if (planets.includes(planet.name)) {
       let otherPlanets = planets.slice();
       otherPlanets.splice(planets.indexOf(planet.name), 1);
@@ -2913,14 +2921,14 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       }
     }
   }
-  __name(generatepassengers, "generatepassengers");
+  __name(generatePassengers, "generatePassengers");
   var onStart = /* @__PURE__ */ __name(() => {
     every("background", (background) => {
       background.startingPos[0] = background.pos.x;
       background.startingPos[1] = background.pos.y;
     });
     every("planet", (planet) => {
-      generatepassengers(planet, 10);
+      generatePassengers(planet, 10);
     });
     move(width() / 2, height() / 2, 1);
   }, "onStart");

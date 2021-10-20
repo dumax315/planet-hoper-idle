@@ -1,5 +1,6 @@
 TODO:
 
+randomize position of planets
 
 using experimental branch management
 
@@ -9,6 +10,12 @@ i'm also going to make each ship have a flame frame animation
 
 unlockable planets yield more profit
 
+group passengers in menu into
+passenger * X
+
+BUGS:
+
+ship doesn't rotate when pointer is close to 180degrees from the direction of travel
 
 DONE:
 
