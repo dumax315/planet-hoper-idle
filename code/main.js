@@ -32,6 +32,8 @@ loadPedit("stars_3", "sprites/stars_3.pedit");
 
 loadPedit("void_1", "sprites/void_1.pedit")
 
+//TODO: put color items in ColorUtil class
+
 // colorPalette
 const ColorPalette = {
   "Rich Black": [0, 18, 25],
