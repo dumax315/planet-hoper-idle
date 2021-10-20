@@ -2660,7 +2660,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         todestroy.destroy();
       }
     });
-    player.passengersSprite = [];
+    debug.log(player.passengers.length);
     for (let i = 0; i < player.passengers.length; i++) {
       let newPassDataShip = player.passengers[i];
       player.passengersSprite.push(add([
@@ -2692,16 +2692,17 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       let playerPassesToRemove = [];
       for (let i = 0; i < player.passengers.length; i++) {
         if (player.passengers[i].destanation == player.planetAt) {
-          moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true, i);
+          moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true);
           player.passengersSprite[i].moving = true;
           playerPassesToRemove.push(i);
         }
       }
-      player.capacity += playerPassesToRemove.length;
-      for (let i = 0; i < playerPassesToRemove.length; i++) {
-        player.passengers.splice(playerPassesToRemove[i], 1);
+      for (let i = playerPassesToRemove.length - 1; i >= 0; i--) {
+        console.log(player.passengers.splice(playerPassesToRemove[i], 1));
       }
+      player.passengersSprite = [];
       refomatePassOnShip();
+      player.capacity += playerPassesToRemove.length;
       for (let i = 0; i < planetsVars[planets.indexOf(player.planetAt)].passengers.length; i++) {
         let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[i];
         add([

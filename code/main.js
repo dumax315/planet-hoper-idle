@@ -378,33 +378,22 @@ function moveToSlow(x, y, objToMove, speed, delAfter) {
       window.clearInterval(intervalID);
     }
   }, 10);
-  // for(let i = 0; i < speed;i++){
-  // 	objToMove.pos.x += moveAmountX;
-  // 	objToMove.pos.y += moveAmountY;
-  // 	wait(10);
-  // }	
-  // if(delAfter){
-  // 	objToMove.destroy();
-  // 	player.passengersSprite.splice(index,1);
-  // 	player.capacity += 1;
-  // }
 }
 
 //reformats the passengers on the ship after people go home
 function refomatePassOnShip() {
-
   every("onShipPass", (todestroy) => {
     if (!todestroy.moving) {
       todestroy.destroy();
     }
   });
-	player.passengersSprite = []
+	debug.log(player.passengers.length)
   for (let i = 0; i < player.passengers.length; i++) {
     let newPassDataShip = player.passengers[i]
     player.passengersSprite.push(add([
       sprite(newPassDataShip.sprite),
-
-      pos(i % 6 * 30 + 15, 135 + (Math.floor(i / 6) + 1) * 20),
+			// debug.log((i+1) % 6 * 30 + 15),
+      pos((i) % 6 * 30 + 15, 135 + (Math.floor(i / 6) + 1) * 20),
       color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
       origin("center"),
       area(),
@@ -445,18 +434,21 @@ player.collides("planet", (planet) => {
     let playerPassesToRemove = [];
     for (let i = 0; i < player.passengers.length; i++) {
       if (player.passengers[i].destanation == player.planetAt) {
-        moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true, i);
+        moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true);
         player.passengersSprite[i].moving = true;
         playerPassesToRemove.push(i);
 
       }
     }
-    player.capacity += playerPassesToRemove.length;
-    for (let i = 0; i < playerPassesToRemove.length; i++) {
-      player.passengers.splice(playerPassesToRemove[i], 1);
-      player.passengersSprite.splice(playerPassesToRemove[i],1);
+
+    for (let i = playerPassesToRemove.length-1;  i >= 0; i--) {
+			console.log(player.passengers.splice(playerPassesToRemove[i], 1));
+      
+      
     }
+		player.passengersSprite = []
     refomatePassOnShip();
+		player.capacity += playerPassesToRemove.length;
 
     for (let i = 0; i < planetsVars[planets.indexOf(player.planetAt)].passengers.length; i++) {
       let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[i]
