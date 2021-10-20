@@ -2852,13 +2852,25 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       planet.scaleTo(mapScale);
     }
   });
+  function sum(a, offset) {
+    var s2 = a[0] + a[1] * offset;
+    return s2;
+  }
+  __name(sum, "sum");
+  function degToRad(a) {
+    return Math.PI / 180 * a;
+  }
+  __name(degToRad, "degToRad");
+  function meanAngleDeg(a, offset) {
+    return 180 / Math.PI * Math.atan2(sum(a.map(degToRad).map(Math.sin), offset) / (offset + 1), sum(a.map(degToRad).map(Math.cos), offset) / (offset + 1));
+  }
+  __name(meanAngleDeg, "meanAngleDeg");
   action("player", () => {
     if (player.speed > 0) {
       player.speed = Math.min(player.speed + player.acceleration, player.max_thrust);
     }
     speedText.text = Math.round(player.speed);
-    debug.log(angleOfMovement);
-    angleOfMovement = (movementArrow.angle + angleOfMovement * 20) / 21;
+    angleOfMovement = meanAngleDeg([movementArrow.angle, angleOfMovement], 20);
     player.angle = angleOfMovement;
     calcRealPos(player);
   });

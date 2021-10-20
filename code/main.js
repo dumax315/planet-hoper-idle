@@ -670,7 +670,21 @@ action("planet", (planet) => {
 
 });
 
-
+function sum(a,offset) {
+    var s = a[0] + a[1]*offset
+    return s;
+} 
+ 
+function degToRad(a) {
+    return Math.PI / 180 * a;
+}
+ 
+function meanAngleDeg(a,offset) {
+    return 180 / Math.PI * Math.atan2(
+        sum(a.map(degToRad).map(Math.sin),offset) / (offset+1),
+        sum(a.map(degToRad).map(Math.cos),offset) / (offset+1)
+    );
+}
 
 
 action("player", () => {
@@ -679,8 +693,8 @@ action("player", () => {
   }
   speedText.text = Math.round(player.speed);
 	//new movement system
-	debug.log(angleOfMovement)
-	angleOfMovement = (movementArrow.angle+angleOfMovement*20)/21;
+	// debug.log(angleOfMovement)
+	angleOfMovement = meanAngleDeg([movementArrow.angle,angleOfMovement],20);
 	player.angle = angleOfMovement;
   calcRealPos(player)
   // debug.log(player.realPos)
