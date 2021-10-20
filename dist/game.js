@@ -9,20 +9,20 @@
   var Pt = Object.getOwnPropertySymbols;
   var Qr = Object.prototype.hasOwnProperty;
   var Kr = Object.prototype.propertyIsEnumerable;
-  var dt = /* @__PURE__ */ __name((e, r, t) => r in e ? Ct(e, r, { enumerable: true, configurable: true, writable: true, value: t }) : e[r] = t, "dt");
+  var dt2 = /* @__PURE__ */ __name((e, r, t) => r in e ? Ct(e, r, { enumerable: true, configurable: true, writable: true, value: t }) : e[r] = t, "dt");
   var Ce = /* @__PURE__ */ __name((e, r) => {
     for (var t in r || (r = {}))
-      Qr.call(r, t) && dt(e, t, r[t]);
+      Qr.call(r, t) && dt2(e, t, r[t]);
     if (Pt)
       for (var t of Pt(r))
-        Kr.call(r, t) && dt(e, t, r[t]);
+        Kr.call(r, t) && dt2(e, t, r[t]);
     return e;
   }, "Ce");
   var Re = /* @__PURE__ */ __name((e, r) => jr(e, Or(r)), "Re");
   var s = /* @__PURE__ */ __name((e, r) => Ct(e, "name", { value: r, configurable: true }), "s");
   var se = /* @__PURE__ */ __name((e, r) => () => (e && (r = e(e = 0)), r), "se");
   var en = /* @__PURE__ */ __name((e, r) => () => (r || e((r = { exports: {} }).exports, r), r.exports), "en");
-  var St = /* @__PURE__ */ __name((e, r, t) => (dt(e, typeof r != "symbol" ? r + "" : r, t), t), "St");
+  var St = /* @__PURE__ */ __name((e, r, t) => (dt2(e, typeof r != "symbol" ? r + "" : r, t), t), "St");
   var Dt = /* @__PURE__ */ __name((e, r, t) => new Promise((c, x) => {
     var P = /* @__PURE__ */ __name((S) => {
       try {
@@ -2389,7 +2389,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   layers([
     "bg",
     "game",
-    "ui"
+    "ui",
+    "store"
   ], "game");
   var map = addLevel([
     "        ",
@@ -2541,8 +2542,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     "player",
     {
       speed: 0,
-      max_thrust: 8,
-      acceleration: 0.05,
+      max_thrust: 400,
+      acceleration: 2.5,
       deceleration: 4,
       animation_frame: 0,
       money: 100,
@@ -2632,6 +2633,34 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     origin("topleft"),
     layer("ui")
   ]);
+  var storeBg = add([
+    area(),
+    solid(),
+    color("skyblue"),
+    opacity(0),
+    pos(0, 0),
+    rect(width(), height()),
+    scale(mapScale),
+    layer("store"),
+    origin("topleft"),
+    {}
+  ]);
+  var button = add([
+    area(),
+    solid(),
+    color("skyblue"),
+    opacity(0),
+    pos(width(), 0),
+    text("Store"),
+    rect(100, 100),
+    scale(mapScale),
+    layer("store"),
+    origin("topright"),
+    {}
+  ]);
+  function planetUi(isOn) {
+  }
+  __name(planetUi, "planetUi");
   function arrowRotateFromMouse() {
     mouseRotationToSend = Math.atan((mousePos().y - height() / 2) / (mousePos().x - width() / 2)) * 180 / Math.PI - 90;
     if (mousePos().x - width() / 2 >= 0) {
@@ -2641,13 +2670,16 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   }
   __name(arrowRotateFromMouse, "arrowRotateFromMouse");
   mouseClick(() => {
-    player.speed = 1;
-    player.onPlanet = false;
-    player.planetAt = "none";
-    planetText.text = player.planetAt;
-    every("onPlanetPass", (passa) => {
-      destroy(passa);
-    });
+    if (player.onPlanet) {
+      player.speed = 1;
+      player.onPlanet = false;
+      planetUi(false);
+      player.planetAt = "none";
+      planetText.text = player.planetAt;
+      every("onPlanetPass", (passa) => {
+        destroy(passa);
+      });
+    }
   });
   movementArrow.action(() => {
     movementArrow.angle = arrowRotateFromMouse();
@@ -2703,6 +2735,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     player.onPlanet = true;
     player.planetAt = planet.name;
     planetText.text = player.planetAt;
+    planetUi(true);
     if (planets.includes(player.planetAt)) {
       let playerPassesToRemove = [];
       for (let i = 0; i < player.passengers.length; i++) {
@@ -2765,7 +2798,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[planetsVars[planets.indexOf(player.planetAt)].passengers.length - 1];
     add([
       sprite(newPassData.sprite),
-      pos(width() / 2 + 25 + 10 * 30, height() / 2),
+      pos(width() / 2 + 50 + 10 * 30, height() / 2),
       color(newPassData.color[0], newPassData.color[1], newPassData.color[2]),
       origin("center"),
       area(),
@@ -2775,8 +2808,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     ]);
   });
   var calcRealPos = /* @__PURE__ */ __name((obj) => {
-    obj.realPos[0] += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed;
-    obj.realPos[1] += Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed;
+    obj.realPos[0] += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
+    obj.realPos[1] += Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
     if (obj.realPos[0] >= numberOfBackTiles / 2 * block_size) {
       obj.realPos[0] = obj.realPos[0] - numberOfBackTiles * block_size;
     }
@@ -2815,8 +2848,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }, 10);
   }, "move");
   action("background", (background) => {
-    background.pos.x += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed;
-    background.pos.y += Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed;
+    background.pos.x += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
+    background.pos.y += Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
     if (background.pos.x >= numberOfBackTiles / 2 * block_size + width() / 2) {
       background.pos.x = background.pos.x - numberOfBackTiles * block_size;
     } else if (background.pos.x <= -1 * (numberOfBackTiles / 2 * block_size) + width() / 2) {
