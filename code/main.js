@@ -1,33 +1,65 @@
 import kaboom from "kaboom";
 
 
-//stat track FPS counter?
+// stat track FPS counter?
 (function() { var script = document.createElement('script'); script.onload = function() { var stats = new Stats(); document.body.appendChild(stats.dom); requestAnimationFrame(function loop() { stats.update(); requestAnimationFrame(loop) }); }; script.src = '//mrdoob.github.io/stats.js/build/stats.min.js'; document.head.appendChild(script); })()
 
 // initialize context
 kaboom();
 
-
-
-// load assets
-
+// load sprite assets
 loadSprite("bean", "sprites/bean.png");
-loadPedit("ship_1", "sprites/ship_1.pedit");
+loadPedit("ship1", "sprites/ship_1.pedit");
 loadSprite("arrow", "sprites/arrow.png");
 loadSprite("planet1", "sprites/planet1.png");
 loadSprite("planet2", "sprites/planet 2.png");
 loadSprite("stars", "sprites/stars repeting.jpg");
 loadSprite("planetWhite", "sprites/planetWhite.png");
-// loadSprite("passenger", "sprites/passenger.png");
+
+// cargo
 loadPedit("passenger", "sprites/cargo.pedit");
 
-//ship stages
-loadPedit("ship1", "sprites/ship_1.pedit");
+// planets
+loadPedit("planet_1", "sprites/planet_1.pedit");
+loadPedit("planet_2", "sprites/planet_2.pedit");
+loadPedit("planet_3", "sprites/planet_3.pedit");
+
+// ship stages
+loadPedit("ship_1", "sprites/ship_1.pedit");
+
+// stars
 loadPedit("stars1", "sprites/stars_1.pedit");
 
 
+// colorPalette
+const ColorPalette = {
+  "Rich Black": [0, 18, 25],
+  "Blue Sapphire": [0, 95, 115],
+  "Viridian Green": [10, 147, 150],
+  "Middle Blue Green": [148, 210, 189],
+  "Medium Champaigne": [233, 216, 166],
+  "Gamboge": [238, 155, 0],
+  "Alloy Orange":[202, 103, 2],
+  "Mahogany": [187, 62, 3],
+  "Rufous": [174, 32, 18],
+  "Ruby Red": [155, 34, 38]
+};
+
+const ColorPaletteAlias = {
+  "black": [0, 18, 25],
+  "blue": [0, 95, 115],
+  "green": [10, 147, 150],
+  "foam": [148, 210, 189],
+  "zest": [233, 216, 166],
+  "orange": [238, 155, 0],
+  "rust":[202, 103, 2],
+  "sunset": [187, 62, 3],
+  "red": [174, 32, 18],
+  "maroon": [155, 34, 38]
+};
+
 let angleOfMovement = 0;
-//scale by screen size
+// scale by screen size
 const mapScale = 1.5;
 const blockSize = 64 * mapScale;
 const backgroundSize = 64 * mapScale * 6;
@@ -37,9 +69,12 @@ let planets = [
   "white",
   "red",
   "blue",
-  "green"]
+  "green",];
+
+const planetNames = [
+];
   
-let planetsVars = []
+let planetsVars = [];
 
 
 layers([
@@ -77,6 +112,7 @@ const map = addLevel([
   " ": () => [
     rect(backgroundSize, backgroundSize),
     sprite("stars"),
+    // where does this number come from
     scale(0.5484 * mapScale),
     // color(0,0,0),
     area(),
@@ -89,9 +125,30 @@ const map = addLevel([
   ],
 });
 
-//Planets
+// what level of randomizatoin can we add to the planet?
+// consider using kaboom funcitons like every or get
+
+/**
+ * Generate a random planet path from planet_ 1 to 3
+ * @returns {string}
+ */
+function getRandomPlanet() {
+  return "planet_" + (1 + Math.floor(Math.random() * 3));
+}
+
+/**
+ * Pick a random color from the ColorPalette
+ * @returns {number[]} 
+ */
+function getRandomPaletteColor() {
+  return ColorPalette[
+    Object.keys(ColorPalette)[
+      (Math.floor(Math.random() * ColorPaletteKeys.length))]];
+}
+
+// planets
 const planetHome = add([
-  sprite("planet1"),
+  sprite(getRandomPlanet()),
   area(),
   solid(),
   pos(0, 0),
@@ -128,7 +185,7 @@ planetsVars.push(add([
   pos(
     30 * blockSize,
     15 * blockSize),
-
+  color(),
   scale(mapScale),
   layer("game"),
   origin("center"),
@@ -211,7 +268,7 @@ planetsVars.push(add([
   },
 ]));
 
-// The player
+// player
 const player = add([
   sprite("ship_1"),
   pos(width() / 2, height() / 2),
@@ -663,6 +720,9 @@ action("planet", (planet) => {
   };
 
   // debug.log(planet.pos.x !== planet.realPos[0] || planet.pos.y !== planet.realPos[1])
+
+  // when you're done make sure you go to the main branch or make another branch to work in.
+  // i can make my own experimental branch I just don't want to cause any conflicts with what you're doing
   if (planet.pos.x !== planet.realPos[0] || planet.pos.y !== planet.realPos[1]) {
     planet.scaleTo(mapScale / 2);
   } else {
@@ -672,7 +732,27 @@ action("planet", (planet) => {
 
 });
 
+// we can talk about it later on discord
+// trying and failing to average angles, it sucks because they wrap around
+// https://rosettacode.org/wiki/Averages/Mean_angle#JavaScript idk
+//i'm going to have my math teacher do it; swag, i don't know what you're trying to do exactly but if he can help then that's good
 
+function sum(a,angle2Off) {
+    var s = a[0]+a[1]*angle2Off;
+    return s;
+} 
+ 
+function degToRad(a) {
+    return Math.PI / 180 * a;
+}
+ 
+function averageOfAngle(a,angle2Off) {
+		let rawAvj = 180 / Math.PI * Math.atan2(
+        sum(a.map(degToRad).map(Math.sin),angle2Off) / (1+angle2Off),
+        sum(a.map(degToRad).map(Math.cos),angle2Off) / (1+angle2Off)
+    )
+    return Math.round(rawAvj);
+}
 
 
 action("player", () => {
@@ -681,8 +761,8 @@ action("player", () => {
   }
   speedText.text = Math.round(player.speed);
 	//new movement system
-	debug.log(angleOfMovement)
-	angleOfMovement = (movementArrow.angle+angleOfMovement*20)/21;
+	// debug.log(angleOfMovement)
+	angleOfMovement = averageOfAngle([movementArrow.angle,angleOfMovement],20);
 	player.angle = angleOfMovement;
   calcRealPos(player)
   // debug.log(player.realPos)

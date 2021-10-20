@@ -2365,14 +2365,17 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   })();
   kaboom_default();
   loadSprite("bean", "sprites/bean.png");
-  loadPedit("ship_1", "sprites/ship_1.pedit");
+  loadPedit("ship1", "sprites/ship_1.pedit");
   loadSprite("arrow", "sprites/arrow.png");
   loadSprite("planet1", "sprites/planet1.png");
   loadSprite("planet2", "sprites/planet 2.png");
   loadSprite("stars", "sprites/stars repeting.jpg");
   loadSprite("planetWhite", "sprites/planetWhite.png");
   loadPedit("passenger", "sprites/cargo.pedit");
-  loadPedit("ship1", "sprites/ship_1.pedit");
+  loadPedit("planet_1", "sprites/planet_1.pedit");
+  loadPedit("planet_2", "sprites/planet_2.pedit");
+  loadPedit("planet_3", "sprites/planet_3.pedit");
+  loadPedit("ship_1", "sprites/ship_1.pedit");
   loadPedit("stars1", "sprites/stars_1.pedit");
   var angleOfMovement = 0;
   var mapScale = 1.5;
@@ -2428,8 +2431,12 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       }
     ]
   });
+  function getRandomPlanet() {
+    return "planet_" + (1 + Math.floor(Math.random() * 3));
+  }
+  __name(getRandomPlanet, "getRandomPlanet");
   var planetHome = add([
-    sprite("planet1"),
+    sprite(getRandomPlanet()),
     area(),
     solid(),
     pos(0, 0),
@@ -2449,6 +2456,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     area(),
     solid(),
     pos(30 * blockSize, 15 * blockSize),
+    color(),
     scale(mapScale),
     layer("game"),
     origin("center"),
@@ -2706,7 +2714,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     if (planets.includes(player.planetAt)) {
       let playerPassesToRemove = [];
       for (let i = 0; i < player.passengers.length; i++) {
-        if (player.passengers[i].destanation == player.planetAt) {
+        if (player.passengers[i].destination == player.planetAt) {
           moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true);
           player.passengersSprite[i].moving = true;
           playerPassesToRemove.push(i);
@@ -2852,13 +2860,26 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       planet.scaleTo(mapScale);
     }
   });
+  function sum(a, angle2Off) {
+    var s2 = a[0] + a[1] * angle2Off;
+    return s2;
+  }
+  __name(sum, "sum");
+  function degToRad(a) {
+    return Math.PI / 180 * a;
+  }
+  __name(degToRad, "degToRad");
+  function averageOfAngle(a, angle2Off) {
+    let rawAvj = 180 / Math.PI * Math.atan2(sum(a.map(degToRad).map(Math.sin), angle2Off) / (1 + angle2Off), sum(a.map(degToRad).map(Math.cos), angle2Off) / (1 + angle2Off));
+    return Math.round(rawAvj);
+  }
+  __name(averageOfAngle, "averageOfAngle");
   action("player", () => {
     if (player.speed > 0) {
       player.speed = Math.min(player.speed + player.acceleration, player.max_thrust);
     }
     speedText.text = Math.round(player.speed);
-    debug.log(angleOfMovement);
-    angleOfMovement = (movementArrow.angle + angleOfMovement * 20) / 21;
+    angleOfMovement = averageOfAngle([movementArrow.angle, angleOfMovement], 20);
     player.angle = angleOfMovement;
     calcRealPos(player);
   });
@@ -2885,7 +2906,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
             break;
         }
         planet.passengers.push({
-          destanation: otherPlanets[generatedPassId],
+          destination: otherPlanets[generatedPassId],
           color: genPassColor,
           sprite: genPassSprite
         });
