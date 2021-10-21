@@ -2552,6 +2552,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       deceleration: 4,
       animation_frame: 0,
       money: 100,
+      capacityMax: 14,
       capacity: 14,
       passengers: [],
       realPos: [0, 0],
@@ -2560,7 +2561,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       passengersSprite: [],
       planetAt: "home",
       anim: "thrust",
-      loadSpeed: 600
+      loadSpeed: 400,
+      baseMoneyPerPass: 50
     }
   ]);
   player.play("thrust");
@@ -2681,52 +2683,64 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     opacity(0)
   ]);
   var scrollAmount = 0;
-  var storeData = [{
-    name: "Upgrade Capacity",
-    id: 0,
-    amountBought: 0,
-    cost: 50,
-    functionToRun: () => {
-      player.capacity = Math.round(player.capacity + 2);
+  var storeData = [
+    {
+      name: "Upgrade Capacity",
+      id: 0,
+      amountBought: 0,
+      cost: 50,
+      functionToRun: () => {
+        player.capacity = Math.floor(player.capacity + 2);
+        capacityText.text = player.capacity;
+      }
+    },
+    {
+      name: "Upgrade Max Speed",
+      id: 1,
+      amountBought: 0,
+      cost: 200,
+      functionToRun: () => {
+        player.max_thrust += 20;
+      }
+    },
+    {
+      name: "Upgrade Acceleration",
+      id: 2,
+      amountBought: 0,
+      cost: 200,
+      functionToRun: () => {
+        player.acceleration *= 1.1;
+      }
+    },
+    {
+      name: "Upgrade Money/Passenger",
+      id: 3,
+      amountBought: 0,
+      cost: 100,
+      functionToRun: () => {
+        player.baseMoneyPerPass *= 1.2;
+      }
+    },
+    {
+      name: "Upgrade Fill Speed",
+      id: 4,
+      amountBought: 0,
+      cost: 300,
+      functionToRun: () => {
+        player.loadSpeed = Math.round(player.loadSpeed * 1.5);
+      }
+    },
+    {
+      name: "Unlock Planet",
+      id: 5,
+      amountBought: 0,
+      cost: 500,
+      costProgression: [5e3, 5e4, 5e4, 5e6],
+      max: 4,
+      functionToRun: () => {
+      }
     }
-  }, {
-    name: "Upgrade Max Speed",
-    id: 1,
-    amountBought: 0,
-    cost: 200,
-    functionToRun: () => {
-      player.max_thrust += 20;
-    }
-  }, {
-    name: "Upgrade Acceleration",
-    id: 2,
-    amountBought: 0,
-    cost: 200,
-    functionToRun: () => {
-    }
-  }, {
-    name: "Upgrade Fill Speed",
-    id: 3,
-    amountBought: 0,
-    cost: 300,
-    functionToRun: () => {
-      player.loadSpeed = Math.round(player.loadSpeed * 1.5);
-    }
-  }, {
-    name: "Unlock Planet",
-    id: 4,
-    amountBought: 0,
-    cost: 500,
-    functionToRun: () => {
-    }
-  }, {
-    name: "Upgrade Fire Rate",
-    id: 5,
-    amountBought: 0,
-    cost: 500,
-    functionToRun: () => {
-    }
-  }];
+  ];
   var storeButtonSprites = [];
   function genStoreItems() {
     add([
@@ -2754,7 +2768,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
           solid(),
           color(255, 165, 0),
           pos(width() / 2, 15 + i * (width() / 1e3 * 100 + 30) + scrollAmount),
-          rect(width() / 3, width() / 1e3 * 100),
+          rect(width() / 2.5, width() / 1e3 * 100),
           layer("store"),
           origin("top"),
           "button",
@@ -2962,7 +2976,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
           moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true);
           player.passengersSprite[i].moving = true;
           playerPassesToRemove.push(i);
-          player.money += 50;
+          player.money += player.baseMoneyPerPass * player.passengers[i].fare;
+          debug.log(player.passengers[i].fare);
           moneyText.text = player.money;
         }
       }
@@ -2972,6 +2987,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       player.passengersSprite = [];
       refomatePassOnShip();
       player.capacity += playerPassesToRemove.length;
+      capacityText.text = player.capacity;
       for (let i = 0; i < planetsVars[planets.indexOf(player.planetAt)].passengers.length; i++) {
         let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[i];
         add([
@@ -3152,7 +3168,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         planet.passengers.push({
           destanation: otherPlanets[generatedPassId],
           color: genPassColor,
-          sprite: genPassSprite
+          sprite: genPassSprite,
+          fare: 1
         });
       }
     }
