@@ -2552,7 +2552,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       deceleration: 4,
       animation_frame: 0,
       money: 100,
-      capacity: 10,
+      capacity: 14,
       passengers: [],
       realPos: [0, 0],
       onPlanet: false,
@@ -2680,6 +2680,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     pos(width() - 20, 20),
     opacity(0)
   ]);
+  var scrollAmount = 0;
   var storeData = [{
     name: "Upgrade Capacity",
     id: 0,
@@ -2728,13 +2729,31 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   }];
   var storeButtonSprites = [];
   function genStoreItems() {
+    add([
+      text("Money:"),
+      scale(width() / 1e3 * 3.5),
+      pos(5, 50 + textLeftModiferHeight * 5),
+      origin("topleft"),
+      layer("store"),
+      "currentMoneyInStore",
+      "inStoreButton"
+    ]);
+    add([
+      text(player.money),
+      scale(width() / 1e3 * 3.5),
+      pos(5, 50 + textLeftModiferHeight * 5 + width() / 1e3 * 2 * 25),
+      origin("topleft"),
+      layer("store"),
+      "currentMoneyInStore",
+      "inStoreButton"
+    ]);
     for (let i = 0; i < storeData.length; i++) {
       storeButtonSprites.push({
         bg: add([
           area(),
           solid(),
           color(255, 165, 0),
-          pos(width() / 2, 15 + i * (width() / 1e3 * 100 + 30)),
+          pos(width() / 2, 15 + i * (width() / 1e3 * 100 + 30) + scrollAmount),
           rect(width() / 3, width() / 1e3 * 100),
           layer("store"),
           origin("top"),
@@ -2752,7 +2771,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
           origin("top"),
           scale(width() / 1e3 * 2),
           "inStoreButton",
-          pos(width() / 2, 20 + i * (width() / 1e3 * 100 + 30))
+          pos(width() / 2, 20 + i * (width() / 1e3 * 100 + 30) + scrollAmount)
         ]),
         boughtTextDis: add([
           text("bought:"),
@@ -2760,7 +2779,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
           origin("topleft"),
           scale(width() / 1e3 * 2),
           "inStoreButton",
-          pos(width() / 2 - width() / 6 + 5, 15 + width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30))
+          pos(width() / 2 - width() / 6 + 5, 15 + width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30) + scrollAmount)
         ]),
         boughtText: add([
           text(storeData[i].amountBought),
@@ -2768,7 +2787,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
           origin("topleft"),
           scale(width() / 1e3 * 2),
           "inStoreButton",
-          pos(width() / 2 - width() / 24, 15 + width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30))
+          pos(width() / 2 - width() / 24, 15 + width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30) + scrollAmount)
         ]),
         costText: add([
           text("cost:"),
@@ -2776,7 +2795,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
           origin("topleft"),
           scale(width() / 1e3 * 2),
           "inStoreButton",
-          pos(width() / 2 - width() / 6 + 5, 15 + 2 * width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30))
+          pos(width() / 2 - width() / 6 + 5, 15 + 2 * width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30) + scrollAmount)
         ]),
         cost: add([
           text(genPrice(storeData[i].cost, storeData[i].amountBought)),
@@ -2784,7 +2803,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
           origin("topleft"),
           scale(width() / 1e3 * 2),
           "inStoreButton",
-          pos(width() / 2 - width() / 24, 15 + 2 * width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30))
+          pos(width() / 2 - width() / 24, 15 + 2 * width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30) + scrollAmount)
         ])
       });
     }
@@ -2841,10 +2860,10 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
   }
   __name(launch, "launch");
-  var storeButX = width() / 6 + width() - 20;
-  var storeButY = width() / 1e3 * 50 + 40;
+  var storeButX = width() - 20 - width() / 6 * mapScale;
+  var storeButY = (20 + width() / 1e3 * 50) * mapScale;
   mouseClick(() => {
-    if (mousePos().x < storeButX && mousePos().y > storeButY) {
+    if (!(mousePos().x > storeButX && mousePos().y < storeButY && player.onPlanet)) {
       launch();
     }
   });
@@ -2865,8 +2884,21 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       shake();
     }
   });
+  document.addEventListener("wheel", (event) => {
+    if (!storeBg.storeOpen) {
+      return;
+    }
+    destroyAll("inStoreButton");
+    storeButtonSprites = [];
+    scrollAmount += event.wheelDelta / 2;
+    scrollAmount = Math.min(scrollAmount, 0);
+    scrollAmount = Math.max(scrollAmount, -1 * (15 + (storeData.length - 1) * (width() / 1e3 * 100 + 30)));
+    genStoreItems();
+  });
   storeButton.clicks(() => {
-    showStore();
+    if (player.onPlanet) {
+      showStore();
+    }
   });
   movementArrow.action(() => {
     movementArrow.angle = arrowRotateFromMouse();
@@ -2935,7 +2967,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         }
       }
       for (let i = playerPassesToRemove.length - 1; i >= 0; i--) {
-        console.log(player.passengers.splice(playerPassesToRemove[i], 1));
+        player.passengers.splice(playerPassesToRemove[i], 1);
       }
       player.passengersSprite = [];
       refomatePassOnShip();
@@ -2959,39 +2991,41 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     if (player.capacity > 0) {
       passenger.move(dir(180).scale(player.loadSpeed * dt() * 40));
     }
+    if (passenger.pos.x <= width() / 2) {
+      player.passengers.push(planetsVars[planets.indexOf(player.planetAt)].passengers[0]);
+      player.capacity -= 1;
+      capacityText.text = player.capacity;
+      let newPassDataShip = player.passengers[player.passengers.length - 1];
+      player.passengersSprite.push(add([
+        sprite(newPassDataShip.sprite),
+        pos((player.passengers.length - 1) % 6 * 30 + 15, 50 + textLeftModiferHeight * 5 + (Math.floor((player.passengers.length - 1) / 6) + 1) * 20),
+        color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
+        origin("center"),
+        area(),
+        layer("game"),
+        "passenger",
+        "onShipPass",
+        {
+          moving: false
+        }
+      ]));
+      passenger.destroy();
+      planetsVars[planets.indexOf(player.planetAt)].passengers.shift();
+      generatepassengers(planetsVars[planets.indexOf(player.planetAt)], 1);
+      let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[planetsVars[planets.indexOf(player.planetAt)].passengers.length - 1];
+      add([
+        sprite(newPassData.sprite),
+        pos(width() / 2 + 10 * 30, height() / 2),
+        color(newPassData.color[0], newPassData.color[1], newPassData.color[2]),
+        origin("center"),
+        area(),
+        layer("game"),
+        "passenger",
+        "onPlanetPass"
+      ]);
+    }
   });
   player.collides("onPlanetPass", (passenger) => {
-    player.passengers.push(planetsVars[planets.indexOf(player.planetAt)].passengers[0]);
-    player.capacity -= 1;
-    capacityText.text = player.capacity;
-    let newPassDataShip = player.passengers[player.passengers.length - 1];
-    player.passengersSprite.push(add([
-      sprite(newPassDataShip.sprite),
-      pos((player.passengers.length - 1) % 6 * 30 + 15, 50 + textLeftModiferHeight * 5 + (Math.floor((player.passengers.length - 1) / 6) + 1) * 20),
-      color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
-      origin("center"),
-      area(),
-      layer("game"),
-      "passenger",
-      "onShipPass",
-      {
-        moving: false
-      }
-    ]));
-    passenger.destroy();
-    planetsVars[planets.indexOf(player.planetAt)].passengers.shift();
-    generatepassengers(planetsVars[planets.indexOf(player.planetAt)], 1);
-    let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[planetsVars[planets.indexOf(player.planetAt)].passengers.length - 1];
-    add([
-      sprite(newPassData.sprite),
-      pos(width() / 2 + 50 + 10 * 30, height() / 2),
-      color(newPassData.color[0], newPassData.color[1], newPassData.color[2]),
-      origin("center"),
-      area(),
-      layer("game"),
-      "passenger",
-      "onPlanetPass"
-    ]);
   });
   var calcRealPos = /* @__PURE__ */ __name((obj) => {
     obj.realPos[0] += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed * dt();

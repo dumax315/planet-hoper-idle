@@ -241,7 +241,7 @@ const player = add([
 		animation_frame: 0,
 		money: 100,
 		// capacityMax: 6,
-		capacity: 10,
+		capacity: 14,
 		passengers: [],
 		realPos: [0, 0],
 		onPlanet: false,
@@ -443,6 +443,11 @@ const storeText = add([
 // 		40+width()/1000*50*mapScale),
 // 	opacity(0),
 // ]);
+
+
+let scrollAmount = 0;
+
+
 let storeData = [{
 		name:"Upgrade Capacity",
 		id:0,
@@ -495,6 +500,28 @@ let storeData = [{
 let storeButtonSprites = [];
 //gereate store item
 function genStoreItems() {
+	
+	//Shows currentMoney in Store 
+	add([
+		text("Money:"),
+		scale(width()/1000*3.5),
+		pos(5, 50+textLeftModiferHeight*5),
+		origin("topleft"),
+		layer("store"),
+		"currentMoneyInStore",
+		"inStoreButton",
+	]);
+	add([
+		text(player.money),
+		scale(width()/1000*3.5),
+		pos(5, (50+textLeftModiferHeight*5)+width()/1000*2*25),
+		origin("topleft"),
+		layer("store"),
+		"currentMoneyInStore",
+		"inStoreButton",
+	]);
+
+
 	for(let i = 0; i < storeData.length; i++){
 		storeButtonSprites.push({bg:
 			add([
@@ -503,7 +530,7 @@ function genStoreItems() {
 				color(255,165,0),
 				pos(
 					width()/2,
-					15+i*(width()/1000*100+30)),
+					15+i*(width()/1000*100+30)+scrollAmount),
 				rect(width()/3, width()/1000*100),
 				layer("store"),
 				origin("top"),
@@ -524,7 +551,7 @@ function genStoreItems() {
 				"inStoreButton",
 				pos(
 					width()/2,
-					20+i*(width()/1000*100+30)),
+					20+i*(width()/1000*100+30)+scrollAmount),
 			]),
 			boughtTextDis: add([
 				text("bought:"),
@@ -535,7 +562,7 @@ function genStoreItems() {
 				"inStoreButton",
 				pos(
 					width()/2-(width()/6)+5,
-					15+width()/1000*35+i*(width()/1000*100+30)),
+					15+width()/1000*35+i*(width()/1000*100+30)+scrollAmount),
 			]),
 			boughtText: add([
 				text(storeData[i].amountBought),
@@ -546,7 +573,7 @@ function genStoreItems() {
 				"inStoreButton",
 				pos(
 					width()/2-(width()/24),
-					15+width()/1000*35+i*(width()/1000*100+30)),
+					15+width()/1000*35+i*(width()/1000*100+30)+scrollAmount),
 			]),
 			costText: add([
 				text("cost:"),
@@ -557,7 +584,7 @@ function genStoreItems() {
 				"inStoreButton",
 				pos(
 					width()/2-(width()/6)+5,
-					15+2*width()/1000*35+i*(width()/1000*100+30)),
+					15+2*width()/1000*35+i*(width()/1000*100+30)+scrollAmount),
 			]),
 			cost: add([
 				text(genPrice(storeData[i].cost,storeData[i].amountBought)),
@@ -568,7 +595,7 @@ function genStoreItems() {
 				"inStoreButton",
 				pos(
 					width()/2-(width()/24),
-					15+2*width()/1000*35+i*(width()/1000*100+30)),
+					15+2*width()/1000*35+i*(width()/1000*100+30)+scrollAmount),
 			]),
 			}
 		);
@@ -656,19 +683,30 @@ function launch() {
 	
 // });
 
-let storeButX = width()/6+width()-20;
+let storeButX = (width()-20)-(width()/6)*mapScale;
 // debug.log(storeButX)
-let storeButY = width()/1000*50+40;
+
+let storeButY = (20+width()/1000*50)*mapScale;
 // debug.log(storeButY)
+//its about drive
 //get click for lounch 
 mouseClick( () => {
-	// debug.log(mousePos().y +"+"+mousePos().x)
-	if((mousePos().x < storeButX && mousePos().y >storeButY)){
+	// debug.log(mousePos().x +"+"+storeButX)
+	if(!((mousePos().x > storeButX && mousePos().y < storeButY) && player.onPlanet)){
 		launch()
 	}
 	// angleOfMovement = movementArrow.angle;
 
 });
+	// pos(
+	// 	width()-20,
+	// 	20),
+	// // text("Store"),
+	// rect(width()/6, width()/1000*50),
+	// scale(mapScale),
+	// layer("store"),
+	// origin("topright")
+
 //get launch from button ui
 // launchButton.clicks( () => {
 // 	launch()
@@ -693,10 +731,27 @@ clicks("inStoreButtonBg", (button) => {
   // debug.log(button.idbuy);
 });
 
-
+//scroll?
+document.addEventListener("wheel", (event) =>{
+	if(!storeBg.storeOpen){
+		return;
+	}
+	destroyAll("inStoreButton");
+	storeButtonSprites = [];
+	scrollAmount += event.wheelDelta/2;
+	scrollAmount = Math.min(scrollAmount, 0)
+	scrollAmount = Math.max(scrollAmount, -1*(15+(storeData.length-1)*(width()/1000*100+30)))
+	// debug.log(scrollAmount)
+	// debug.log(15+storeData.length*(width()/1000*100+30)+width()/1000*100)
+	genStoreItems();
+	// debug.log(event.wheelDelta)
+});
 
 storeButton.clicks( () => {
-	showStore();
+	if(player.onPlanet){
+		showStore();
+	}
+
 })
 // action("button", b => {
 //   if (b.isHovered()){
@@ -711,6 +766,7 @@ storeButton.clicks( () => {
 
 // arrow indicator
 movementArrow.action(() => {
+
 	movementArrow.angle = arrowRotateFromMouse();
 	movementArrow.pos.x = width() / 2 + (Math.sin(movementArrow.angle * (Math.PI / 180))) * 60;
 	movementArrow.pos.y = height() / 2 + (-1 * Math.cos(movementArrow.angle * (Math.PI / 180))) * 60;
@@ -766,8 +822,10 @@ function refomatePassOnShip() {
 			}
 		]));
 	}
-
 }
+//Todo: make it only show the amount from each
+
+
 
 player.collides("planet", (planet) => {
 	// debug.log("yo");
@@ -806,7 +864,7 @@ player.collides("planet", (planet) => {
 		}
 
 		for (let i = playerPassesToRemove.length - 1; i >= 0; i--) {
-			console.log(player.passengers.splice(playerPassesToRemove[i], 1));
+			player.passengers.splice(playerPassesToRemove[i], 1);
 
 
 		}
@@ -839,56 +897,57 @@ action("onPlanetPass", (passenger) => {
 		passenger.move(dir(180).scale(player.loadSpeed*dt()*40))
 		// passenger.pos.x -= passengerMoveSpeed*dt()*100;
 	}
+	if(passenger.pos.x <=width()/2){
+		// debug.log("asdf")
+		//update player object
+		player.passengers.push(planetsVars[planets.indexOf(player.planetAt)].passengers[0])
+		player.capacity -= 1;
+		capacityText.text = player.capacity
+		//render in passengerarea
 
+		//reneder for pass in ship
+		let newPassDataShip = player.passengers[player.passengers.length - 1]
+		player.passengersSprite.push(add([
+			sprite(newPassDataShip.sprite),
+
+			pos((player.passengers.length - 1) % 6 * 30 + 15, 50+textLeftModiferHeight*5 + (Math.floor((player.passengers.length - 1) / 6) + 1) * 20),
+			color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
+			origin("center"),
+			area(),
+			layer("game"),
+			"passenger",
+			"onShipPass",
+			{
+				moving: false,
+			}
+		]));
+
+		//remove passenger from planet
+		passenger.destroy()
+		planetsVars[planets.indexOf(player.planetAt)].passengers.shift()
+
+
+		//generate and render new passenger
+
+
+		generatepassengers(planetsVars[planets.indexOf(player.planetAt)], 1)
+		let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[planetsVars[planets.indexOf(player.planetAt)].passengers.length - 1]
+		add([
+			sprite(newPassData.sprite),
+			//pos(width() / 2 + 50 + 10 * 30, height() / 2),
+			pos(width() / 2 + 10 * 30, height() / 2),
+			color(newPassData.color[0], newPassData.color[1], newPassData.color[2]),
+			origin("center"),
+			area(),
+			layer("game"),
+			"passenger",
+			"onPlanetPass"
+		]);
+	}
 });
 
 player.collides("onPlanetPass", (passenger) => {
-	// debug.log("asdf")
-	//update player object
-	player.passengers.push(planetsVars[planets.indexOf(player.planetAt)].passengers[0])
-	player.capacity -= 1;
-	capacityText.text = player.capacity
-	//render in passengerarea
-
-	//reneder for pass in ship
-	let newPassDataShip = player.passengers[player.passengers.length - 1]
-	player.passengersSprite.push(add([
-		sprite(newPassDataShip.sprite),
-
-		pos((player.passengers.length - 1) % 6 * 30 + 15, 50+textLeftModiferHeight*5 + (Math.floor((player.passengers.length - 1) / 6) + 1) * 20),
-		color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
-		origin("center"),
-		area(),
-		layer("game"),
-		"passenger",
-		"onShipPass",
-		{
-			moving: false,
-		}
-	]));
-
-	//remove passenger from planet
-	passenger.destroy()
-	planetsVars[planets.indexOf(player.planetAt)].passengers.shift()
-
-
-	//generate and render new passenger
-
-
-	generatepassengers(planetsVars[planets.indexOf(player.planetAt)], 1)
-	let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[planetsVars[planets.indexOf(player.planetAt)].passengers.length - 1]
-	add([
-		sprite(newPassData.sprite),
-
-		pos(width() / 2 + 50 + 10 * 30, height() / 2),
-		color(newPassData.color[0], newPassData.color[1], newPassData.color[2]),
-		origin("center"),
-		area(),
-		layer("game"),
-		"passenger",
-		"onPlanetPass"
-	]);
-
+	
 });
 
 // collides("planet", "player", () => {
