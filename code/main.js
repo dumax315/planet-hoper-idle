@@ -1,7 +1,14 @@
 import kaboom from "kaboom";
 
-// stat track FPS counter?
-was in master
+import {
+  ColorPalette,
+  ColorPaletteAlias
+} from "./util/colorUtil";
+
+import * as planetUtil from "./util/planetUtil";
+
+
+
 (function() { var script = document.createElement('script'); script.onload = function() { var stats = new Stats(); document.body.appendChild(stats.dom); requestAnimationFrame(function loop() { stats.update(); requestAnimationFrame(loop) }); }; script.src = '//mrdoob.github.io/stats.js/build/stats.min.js'; document.head.appendChild(script); })()
 
 // initialize context
@@ -31,6 +38,7 @@ loadSprite("planetWhite", "sprites/planetWhite.png");
 loadPedit("arrow_1", "sprites/arrow_1.pedit");
 
 loadPedit("passenger", "sprites/cargo.pedit");
+loadPedit("passRainbow", "sprites/cargoRainbow.pedit");
 
 loadPedit("planet_1", "sprites/planet_1.pedit");
 loadPedit("planet_2", "sprites/planet_2.pedit");
@@ -43,35 +51,10 @@ loadPedit("stars_2", "sprites/stars_2.pedit");
 loadPedit("stars_3", "sprites/stars_3.pedit");
 
 loadPedit("void_1", "sprites/void_1.pedit")
+loadSprite("rainBowPlanet", "sprites/rainBowPlanet.png");
 
 //TODO: put color items in ColorUtil class
 
-// colorPalette
-const ColorPalette = {
-  "Rich Black": [0, 18, 25],
-  "Blue Sapphire": [0, 95, 115],
-  "Viridian Green": [10, 147, 150],
-  "Middle Blue Green": [148, 210, 189],
-  "Medium Champaigne": [233, 216, 166],
-  "Gamboge": [238, 155, 0],
-  "Alloy Orange":[202, 103, 2],
-  "Mahogany": [187, 62, 3],
-  "Rufous": [174, 32, 18],
-  "Ruby Red": [155, 34, 38]
-};
-
-const ColorPaletteAlias = {
-  "black": [0, 18, 25],
-  "blue": [0, 95, 115],
-  "green": [10, 147, 150],
-  "foam": [148, 210, 189],
-  "zest": [233, 216, 166],
-  "orange": [238, 155, 0],
-  "rust":[202, 103, 2],
-  "sunset": [187, 62, 3],
-  "red": [174, 32, 18],
-  "maroon": [155, 34, 38]
-};
 
 let angleOfMovement = 0;
 // scale by screen size
@@ -132,9 +115,10 @@ const map = addLevel([
 
   " ": () => [
     rect(backgroundSize, backgroundSize),
-    sprite("void_1"),
+    sprite("stars"),
     // scale to match image size: 0.5484
-    scale(400 * mapScale),
+    // scale(400 * mapScale),
+		scale(0.5484 * mapScale),
     // color(0,0,0),
     area(),
     origin("center"),
@@ -144,69 +128,12 @@ const map = addLevel([
       startingPos: [0, 0],
     },
   ],
-
-//  
-// 	width: background_size,
-// 	height: background_size,
-// 	pos: vec2(width() / 2 - 10 * background_size, height() / 2 - 10 * background_size),
-// 	"=": () => [
-// 		rect(background_size, background_size),
-// 		color(255, 0, 0),
-// 		area(),
-// 		origin("center"),
-// 		// "planet",
-// 		layer("bg"),
-// 		"background",
-// 		{
-// 			startingPos: [0, 0],
-// 		}
-// 	],
-// 	" ": () => [
-// 		rect(background_size, background_size),
-// 		sprite("stars"),
-// 		scale(0.5484 * mapScale),
-// 		// color(0,0,0),
-// 		area(),
-// 		origin("center"),
-// 		layer("bg"),
-// 		"background",
-// 		{
-// 			startingPos: [0, 0],
-// 		}
-// 	],
 });
-
-/**
- * Generate a random planet path from planet_ 1 to 3
- * @returns {string}
- */
-function getRandomPlanet() {
-  return "planet_" + (1 + Math.floor(Math.random() * 3));
-}
-
-/**
- * Pick a random color rgb list from the ColorPalette
- * @returns {number[]} 
- */
-function getRandomPaletteColorList() {
-  return ColorPalette[
-    Object.keys(ColorPalette)[
-      (Math.floor(Math.random() * ColorPaletteKeys.length))]];
-}
-
-/**
- * Pick a random color from the ColorPalette
- * @returns {string}
- */
-function getRandomPaletteColor() {
-  return Object.keys(ColorPalette)[
-      (Math.floor(Math.random() * ColorPaletteKeys.length))];
-}
 
 // planets
 const planetHome = add([
 // was in experimental
-  sprite(getRandomPlanet()),
+  sprite("planet1"),
   pos(0, 0),
   scale(planetScale),
   area({ scale: 1.5 }),
@@ -221,43 +148,14 @@ const planetHome = add([
     name: "home",
     passengers: [],
   },
-// 
-// 	sprite("planet1"),
-// 	area(),
-// 	solid(),
-// 	pos(0, 0),
-// 	scale(mapScale),
-// 	layer("game"),
-// 	origin("center"),
-// 	"planet",
-// 	{
-// 		realPos: [0, 0],
-// 		startingPos: [0, 0],
-// 		name: "home",
-// 		passengers: [],
-// 	},
-// was in master
 ]);
-
-// const planet2 = add([
-// 	sprite("planet2"),
-// 	area(),
-// 	solid(),
-// 	pos(9*blockSize,3*blockSize),
-// 	scale(2*mapScale),
-// 	origin("center"),
-// 	"planet",
-// 	{
-//   	realPos: [9*blockSize,3*blockSize],
-//   },
-// ]);
 
 
 //TODO: randomize position of planets
 
 planetsVars.push(add([
 // was in experimental
-  sprite(getRandomPlanet()),
+  sprite("planetWhite"),
   area(),
   solid(),
   // color(255,0,0),
@@ -282,7 +180,7 @@ planetsVars.push(add([
 ]));
 
 planetsVars.push(add([
-  sprite(getRandomPlanet()),
+  sprite("planetWhite"),
   area(),
   solid(),
   color(255, 0, 0),
@@ -300,7 +198,7 @@ planetsVars.push(add([
 ]));
 
 planetsVars.push(add([
-  sprite(getRandomPlanet()),
+  sprite("planetWhite"),
   area(),
   solid(),
   color(0, 0, 255),
@@ -322,7 +220,7 @@ planetsVars.push(add([
 ]));
 
 planetsVars.push(add([
-  sprite(getRandomPlanet()),
+  sprite("planetWhite"),
   area(),
   solid(),
   color(0, 255, 0),
@@ -345,116 +243,52 @@ planetsVars.push(add([
     passengers: [],
     size: 1,
   },
-// 
-// 	sprite("planetWhite"),
-// 	area(),
-// 	solid(),
-// 	// color(255,0,0),
-// 	pos(
-// 		30 * block_size,
-// 		15 * block_size),
-
-// 	scale(mapScale),
-// 	layer("game"),
-// 	origin("center"),
-// 	"planet",
-// 	{
-// 		realPos: [
-// 			20 * block_size,
-// 			15 * block_size],
-// 		startingPos: [
-// 			20 * block_size,
-// 			15 * block_size],
-// 		name: "white",
-// 		passengers: [],
-// 	},
-// ]));
-
-// planetsVars.push(add([
-// 	sprite("planetWhite"),
-// 	area(),
-// 	solid(),
-// 	color(255, 0, 0),
-// 	pos(12 * block_size, 6 * block_size),
-// 	scale(mapScale),
-// 	layer("game"),
-// 	origin("center"),
-// 	"planet",
-// 	{
-// 		realPos: [12 * block_size, 6 * block_size],
-// 		startingPos: [12 * block_size, 6 * block_size],
-// 		name: "red",
-// 		passengers: [],
-// 	},
-// ]));
-
-// planetsVars.push(add([
-// 	sprite("planetWhite"),
-// 	area(),
-// 	solid(),
-// 	color(0, 0, 255),
-// 	rotate(90),
-// 	pos(15 * block_size, 40 * block_size),
-// 	scale(mapScale),
-// 	layer("game"),
-// 	origin("center"),
-// 	"planet",
-// 	{
-// 		realPos: [
-// 			15 * block_size,
-// 			20 * block_size],
-// 		startingPos: [15 * block_size, 20 * block_size],
-// 		name: "blue",
-// 		passengers: [],
-// 		size: 1,
-// 	},
-// ]));
-
-// planetsVars.push(add([
-// 	sprite("planetWhite"),
-// 	area(),
-// 	solid(),
-// 	color(0, 255, 0),
-// 	rotate(90),
-// 	pos(
-// 		15 * block_size,
-// 		40 * block_size),
-// 	scale(mapScale),
-// 	layer("game"),
-// 	origin("center"),
-// 	"planet",
-// 	{
-// 		realPos: [
-// 			7 * block_size,
-// 			12 * block_size],
-// 		startingPos: [
-// 			7 * block_size,
-// 			12 * block_size],
-// 		name: "green",
-// 		passengers: [],
-// 		size: 1,
-// 	},
-// was in master
 ]));
+
+function buyPlanets() {
+	// debug.log(planetsVars.length)
+	if(planetsVars.length == 4){
+		planetsVars.push(add([
+		sprite("rainBowPlanet"),
+		area(),
+		solid(),
+		// color(0, 255, 0),
+		// rotate(90),
+		// debug.log(player.realPos),
+		pos(
+			2 * blockSize,
+			2 * blockSize),
+		scale(planetScale),
+		layer("game"),
+		origin("center"),
+		"planet",
+		z(0),
+		{
+			realPos: [
+				2 * blockSize+player.realPos[0],
+				2 * blockSize+player.realPos[1]],
+			startingPos: [
+				2 * blockSize,
+				2 * blockSize],
+			name: "rainbow",
+			passengers: [],
+			size: 1,
+		},
+	]));
+	planets.push("rainbow");
+	}
+	generatePassengers(planetsVars[planetsVars.length-1], 10);
+	player.z = 100;
+	every("planet", (planet) => {
+		planet.passengers = [];
+		generatePassengers(planet, 10)
+	})
+	// move(width() / -2, height() / -2, 1)
+}
+
 
 // player
 const player = add([
-// was in experimental
-//   sprite("ship_1"),
-//   pos(width() / 2, height() / 2),
-//   rotate(0),
-//   scale(3),
-//   area(),
-//   layer("game"),
-//   origin("center"),
-//   "player",
-//   {
-//     speed: 0,
-//     max_thrust: 8,
-//     acceleration: .05,
-//     deceleration: 4,
-//     animation_frame: 0,
-// 
 	sprite("ship_1"),
 	pos(width() / 2, height() / 2),
 	rotate(0),
@@ -499,18 +333,7 @@ const movementArrow = add([
     animation_frame: 0,
     anim: "spin",
   },
-// 
-// 	sprite("arrow"),
-// 	pos(40, 80),
-// 	rotate(0),
-// 	// scale(2),
-// 	layer("game"),
-// 	origin("center"),
-// 	"arrow",
-// 	{
-// 		animation_frame: 0,
-// 	}
-// was in master
+
 ]);
 movementArrow.play("spin")
 
@@ -652,48 +475,7 @@ const storeText = add([
 
 //Todo Add up and Down Arrow or mouse scorll to store
 
-
-//launch button 
-// const launchButton = add([
-// 	area(),
-// 	solid(),
-// 	color(28,71,88),
-// 	opacity(0),
-// 	pos(
-// 		width()-20,
-// 		20+20+(width()/1000*50*mapScale)),
-// 	// text("Store"),
-// 	rect(width()/6, width()/1000*50),
-// 	scale(mapScale),
-// 	layer("ui"),
-// 	origin("topright"),
-// 	"button",
-// 	"launchButton",
-// 	"atPanetUi",
-// 	{
-
-// 	},
-// ]);
-
-// add([
-//   text("Launch!\n(click)"),
-//   pos(240, 180),
-//   // color(0, 0, 0),
-// 	"atPanetUi",
-// 	layer("ui"),
-// 	scale(width()/1000*1.8*fontSize),
-// 	origin("topright"),
-// 	"launchButton",
-// 	//make reletive position better
-// 	pos(
-// 		width()-0-width()/24,
-// 		40+width()/1000*50*mapScale),
-// 	opacity(0),
-// ]);
-
-
 let scrollAmount = 0;
-
 
 let storeData = [{
 		name:"Upgrade Capacity",
@@ -738,14 +520,25 @@ let storeData = [{
 			player.loadSpeed = Math.round(player.loadSpeed*1.5);
 		},
 	},{
-		name:"Unlock Planet",
+		name:"Unlock Planets",
 		id:5,
 		amountBought:0,
-		cost: 500,
-		costProgression: [5000, 50000, 50000,5000000],
+		cost: "prog",
+		costProgression: [100, 100, 100,100],
+		// costProgression: [5000, 50000, 50000,5000000],
 		max:4,
 		functionToRun: () => {
-
+			buyPlanets()
+		},
+	},{
+		name:"UpGrade Handling",
+		id:6,
+		amountBought:0,
+		cost: 500,
+		// costProgression: [5000, 50000, 50000,5000000],
+		max:10,
+		functionToRun: () => {
+			// player.handling 
 		},
 	},
 ];
@@ -839,7 +632,7 @@ function genStoreItems() {
 					15+2*width()/1000*35+i*(width()/1000*100+30)+scrollAmount),
 			]),
 			cost: add([
-				text(genPrice(storeData[i].cost,storeData[i].amountBought)),
+				text(genPrice(storeData[i],storeData[i].amountBought)),
 				// color(0, 0, 0),
 				layer("store"),
 				origin("topleft"),
@@ -928,18 +721,9 @@ function launch() {
 	}
 }
 
-//get space for lounch 
-// keyDown("space", () => {
-// 	// angleOfMovement = movementArrow.angle;
-// 	launch()
-	
-// });
 
 let storeButX = (width()-20)-(width()/6)*mapScale;
-// debug.log(storeButX)
-
 let storeButY = (20+width()/1000*50)*mapScale;
-// debug.log(storeButY)
 //its about drive
 //get click for lounch 
 mouseClick( () => {
@@ -950,27 +734,19 @@ mouseClick( () => {
 	// angleOfMovement = movementArrow.angle;
 
 });
-	// pos(
-	// 	width()-20,
-	// 	20),
-	// // text("Store"),
-	// rect(width()/6, width()/1000*50),
-	// scale(mapScale),
-	// layer("store"),
-	// origin("topright")
 
-//get launch from button ui
-// launchButton.clicks( () => {
-// 	launch()
-// })
-function genPrice(cost, time){
-	return Math.round(cost**(((time+20)/20)));
+//The the price of a thing in the shop
+function genPrice(item, time){
+	if(item.cost == "prog"){
+		return item.costProgression[time]
+	}
+	return Math.round(item.cost**(((time+20)/20)));
 }
 
 //Clicks button in the store run sthe function
 clicks("inStoreButtonBg", (button) => {
-	if(player.money >= genPrice(storeData[button.idbuy].cost,storeData[button.idbuy].amountBought)){
-		player.money -= genPrice(storeData[button.idbuy].cost,storeData[button.idbuy].amountBought);
+	if(player.money >= genPrice(storeData[button.idbuy],storeData[button.idbuy].amountBought)){
+		player.money -= genPrice(storeData[button.idbuy],storeData[button.idbuy].amountBought);
 		storeData[button.idbuy].functionToRun();
 		storeData[button.idbuy].amountBought++;
 		moneyText.text = player.money;
@@ -1005,14 +781,12 @@ storeButton.clicks( () => {
 	}
 
 })
-// action("button", b => {
-//   if (b.isHovered()){
-// 		b.use(color(0.7, 0.7, 0.7));
+// action("inStoreButtonBg", (button) => {
+//   if (button.isHovered()){
+// 		button.color(ColorPalette.Rufous);
 // 	}else{
-// 		b.use(color(1, 1, 1));
+// 		button.color(ColorPalette.Mahogany);
 // 	}
-
-
 // 	}
 // );
 
@@ -1077,26 +851,6 @@ function refomatePassOnShip() {
 }
 //Todo: make it only show the amount from each
 
-// was in experimental
-// // when player collides with planet
-// player.collides("planet", (planet) => {
-
-//   if (player.onPlanet) {
-//     return
-//   }
-//   player.speed = 0;
-
-//   //why did -1 work
-//   move(-1 * planet.startingPos[0] + width() / 2, -1 * planet.startingPos[1] + height() / 2, 10);
-//   player.onPlanet = true;
-//   //update planet
-//   player.planetAt = planet.name;
-//   planetText.text = player.planetAt;
-
-//   // debug.log(player.planetAt)
-// 
-// was in master
-
 
 player.collides("planet", (planet) => {
 	// debug.log("yo");
@@ -1128,30 +882,15 @@ player.collides("planet", (planet) => {
 				moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true);
 				player.passengersSprite[i].moving = true;
 				playerPassesToRemove.push(i);
-				player.money += player.baseMoneyPerPass*player.passengers[i].fare;
-				debug.log(player.passengers[i].fare)
+				player.money += Math.round(player.baseMoneyPerPass*player.passengers[i].fare);
+				// debug.log(player.passengers[i].fare)
 				moneyText.text = player.money;
 
-// was in experimental
-//   // move passenger to ship
-//   if (planets.includes(player.planetAt)) {
-//     // move ship passenger to planet
-//     let playerPassesToRemove = [];
-//     for (let i = 0; i < player.passengers.length; i++) {
-//       if (player.passengers[i].destination == player.planetAt) {
-//         moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true);
-//         player.passengersSprite[i].moving = true;
-//         playerPassesToRemove.push(i);
-// 				player.money += 50;
-// 				moneyText.text = player.money;
-// 
 			}
 		}
 
 		for (let i = playerPassesToRemove.length - 1; i >= 0; i--) {
 			player.passengers.splice(playerPassesToRemove[i], 1);
-// was in master
-
 
 		}
 		player.passengersSprite = []
@@ -1216,7 +955,7 @@ action("onPlanetPass", (passenger) => {
 		//generate and render new passenger
 
 
-		generatepassengers(planetsVars[planets.indexOf(player.planetAt)], 1)
+		generatePassengers(planetsVars[planets.indexOf(player.planetAt)], 1)
 		let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[planetsVars[planets.indexOf(player.planetAt)].passengers.length - 1]
 		add([
 			sprite(newPassData.sprite),
@@ -1232,57 +971,7 @@ action("onPlanetPass", (passenger) => {
 	}
 });
 
-//I think that I added this to the other code
-// player.collides("onPlanetPass", (passenger) => {
-// was in experimental
 
-//   //update player object
-//   player.passengers.push(planetsVars[planets.indexOf(player.planetAt)].passengers[0])
-//   player.capacity -= 1;
-//   capacityText.text = player.capacity
-//   //render in passenger area
-
-//   //render for pass in ship
-// 	let newPassDataShip = player.passengers[player.passengers.length-1]
-// 	player.passengersSprite.push(add([
-// 		sprite(newPassDataShip.sprite),
-
-// 		pos((player.passengers.length-1) % 6 * 30 + 15, 135 + (Math.floor((player.passengers.length-1) / 6) + 1) * 20),
-// 		color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
-// 		origin("center"),
-// 		area(),
-// 		layer("game"),
-// 		"passenger",
-// 		"onShipPass",
-// 		{
-// 			moving: false,
-// 		}
-//   ]));
-
-//   //remove passenger from planet
-//   passenger.destroy()
-//   planetsVars[planets.indexOf(player.planetAt)].passengers.shift()
-
-
-//   //generate and render new passenger
-//   generatePassengers(planetsVars[planets.indexOf(player.planetAt)], 1);
-//   let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[planetsVars[planets.indexOf(player.planetAt)].passengers.length - 1]
-//   add([
-//     sprite(newPassData.sprite),
-
-//     pos(width() / 2 + 25 + 10 * 30, height() / 2),
-//     color(newPassData.color[0], newPassData.color[1], newPassData.color[2]),
-//     origin("center"),
-//     area(),
-//     layer("game"),
-//     "passenger",
-//     "onPlanetPass",
-//   ]);
-
-// 
-	
-// was in master
-// });
 
 // collides("planet", "player", () => {
 
@@ -1292,51 +981,25 @@ action("onPlanetPass", (passenger) => {
 
 
 // calcualte real position of object
-let calcRealPos = obj => {
-//just doesn't have dt
-// was in experimental
-
-//   obj.realPos[0] += (-1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed);
-//   obj.realPos[1] += (Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed);
-//   // debug.log(obj.realPos[0])
-//   // debug.log(obj.realPos[1])
-
-//   // can you not do +=/-=?
-//   if (obj.realPos[0] >= (numberOfBackTiles / 2 * blockSize)) {
-//     obj.realPos[0] = obj.realPos[0] - (numberOfBackTiles * blockSize);
-//   };
-
-//   if (obj.realPos[1] >= (numberOfBackTiles / 2 * blockSize)) {
-//     obj.realPos[1] = obj.realPos[1] - (numberOfBackTiles * blockSize);
-//   };
-
-//   if (obj.realPos[0] <= -1 * (numberOfBackTiles / 2 * blockSize)) {
-//     obj.realPos[0] = obj.realPos[0] + (numberOfBackTiles * blockSize);
-//   };
-
-//   if (obj.realPos[1] <= -1 * (numberOfBackTiles / 2 * blockSize)) {
-//     obj.realPos[1] = obj.realPos[1] + (numberOfBackTiles * blockSize);
-//   };
-// };
-// 
+function calcRealPos(obj) {
 	obj.realPos[0] += (-1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed*dt());
 	obj.realPos[1] += (Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed*dt());
 	// debug.log(obj.realPos[0])
 	// debug.log(obj.realPos[1])
-	if (obj.realPos[0] >= (numberOfBackTiles / 2 * block_size)) {
-		obj.realPos[0] = obj.realPos[0] - (numberOfBackTiles * block_size)
+	if (obj.realPos[0] >= (numberOfBackTiles / 2 * blockSize)) {
+		obj.realPos[0] = obj.realPos[0] - (numberOfBackTiles * blockSize)
 	};
 
-	if (obj.realPos[1] >= (numberOfBackTiles / 2 * block_size)) {
-		obj.realPos[1] = obj.realPos[1] - (numberOfBackTiles * block_size)
+	if (obj.realPos[1] >= (numberOfBackTiles / 2 * blockSize)) {
+		obj.realPos[1] = obj.realPos[1] - (numberOfBackTiles * blockSize)
 	};
 
-	if (obj.realPos[0] <= -1 * (numberOfBackTiles / 2 * block_size)) {
-		obj.realPos[0] = obj.realPos[0] + (numberOfBackTiles * block_size)
+	if (obj.realPos[0] <= -1 * (numberOfBackTiles / 2 * blockSize)) {
+		obj.realPos[0] = obj.realPos[0] + (numberOfBackTiles * blockSize)
 	};
 
-	if (obj.realPos[1] <= -1 * (numberOfBackTiles / 2 * block_size)) {
-		obj.realPos[1] = obj.realPos[1] + (numberOfBackTiles * block_size)
+	if (obj.realPos[1] <= -1 * (numberOfBackTiles / 2 * blockSize)) {
+		obj.realPos[1] = obj.realPos[1] + (numberOfBackTiles * blockSize)
 	};
 }
 // was in master
@@ -1348,19 +1011,6 @@ let move = (x, y, slow) => {
 	let moveAmountY = (y - player.realPos[1]) / slow
 	player.realPos[1] = y
 
-	// every("background", (background) => {
-	// 	// debug.log(background.startingPos[0])
-	// 	background.pos.x += moveAmountX;
-	// 	background.pos.y += moveAmountY;
-	// 	// debug.log(background.startingPos[0])
-	// })
-	// every("planet", (planet) => {
-	// 	// planet.pos.x = planet.startingPos[0] + x;
-	// 	// planet.pos.x = planet.startingPos[1] + y;
-	// 	planet.realPos[0] += moveAmountX;
-	// 	planet.realPos[1] += moveAmountY;
-
-	// })
 	let timerreset = 0;
 	let intervalID = setInterval(function() {
 		every("background", (background) => {
@@ -1383,71 +1033,22 @@ let move = (x, y, slow) => {
 }
 
 action("background", (background) => {
-// was in experimental
-//   background.pos.x += (-1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed);
-//   background.pos.y += (Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed);
-//   if (background.pos.x >= (numberOfBackTiles / 2 * blockSize) + width() / 2) {
-//     background.pos.x = background.pos.x - (numberOfBackTiles * blockSize)
-//   } else if (background.pos.x <= -1 * (numberOfBackTiles / 2 * blockSize) + width() / 2) {
-//     background.pos.x = background.pos.x + (numberOfBackTiles * blockSize)
-//   }
-//   if (background.pos.y >= (numberOfBackTiles / 2 * blockSize) + height() / 2) {
-//     background.pos.y = background.pos.y - (numberOfBackTiles * blockSize)
-//   } else if (background.pos.y <= -1 * (numberOfBackTiles / 2 * blockSize) + height() / 2) {
-//     background.pos.y = background.pos.y + (numberOfBackTiles * blockSize)
-//   }
-
-
-//   // background.pos.x = background.pos.x % (26 * blockSize);
-//   // background.pos.y = background.pos.y % (26 * blockSize);
-// });
-
-// action("planet", (planet) => {
-
-//   calcRealPos(planet);
-
-//   if (planet.realPos[0] <= 0) {
-//     planet.pos.x = 0;
-//   } else if (planet.realPos[0] >= width()) {
-//     planet.pos.x = width();
-//   } else {
-//     planet.pos.x = planet.realPos[0];
-//   };
-
-//   if (planet.realPos[1] <= 0) {
-//     planet.pos.y = 0;
-//   } else if (planet.realPos[1] >= height()) {
-//     planet.pos.y = height();
-//   } else {
-//     planet.pos.y = planet.realPos[1];
-//   };
-
-//   // debug.log(planet.pos.x !== planet.realPos[0] || planet.pos.y !== planet.realPos[1])
-
-//   // TODO: update to allow for individual planet scaling
-//   if (planet.pos.x !== planet.realPos[0] || planet.pos.y !== planet.realPos[1]) {
-//     // TODO: make animation gradual
-//     planet.scaleTo(planetScale / 2);
-//   } else {
-//     planet.scaleTo(planetScale);
-//   }
-// 
 	background.pos.x += (-1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed*dt());
 	background.pos.y += (Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed*dt());
-	if (background.pos.x >= (numberOfBackTiles / 2 * block_size) + width() / 2) {
-		background.pos.x = background.pos.x - (numberOfBackTiles * block_size)
-	} else if (background.pos.x <= -1 * (numberOfBackTiles / 2 * block_size) + width() / 2) {
-		background.pos.x = background.pos.x + (numberOfBackTiles * block_size)
+	if (background.pos.x >= (numberOfBackTiles / 2 * blockSize) + width() / 2) {
+		background.pos.x = background.pos.x - (numberOfBackTiles * blockSize)
+	} else if (background.pos.x <= -1 * (numberOfBackTiles / 2 * blockSize) + width() / 2) {
+		background.pos.x = background.pos.x + (numberOfBackTiles * blockSize)
 	}
-	if (background.pos.y >= (numberOfBackTiles / 2 * block_size) + height() / 2) {
-		background.pos.y = background.pos.y - (numberOfBackTiles * block_size)
-	} else if (background.pos.y <= -1 * (numberOfBackTiles / 2 * block_size) + height() / 2) {
-		background.pos.y = background.pos.y + (numberOfBackTiles * block_size)
+	if (background.pos.y >= (numberOfBackTiles / 2 * blockSize) + height() / 2) {
+		background.pos.y = background.pos.y - (numberOfBackTiles * blockSize)
+	} else if (background.pos.y <= -1 * (numberOfBackTiles / 2 * blockSize) + height() / 2) {
+		background.pos.y = background.pos.y + (numberOfBackTiles * blockSize)
 	}
 
 
-	// background.pos.x = background.pos.x % (26 * block_size);
-	// background.pos.y = background.pos.y % (26 * block_size);
+	// background.pos.x = background.pos.x % (26 * blockSize);
+	// background.pos.y = background.pos.y % (26 * blockSize);
 });
 
 action("planet", (planet) => {
@@ -1470,13 +1071,14 @@ action("planet", (planet) => {
 	};
 
 	// debug.log(planet.pos.x !== planet.realPos[0] || planet.pos.y !== planet.realPos[1])
+	
+  // TODO: update to allow for individual planet scaling
+  // TODO: make animation gradual
 	if (planet.pos.x !== planet.realPos[0] || planet.pos.y !== planet.realPos[1]) {
 		planet.scaleTo(mapScale / 2);
 	} else {
 		planet.scaleTo(mapScale);
 	}
-// was in master
-
 
 });
 
@@ -1516,52 +1118,6 @@ action("player", () => {
 
 function generatePassengers(planet, ammount) {
 
-// was in experimental
-//   if (planets.includes(planet.name)) {
-//     // debug.log(planets)
-//     let otherPlanets = planets.slice();
-//     // debug.log(planet.name)
-//     otherPlanets.splice(planets.indexOf(planet.name), 1)
-//     // if(planet.name == "red"){
-//     // 	debug.log(otherPlanets)
-//     // }
-//     // debug.log(otherPlanets)
-//     for (let i = 0; i < ammount; i++) {
-
-//       let generatedPassId = Math.floor(Math.random() * otherPlanets.length);
-//       let genPassColor = (0, 0, 0);
-//       let genPassSprite = "passenger";
-
-//       switch (otherPlanets[generatedPassId]) {
-//         case "white":
-//           genPassColor = [255, 255, 255];
-//           break;
-//         case "blue":
-//           genPassColor = [0, 0, 255];
-//           break;
-//         case "red":
-//           genPassColor = [255, 0, 0];
-//           break;
-//         case "green":
-//           genPassColor = [0, 255, 0];
-//           break;
-//       }
-//       planet.passengers.push({
-//         destination: otherPlanets[generatedPassId],
-//         color: genPassColor,
-//         sprite: genPassSprite,
-//       })
-
-//       // if(planet.name == "blue"){
-//       // 	debug.log(planet.name)
-//       // 	debug.log(planet.passengers[i].destination)
-//       // 	debug.log(generatedPassId)
-//       // 	debug.log(otherPlanets)
-//       // 	debug.log(otherPlanets[generatedPassId])
-//       // }
-//     }
-//   }
-// 
 	if (planets.includes(planet.name)) {
 		// debug.log(planets)
 		let otherPlanets = planets.slice();
@@ -1576,7 +1132,7 @@ function generatePassengers(planet, ammount) {
 			let generatedPassId = Math.floor(Math.random() * otherPlanets.length);
 			let genPassColor = (0, 0, 0);
 			let genPassSprite = "passenger";
-
+			let genPassFare = 1;
 			switch (otherPlanets[generatedPassId]) {
 				case "white":
 					genPassColor = [255, 255, 255];
@@ -1590,20 +1146,18 @@ function generatePassengers(planet, ammount) {
 				case "green":
 					genPassColor = [0, 255, 0];
 					break;
+				case "rainbow":
+					genPassSprite = "passRainbow";
+					genPassColor = [255, 255, 255];
+					genPassFare = 10;
+				//add in ranbow
 			}
 			planet.passengers.push({
 				destanation: otherPlanets[generatedPassId],
 				color: genPassColor,
 				sprite: genPassSprite,
-				fare:1,
+				fare:genPassFare,
 			})
-			// if(planet.name == "blue"){
-			// 	debug.log(planet.name)
-			// 	debug.log(planet.passengers[i].destanation)
-			// 	debug.log(generatedPassId)
-			// 	debug.log(otherPlanets)
-			// 	debug.log(otherPlanets[generatedPassId])
-			// }
 		}
 	}
 // was in master
@@ -1611,25 +1165,16 @@ function generatePassengers(planet, ammount) {
 }
 
 let onStart = () => {
-// was in experimental
-//   every("background", (background) => {
-//     background.startingPos[0] = background.pos.x;
-//     background.startingPos[1] = background.pos.y;
-//   })
-//   every("planet", (planet) => {
-//     generatePassengers(planet, 10)
-//   })
-//   move(width() / 2, height() / 2, 1)
-// 
 	every("background", (background) => {
 		background.startingPos[0] = background.pos.x;
 		background.startingPos[1] = background.pos.y;
 	})
 	every("planet", (planet) => {
-		generatepassengers(planet, 10)
+		generatePassengers(planet, 10)
 	})
 	move(width() / 2, height() / 2, 1)
-// was in master
 }
+
+
 
 onStart()
