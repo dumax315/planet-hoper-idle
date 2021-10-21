@@ -1,5 +1,6 @@
 (() => {
   var __defProp = Object.defineProperty;
+  var __pow = Math.pow;
   var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 
   // node_modules/kaboom/dist/kaboom.mjs
@@ -2363,7 +2364,10 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     script.src = "//mrdoob.github.io/stats.js/build/stats.min.js";
     document.head.appendChild(script);
   })();
-  kaboom_default();
+  kaboom_default({
+    font: "sinko"
+  });
+  var fontSize = 2;
   loadSprite("bean", "sprites/bean.png");
   loadPedit("ship_1", "sprites/ship_1.pedit");
   loadSprite("arrow", "sprites/arrow.png");
@@ -2390,6 +2394,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     "bg",
     "game",
     "ui",
+    "uiText",
     "store"
   ], "game");
   var map = addLevel([
@@ -2547,15 +2552,15 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       deceleration: 4,
       animation_frame: 0,
       money: 100,
-      capacityMax: 6,
-      capacity: 30,
+      capacity: 10,
       passengers: [],
       realPos: [0, 0],
       onPlanet: false,
       startingPos: [width() / 2, height() / 2],
       passengersSprite: [],
       planetAt: "home",
-      anim: "thrust"
+      anim: "thrust",
+      loadSpeed: 600
     }
   ]);
   player.play("thrust");
@@ -2570,95 +2575,246 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       animation_frame: 0
     }
   ]);
+  var textLeftModifer = width() / 1e3;
+  var textLeftModiferHeight = width() * 0.025;
   add([
     text("Planet: ", 8),
-    scale(0.3),
+    scale(fontSize * textLeftModifer),
     pos(5, 50),
     origin("topleft"),
     layer("ui")
   ]);
   var planetText = add([
     text(player.planetAt, 8),
-    scale(0.3),
-    pos(100, 50),
+    scale(fontSize * textLeftModifer),
+    pos(120 * textLeftModifer, 50 + textLeftModiferHeight * 0),
     origin("topleft"),
     layer("ui")
   ]);
   add([
     text("Money:", 8),
-    scale(0.3),
-    pos(5, 90),
+    scale(fontSize * textLeftModifer),
+    pos(5, 50 + textLeftModiferHeight * 1),
     origin("topleft"),
     layer("ui")
   ]);
   var moneyText = add([
     text(player.money, 8),
-    scale(0.3),
-    pos(100, 90),
+    scale(fontSize * textLeftModifer),
+    pos(100 * textLeftModifer, 50 + textLeftModiferHeight * 1),
     origin("topleft"),
     layer("ui")
   ]);
   add([
     text("Speed: ", 8),
-    scale(0.3),
-    pos(5, 70),
+    scale(fontSize * textLeftModifer),
+    pos(5, 50 + textLeftModiferHeight * 2),
     origin("topleft"),
     layer("ui")
   ]);
   var speedText = add([
     text(player.speed, 8),
-    scale(0.3),
-    pos(100, 70),
+    scale(fontSize * textLeftModifer),
+    pos(100 * textLeftModifer, 50 + textLeftModiferHeight * 2),
     origin("topleft"),
     layer("ui")
   ]);
   add([
     text("Capacity:", 8),
-    scale(0.3),
-    pos(5, 110),
+    scale(fontSize * textLeftModifer),
+    pos(5, 50 + textLeftModiferHeight * 3),
     origin("topleft"),
     layer("ui")
   ]);
   var capacityText = add([
     text(player.capacity, 8),
-    scale(0.3),
-    pos(130, 110),
+    scale(fontSize * textLeftModifer),
+    pos(150 * textLeftModifer, 50 + textLeftModiferHeight * 3),
     origin("topleft"),
     layer("ui")
   ]);
   add([
-    text("passengers:", 8),
-    scale(0.3),
-    pos(5, 130),
+    text("Passengers:", 8),
+    scale(fontSize * textLeftModifer),
+    pos(5, 50 + textLeftModiferHeight * 4),
     origin("topleft"),
     layer("ui")
   ]);
   var storeBg = add([
     area(),
     solid(),
-    color("skyblue"),
+    color(50, 50, 50),
     opacity(0),
     pos(0, 0),
     rect(width(), height()),
     scale(mapScale),
     layer("store"),
     origin("topleft"),
-    {}
+    {
+      storeOpen: false
+    }
   ]);
-  var button = add([
+  var storeButton = add([
     area(),
     solid(),
-    color("skyblue"),
+    color(28, 71, 88),
     opacity(0),
-    pos(width(), 0),
-    text("Store"),
-    rect(100, 100),
+    pos(width() - 20, 20),
+    rect(width() / 6, width() / 1e3 * 50),
     scale(mapScale),
     layer("store"),
     origin("topright"),
+    "button",
+    "atPanetUi",
+    "storeButton",
     {}
   ]);
+  var storeText = add([
+    text("Store"),
+    pos(240, 180),
+    layer("store"),
+    scale(width() / 1e3 * 3 * fontSize),
+    origin("topright"),
+    "atPanetUi",
+    "storeButton",
+    pos(width() - 20, 20),
+    opacity(0)
+  ]);
+  var storeData = [{
+    name: "Upgrade Capacity",
+    id: 0,
+    amountBought: 0,
+    cost: 50,
+    functionToRun: () => {
+      player.capacity = Math.round(player.capacity + 2);
+    }
+  }, {
+    name: "Upgrade Max Speed",
+    id: 1,
+    amountBought: 0,
+    cost: 200,
+    functionToRun: () => {
+      player.max_thrust += 20;
+    }
+  }, {
+    name: "Upgrade Acceleration",
+    id: 2,
+    amountBought: 0,
+    cost: 200,
+    functionToRun: () => {
+    }
+  }, {
+    name: "Upgrade Fill Speed",
+    id: 3,
+    amountBought: 0,
+    cost: 300,
+    functionToRun: () => {
+      player.loadSpeed = Math.round(player.loadSpeed * 1.5);
+    }
+  }, {
+    name: "Unlock Planet",
+    id: 4,
+    amountBought: 0,
+    cost: 500,
+    functionToRun: () => {
+    }
+  }, {
+    name: "Upgrade Fire Rate",
+    id: 5,
+    amountBought: 0,
+    cost: 500,
+    functionToRun: () => {
+    }
+  }];
+  var storeButtonSprites = [];
+  function genStoreItems() {
+    for (let i = 0; i < storeData.length; i++) {
+      storeButtonSprites.push({
+        bg: add([
+          area(),
+          solid(),
+          color(255, 165, 0),
+          pos(width() / 2, 15 + i * (width() / 1e3 * 100 + 30)),
+          rect(width() / 3, width() / 1e3 * 100),
+          layer("store"),
+          origin("top"),
+          "button",
+          "inStoreButton",
+          "inStoreButtonBg",
+          {
+            idbuy: i,
+            functionToRun: storeData[i].functionToRun
+          }
+        ]),
+        title: add([
+          text(storeData[i].name),
+          layer("store"),
+          origin("top"),
+          scale(width() / 1e3 * 2),
+          "inStoreButton",
+          pos(width() / 2, 20 + i * (width() / 1e3 * 100 + 30))
+        ]),
+        boughtTextDis: add([
+          text("bought:"),
+          layer("store"),
+          origin("topleft"),
+          scale(width() / 1e3 * 2),
+          "inStoreButton",
+          pos(width() / 2 - width() / 6 + 5, 15 + width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30))
+        ]),
+        boughtText: add([
+          text(storeData[i].amountBought),
+          layer("store"),
+          origin("topleft"),
+          scale(width() / 1e3 * 2),
+          "inStoreButton",
+          pos(width() / 2 - width() / 24, 15 + width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30))
+        ]),
+        costText: add([
+          text("cost:"),
+          layer("store"),
+          origin("topleft"),
+          scale(width() / 1e3 * 2),
+          "inStoreButton",
+          pos(width() / 2 - width() / 6 + 5, 15 + 2 * width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30))
+        ]),
+        cost: add([
+          text(genPrice(storeData[i].cost, storeData[i].amountBought)),
+          layer("store"),
+          origin("topleft"),
+          scale(width() / 1e3 * 2),
+          "inStoreButton",
+          pos(width() / 2 - width() / 24, 15 + 2 * width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30))
+        ])
+      });
+    }
+  }
+  __name(genStoreItems, "genStoreItems");
+  function showStore() {
+    if (!storeBg.storeOpen) {
+      storeBg.opacity = 0.8;
+      storeBg.storeOpen = true;
+      storeText.text = "Game";
+      genStoreItems();
+    } else {
+      storeBg.opacity = 0;
+      storeBg.storeOpen = false;
+      storeText.text = "Store";
+      destroyAll("inStoreButton");
+      storeButtonSprites = [];
+    }
+  }
+  __name(showStore, "showStore");
   function planetUi(isOn) {
+    if (!isOn) {
+      every("atPanetUi", (uiEll) => {
+        uiEll.opacity = 0;
+      });
+    } else {
+      every("atPanetUi", (uiEll) => {
+        uiEll.opacity = 1;
+      });
+    }
   }
   __name(planetUi, "planetUi");
   function arrowRotateFromMouse() {
@@ -2669,7 +2825,10 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     return mouseRotationToSend;
   }
   __name(arrowRotateFromMouse, "arrowRotateFromMouse");
-  mouseClick(() => {
+  function launch() {
+    if (storeBg.storeOpen) {
+      return;
+    }
     if (player.onPlanet) {
       player.speed = 1;
       player.onPlanet = false;
@@ -2680,6 +2839,34 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         destroy(passa);
       });
     }
+  }
+  __name(launch, "launch");
+  var storeButX = width() / 6 + width() - 20;
+  var storeButY = width() / 1e3 * 50 + 40;
+  mouseClick(() => {
+    if (mousePos().x < storeButX && mousePos().y > storeButY) {
+      launch();
+    }
+  });
+  function genPrice(cost, time) {
+    return Math.round(__pow(cost, (time + 20) / 20));
+  }
+  __name(genPrice, "genPrice");
+  clicks("inStoreButtonBg", (button) => {
+    if (player.money >= genPrice(storeData[button.idbuy].cost, storeData[button.idbuy].amountBought)) {
+      player.money -= genPrice(storeData[button.idbuy].cost, storeData[button.idbuy].amountBought);
+      storeData[button.idbuy].functionToRun();
+      storeData[button.idbuy].amountBought++;
+      moneyText.text = player.money;
+      destroyAll("inStoreButton");
+      storeButtonSprites = [];
+      genStoreItems();
+    } else {
+      shake();
+    }
+  });
+  storeButton.clicks(() => {
+    showStore();
   });
   movementArrow.action(() => {
     movementArrow.angle = arrowRotateFromMouse();
@@ -2712,7 +2899,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       let newPassDataShip = player.passengers[i];
       player.passengersSprite.push(add([
         sprite(newPassDataShip.sprite),
-        pos(i % 6 * 30 + 15, 135 + (Math.floor(i / 6) + 1) * 20),
+        pos(i % 6 * 30 + 15, 50 + textLeftModiferHeight * 5 + (Math.floor(i / 6) + 1) * 20),
         color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
         origin("center"),
         area(),
@@ -2768,10 +2955,9 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       }
     }
   });
-  var passengerMoveSpeed = 400;
   action("onPlanetPass", (passenger) => {
     if (player.capacity > 0) {
-      passenger.move(dir(180).scale(passengerMoveSpeed));
+      passenger.move(dir(180).scale(player.loadSpeed * dt() * 40));
     }
   });
   player.collides("onPlanetPass", (passenger) => {
@@ -2781,7 +2967,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     let newPassDataShip = player.passengers[player.passengers.length - 1];
     player.passengersSprite.push(add([
       sprite(newPassDataShip.sprite),
-      pos((player.passengers.length - 1) % 6 * 30 + 15, 135 + (Math.floor((player.passengers.length - 1) / 6) + 1) * 20),
+      pos((player.passengers.length - 1) % 6 * 30 + 15, 50 + textLeftModiferHeight * 5 + (Math.floor((player.passengers.length - 1) / 6) + 1) * 20),
       color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
       origin("center"),
       area(),
@@ -2903,7 +3089,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       player.speed = Math.min(player.speed + player.acceleration, player.max_thrust);
     }
     speedText.text = Math.round(player.speed);
-    angleOfMovement = meanAngleDeg([movementArrow.angle, angleOfMovement], 20);
+    angleOfMovement = meanAngleDeg([movementArrow.angle, angleOfMovement], 0.3 / dt());
     player.angle = angleOfMovement;
     calcRealPos(player);
   });

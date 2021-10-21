@@ -4,7 +4,19 @@ import kaboom from "kaboom";
 (function() { var script = document.createElement('script'); script.onload = function() { var stats = new Stats(); document.body.appendChild(stats.dom); requestAnimationFrame(function loop() { stats.update(); requestAnimationFrame(loop) }); }; script.src = '//mrdoob.github.io/stats.js/build/stats.min.js'; document.head.appendChild(script); })()
 
 // initialize context
-kaboom();
+
+// init with some options (check out #KaboomOpt for full options list)
+// create a game with custom dimension, but stretch to fit container, keeping aspect ratio, with a clear color
+kaboom({
+    // width: 320,
+    // height: 240,
+    // stretch: true,
+    // letterbox: true,
+    font: "sinko",
+		// crips: true,
+    // background: [ 0, 0, 255, ],
+});
+let fontSize = 2;
 
 // load assets
 
@@ -34,7 +46,7 @@ let planets = [
 	"white",
 	"red",
 	"blue",
-	"green"]
+	"green",]
 
 let planetsVars = []
 
@@ -43,7 +55,9 @@ layers([
 	"bg",
 	"game",
 	"ui",
+	"uiText",
 	"store",
+	
 ], "game");
 
 
@@ -226,8 +240,8 @@ const player = add([
 		deceleration: 4,
 		animation_frame: 0,
 		money: 100,
-		capacityMax: 6,
-		capacity: 30,
+		// capacityMax: 6,
+		capacity: 10,
 		passengers: [],
 		realPos: [0, 0],
 		onPlanet: false,
@@ -235,6 +249,7 @@ const player = add([
 		passengersSprite: [],
 		planetAt: "home",
 		anim: "thrust",
+		loadSpeed: 600,
 	}
 ]);
 player.play("thrust");
@@ -254,9 +269,11 @@ const movementArrow = add([
 
 //ui
 //planet indicator
+let textLeftModifer = width()/1000;
+let textLeftModiferHeight = width()*.025;
 add([
 	text("Planet: ", 8),
-	scale(.3),
+	scale(fontSize*textLeftModifer),
 	pos(5, 50),
 	origin("topleft"),
 	layer("ui"),
@@ -264,25 +281,25 @@ add([
 
 const planetText = add([
 	text(player.planetAt, 8),
-	scale(.3),
-	pos(100, 50),
+	scale(fontSize*textLeftModifer),
+	pos(120*textLeftModifer, 50+textLeftModiferHeight*0),
 	origin("topleft"),
 	layer("ui"),
 ]);
 
-//planet indicator
+//money indicator
 add([
 	text("Money:", 8),
-	scale(.3),
-	pos(5, 90),
+	scale(fontSize*textLeftModifer),
+	pos(5, 50+textLeftModiferHeight*1),
 	origin("topleft"),
 	layer("ui"),
 ]);
 
 const moneyText = add([
 	text(player.money, 8),
-	scale(.3),
-	pos(100, 90),
+	scale(fontSize*textLeftModifer),
+	pos(100*textLeftModifer, 50+textLeftModiferHeight*1),
 	origin("topleft"),
 	layer("ui"),
 ]);
@@ -290,16 +307,16 @@ const moneyText = add([
 //speed
 add([
 	text("Speed: ", 8),
-	scale(.3),
-	pos(5, 70),
+	scale(fontSize*textLeftModifer),
+	pos(5, 50+textLeftModiferHeight*2),
 	origin("topleft"),
 	layer("ui"),
 ]);
 
 const speedText = add([
 	text(player.speed, 8),
-	scale(.3),
-	pos(100, 70),
+	scale(fontSize*textLeftModifer),
+	pos(100*textLeftModifer, 50+textLeftModiferHeight*2),
 	origin("topleft"),
 	layer("ui"),
 ]);
@@ -308,24 +325,24 @@ const speedText = add([
 
 add([
 	text("Capacity:", 8),
-	scale(.3),
-	pos(5, 110),
+	scale(fontSize*textLeftModifer),
+	pos(5, 50+textLeftModiferHeight*3),
 	origin("topleft"),
 	layer("ui"),
 ]);
 
 const capacityText = add([
 	text(player.capacity, 8),
-	scale(.3),
-	pos(130, 110),
+	scale(fontSize*textLeftModifer),
+	pos(150*textLeftModifer, 50+textLeftModiferHeight*3),
 	origin("topleft"),
 	layer("ui"),
 ]);
 //passengers
 add([
-	text("passengers:", 8),
-	scale(.3),
-	pos(5, 130),
+	text("Passengers:", 8),
+	scale(fontSize*textLeftModifer),
+	pos(5, 50+textLeftModiferHeight*4),
 	origin("topleft"),
 	layer("ui"),
 ]);
@@ -334,7 +351,7 @@ add([
 const storeBg = add([
 	area(),
 	solid(),
-	color("skyblue"),
+	color(50,50,50),
 	opacity(0),
 	pos(
 		0,
@@ -344,34 +361,248 @@ const storeBg = add([
 	layer("store"),
 	origin("topleft"),
 	{
-
+		storeOpen: false,
 	},
 ]);
 
-const button = add([
+//buttons at planets
+//store button
+const storeButton = add([
 	area(),
 	solid(),
-	color("skyblue"),
+	color(28,71,88),
 	opacity(0),
 	pos(
-		width(),
-		0),
-	text("Store"),
-	rect(100, 100),
+		width()-20,
+		20),
+	// text("Store"),
+	rect(width()/6, width()/1000*50),
 	scale(mapScale),
 	layer("store"),
 	origin("topright"),
+	"button",
+	"atPanetUi",
+	"storeButton",
 	{
 
 	},
 ]);
 
+const storeText = add([
+  text("Store"),
+  pos(240, 180),
+  // color(0, 0, 0),
+	layer("store"),
+	scale(width()/1000*3*fontSize),
+	origin("topright"),
+	"atPanetUi",
+	"storeButton",
+	pos(
+		width()-20,
+		20),
+	opacity(0),
+]);
+
+//Todo Add up and Down Arrow or mouse scorll to store
+
+
+//launch button 
+// const launchButton = add([
+// 	area(),
+// 	solid(),
+// 	color(28,71,88),
+// 	opacity(0),
+// 	pos(
+// 		width()-20,
+// 		20+20+(width()/1000*50*mapScale)),
+// 	// text("Store"),
+// 	rect(width()/6, width()/1000*50),
+// 	scale(mapScale),
+// 	layer("ui"),
+// 	origin("topright"),
+// 	"button",
+// 	"launchButton",
+// 	"atPanetUi",
+// 	{
+
+// 	},
+// ]);
+
+// add([
+//   text("Launch!\n(click)"),
+//   pos(240, 180),
+//   // color(0, 0, 0),
+// 	"atPanetUi",
+// 	layer("ui"),
+// 	scale(width()/1000*1.8*fontSize),
+// 	origin("topright"),
+// 	"launchButton",
+// 	//make reletive position better
+// 	pos(
+// 		width()-0-width()/24,
+// 		40+width()/1000*50*mapScale),
+// 	opacity(0),
+// ]);
+let storeData = [{
+		name:"Upgrade Capacity",
+		id:0,
+		amountBought:0,
+		cost: 50,
+		functionToRun: () => {
+			player.capacity = Math.round(player.capacity+2);
+		},
+	},{
+		name:"Upgrade Max Speed",
+		id:1,
+		amountBought:0,
+		cost: 200,
+		functionToRun: () => {
+			player.max_thrust += 20;
+		},
+	},{
+		name:"Upgrade Acceleration",
+		id:2,
+		amountBought:0,
+		cost: 200,
+		functionToRun: () => {
+
+		},
+	},{
+		name:"Upgrade Fill Speed",
+		id:3,
+		amountBought:0,
+		cost: 300,
+		functionToRun: () => {
+			player.loadSpeed = Math.round(player.loadSpeed*1.5);
+		},
+	},{
+		name:"Unlock Planet",
+		id:4,
+		amountBought:0,
+		cost: 500,
+		functionToRun: () => {
+
+		},
+	},{
+		name:"Upgrade Fire Rate",
+		id:5,
+		amountBought:0,
+		cost: 500,
+		functionToRun: () => {
+
+		},
+},];
+let storeButtonSprites = [];
+//gereate store item
+function genStoreItems() {
+	for(let i = 0; i < storeData.length; i++){
+		storeButtonSprites.push({bg:
+			add([
+				area(),
+				solid(),
+				color(255,165,0),
+				pos(
+					width()/2,
+					15+i*(width()/1000*100+30)),
+				rect(width()/3, width()/1000*100),
+				layer("store"),
+				origin("top"),
+				"button",
+				"inStoreButton",
+				"inStoreButtonBg",
+				{
+					idbuy:i,
+					functionToRun: storeData[i].functionToRun,
+				},
+			]),
+			title:  add([
+				text(storeData[i].name),
+				// color(0, 0, 0),
+				layer("store"),
+				origin("top"),
+				scale(width()/1000*2),
+				"inStoreButton",
+				pos(
+					width()/2,
+					20+i*(width()/1000*100+30)),
+			]),
+			boughtTextDis: add([
+				text("bought:"),
+				// color(0, 0, 0),
+				layer("store"),
+				origin("topleft"),
+				scale(width()/1000*2),
+				"inStoreButton",
+				pos(
+					width()/2-(width()/6)+5,
+					15+width()/1000*35+i*(width()/1000*100+30)),
+			]),
+			boughtText: add([
+				text(storeData[i].amountBought),
+				// color(0, 0, 0),
+				layer("store"),
+				origin("topleft"),
+				scale(width()/1000*2),
+				"inStoreButton",
+				pos(
+					width()/2-(width()/24),
+					15+width()/1000*35+i*(width()/1000*100+30)),
+			]),
+			costText: add([
+				text("cost:"),
+				// color(0, 0, 0),
+				layer("store"),
+				origin("topleft"),
+				scale(width()/1000*2),
+				"inStoreButton",
+				pos(
+					width()/2-(width()/6)+5,
+					15+2*width()/1000*35+i*(width()/1000*100+30)),
+			]),
+			cost: add([
+				text(genPrice(storeData[i].cost,storeData[i].amountBought)),
+				// color(0, 0, 0),
+				layer("store"),
+				origin("topleft"),
+				scale(width()/1000*2),
+				"inStoreButton",
+				pos(
+					width()/2-(width()/24),
+					15+2*width()/1000*35+i*(width()/1000*100+30)),
+			]),
+			}
+		);
+	}
+}
+
+
+function showStore(){
+	if(!storeBg.storeOpen){
+		storeBg.opacity = .8;
+		storeBg.storeOpen = true;
+
+		storeText.text = "Game";
+		genStoreItems();
+	}
+	else{
+		storeBg.opacity = 0;
+		storeBg.storeOpen = false;
+		storeText.text = "Store";
+		destroyAll("inStoreButton");
+		storeButtonSprites = [];
+	}
+}
+
 function planetUi(isOn){
-	// if(!isOn){
-	// 	button.opacity = 0;
-	// }else{
-	// 	button.opacity = 255;
-	// }
+	if(!isOn){
+		every("atPanetUi", (uiEll) => {
+			uiEll.opacity = 0;
+		})
+	}else{
+		every("atPanetUi", (uiEll) => {
+			uiEll.opacity = 1;
+		})
+	}
 }
 
 function arrowRotateFromMouse() {
@@ -400,8 +631,12 @@ function arrowRotateFromMouse() {
 //   playerMoveToo[1] = -1*player.speed;
 // });
 
-mouseClick(() => {
-	// angleOfMovement = movementArrow.angle;
+
+//launch code
+function launch() {
+	if(storeBg.storeOpen){
+		return;
+	}
 	if(player.onPlanet){
 		player.speed = 1;
 		player.onPlanet = false;
@@ -412,8 +647,67 @@ mouseClick(() => {
 			destroy(passa)
 		})
 	}
+}
+
+//get space for lounch 
+// keyDown("space", () => {
+// 	// angleOfMovement = movementArrow.angle;
+// 	launch()
 	
+// });
+
+let storeButX = width()/6+width()-20;
+// debug.log(storeButX)
+let storeButY = width()/1000*50+40;
+// debug.log(storeButY)
+//get click for lounch 
+mouseClick( () => {
+	// debug.log(mousePos().y +"+"+mousePos().x)
+	if((mousePos().x < storeButX && mousePos().y >storeButY)){
+		launch()
+	}
+	// angleOfMovement = movementArrow.angle;
+
 });
+//get launch from button ui
+// launchButton.clicks( () => {
+// 	launch()
+// })
+function genPrice(cost, time){
+	return Math.round(cost**(((time+20)/20)));
+}
+
+//Clicks button in the store run sthe function
+clicks("inStoreButtonBg", (button) => {
+	if(player.money >= genPrice(storeData[button.idbuy].cost,storeData[button.idbuy].amountBought)){
+		player.money -= genPrice(storeData[button.idbuy].cost,storeData[button.idbuy].amountBought);
+		storeData[button.idbuy].functionToRun();
+		storeData[button.idbuy].amountBought++;
+		moneyText.text = player.money;
+		destroyAll("inStoreButton");
+		storeButtonSprites = [];
+		genStoreItems();
+	}else{
+		shake();
+	}
+  // debug.log(button.idbuy);
+});
+
+
+
+storeButton.clicks( () => {
+	showStore();
+})
+// action("button", b => {
+//   if (b.isHovered()){
+// 		b.use(color(0.7, 0.7, 0.7));
+// 	}else{
+// 		b.use(color(1, 1, 1));
+// 	}
+
+
+// 	}
+// );
 
 // arrow indicator
 movementArrow.action(() => {
@@ -460,7 +754,7 @@ function refomatePassOnShip() {
 		player.passengersSprite.push(add([
 			sprite(newPassDataShip.sprite),
 			// debug.log((i+1) % 6 * 30 + 15),
-			pos((i) % 6 * 30 + 15, 135 + (Math.floor(i / 6) + 1) * 20),
+			pos((i) % 6 * 30 + 15, 50+textLeftModiferHeight*5 + (Math.floor(i / 6) + 1) * 20),
 			color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
 			origin("center"),
 			area(),
@@ -538,11 +832,11 @@ player.collides("planet", (planet) => {
 	}
 });
 
-let passengerMoveSpeed = 400;
+
 //move passengers into ship
 action("onPlanetPass", (passenger) => {
 	if (player.capacity > 0) {
-		passenger.move(dir(180).scale(passengerMoveSpeed))
+		passenger.move(dir(180).scale(player.loadSpeed*dt()*40))
 		// passenger.pos.x -= passengerMoveSpeed*dt()*100;
 	}
 
@@ -561,7 +855,7 @@ player.collides("onPlanetPass", (passenger) => {
 	player.passengersSprite.push(add([
 		sprite(newPassDataShip.sprite),
 
-		pos((player.passengers.length - 1) % 6 * 30 + 15, 135 + (Math.floor((player.passengers.length - 1) / 6) + 1) * 20),
+		pos((player.passengers.length - 1) % 6 * 30 + 15, 50+textLeftModiferHeight*5 + (Math.floor((player.passengers.length - 1) / 6) + 1) * 20),
 		color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
 		origin("center"),
 		area(),
@@ -740,7 +1034,9 @@ action("player", () => {
 	speedText.text = Math.round(player.speed);
 	//new movement system
 	// debug.log(angleOfMovement)
-	angleOfMovement = meanAngleDeg([movementArrow.angle, angleOfMovement], 20);
+	//does the dt work?
+	angleOfMovement = meanAngleDeg([movementArrow.angle, angleOfMovement],.3/dt());
+	// debug.log(Math.round(.3/dt()))
 	player.angle = angleOfMovement;
 	calcRealPos(player)
 	// debug.log(player.realPos)
