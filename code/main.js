@@ -1,10 +1,6 @@
 import kaboom from "kaboom";
 
-import {
-  ColorPalette,
-  ColorPaletteAlias
-} from "./util/colorUtil";
-
+import * as colorUtil from "./util/colorUtil";
 import * as planetUtil from "./util/planetUtil";
 
 
@@ -14,8 +10,8 @@ import * as planetUtil from "./util/planetUtil";
 // initialize context
 
 // init with some options (check out #KaboomOpt for full options list)
-// create a game with custom dimension, but stretch to fit container, keeping aspect ratio, with a clear color
-kaboom({
+// // create a game with custom dimension, but stretch to fit container, keeping aspect ratio, with a clear color
+export const k = kaboom({
     // width: 320,
     // height: 240,
     // stretch: true,
@@ -24,6 +20,8 @@ kaboom({
 		// crips: true,
     // background: [ 0, 0, 255, ],
 });
+//export default k
+
 let fontSize = 2;
 
 // load sprite assets
@@ -70,20 +68,14 @@ let planets = [
 	"blue",
 	"green",]
 
-const planetNames = [
-];
-  
-let planetsVars = [];
-
 // game layers
 layers([
 	"bg",
 	"game",
 	"ui",
 	"uiText",
-	"store",
-	
-], "game");
+	"store",]
+  , "game");
 
 // generate map
 const map = addLevel([
@@ -130,6 +122,8 @@ const map = addLevel([
   ],
 });
 
+let planetsVars = [];
+
 // planets
 const planetHome = add([
 // was in experimental
@@ -147,6 +141,7 @@ const planetHome = add([
     startingPos: [0, 0],
     name: "home",
     passengers: [],
+    size: 1,
   },
 ]);
 
@@ -176,6 +171,7 @@ planetsVars.push(add([
       15 * blockSize],
     name: "white",
     passengers: [],
+    size: 1,
   },
 ]));
 
@@ -194,6 +190,7 @@ planetsVars.push(add([
     startingPos: [12 * blockSize, 6 * blockSize],
     name: "red",
     passengers: [],
+    size: 1,
   },
 ]));
 
@@ -1075,9 +1072,9 @@ action("planet", (planet) => {
   // TODO: update to allow for individual planet scaling
   // TODO: make animation gradual
 	if (planet.pos.x !== planet.realPos[0] || planet.pos.y !== planet.realPos[1]) {
-		planet.scaleTo(mapScale / 2);
+		planet.scaleTo(planetScale * planet.size / 2);
 	} else {
-		planet.scaleTo(mapScale);
+		planet.scaleTo(planetScale * planet.size);
 	}
 
 });
@@ -1164,7 +1161,7 @@ function generatePassengers(planet, ammount) {
 
 }
 
-let onStart = () => {
+export let onStart = () => {
 	every("background", (background) => {
 		background.startingPos[0] = background.pos.x;
 		background.startingPos[1] = background.pos.y;

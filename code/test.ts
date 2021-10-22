@@ -1,6 +1,5 @@
-function getRandomPlanet(): string {
-  // generate a random planet path from planet_ 1 to 3
-  return "planet_" + (1 + Math.floor(Math.random() * 3));
-}
+import { k } from "./main.js";
 
-console.log(getRandomPlanet());
+let aVec = k.vec2(1,1);
+
+k.debug.log(aVec.x + ", " + aVec.y)
