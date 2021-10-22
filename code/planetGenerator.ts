@@ -65,7 +65,7 @@ export function addBasePlanet(): Character {
 
 export let planetsVars = [];
 
-planetsVars.push(k.add([
+planetsVars.push(add([
 // was in experimental
   sprite("planetWhite"),
   area(),
@@ -92,7 +92,7 @@ planetsVars.push(k.add([
   },
 ]));
 
-planetsVars.push(k.add([
+planetsVars.push(add([
   sprite("planetWhite"),
   area(),
   solid(),
@@ -111,7 +111,7 @@ planetsVars.push(k.add([
   },
 ]));
 
-planetsVars.push(k.add([
+planetsVars.push(add([
   sprite("planetWhite"),
   area(),
   solid(),
@@ -133,7 +133,7 @@ planetsVars.push(k.add([
   },
 ]));
 
-planetsVars.push(k.add([
+planetsVars.push(add([
   sprite("planetWhite"),
   area(),
   solid(),

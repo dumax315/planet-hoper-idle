@@ -2504,7 +2504,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   }
   __name(addBasePlanet, "addBasePlanet");
   var planetsVars = [];
-  planetsVars.push(k.add([
+  planetsVars.push(add([
     sprite("planetWhite"),
     area(),
     solid(),
@@ -2528,7 +2528,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       size: 1
     }
   ]));
-  planetsVars.push(k.add([
+  planetsVars.push(add([
     sprite("planetWhite"),
     area(),
     solid(),
@@ -2546,7 +2546,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       size: 1
     }
   ]));
-  planetsVars.push(k.add([
+  planetsVars.push(add([
     sprite("planetWhite"),
     area(),
     solid(),
@@ -2568,7 +2568,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       size: 1
     }
   ]));
-  planetsVars.push(k.add([
+  planetsVars.push(add([
     sprite("planetWhite"),
     area(),
     solid(),
