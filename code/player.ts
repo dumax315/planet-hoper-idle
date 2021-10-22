@@ -21,7 +21,7 @@ export function loadPlayer(): Character {
       acceleration: 2.5,
       deceleration: 4,
       animation_frame: 0,
-      money: 1000000000000000000,
+      money: 100,
       capacityMax: 14,
       capacity: 14,
       passengers: [],

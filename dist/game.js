@@ -2488,7 +2488,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     size: 1
   };
   function addBasePlanet() {
-    return k.add([
+    return main_default.add([
       sprite("planet1"),
       pos(0, 0),
       scale(planetScale),
@@ -2504,15 +2504,15 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   }
   __name(addBasePlanet, "addBasePlanet");
   var planetsVars = [];
-  planetsVars.push(add([
-    sprite("planetWhite"),
-    area(),
-    solid(),
-    pos(30 * blockSize, 15 * blockSize),
-    color(),
-    scale(planetScale),
-    layer("game"),
-    origin("center"),
+  planetsVars.push(main_default.add([
+    main_default.sprite("planetWhite"),
+    main.area(),
+    main.solid(),
+    main.pos(30 * blockSize, 15 * blockSize),
+    main.color(),
+    main.scale(planetScale),
+    main.layer("game"),
+    main.origin("center"),
     "planet",
     {
       realPos: [
@@ -2524,71 +2524,6 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         15 * blockSize
       ],
       name: "white",
-      passengers: [],
-      size: 1
-    }
-  ]));
-  planetsVars.push(add([
-    sprite("planetWhite"),
-    area(),
-    solid(),
-    color(255, 0, 0),
-    pos(12 * blockSize, 6 * blockSize),
-    scale(planetScale),
-    layer("game"),
-    origin("center"),
-    "planet",
-    {
-      realPos: [12 * blockSize, 6 * blockSize],
-      startingPos: [12 * blockSize, 6 * blockSize],
-      name: "red",
-      passengers: [],
-      size: 1
-    }
-  ]));
-  planetsVars.push(add([
-    sprite("planetWhite"),
-    area(),
-    solid(),
-    color(0, 0, 255),
-    rotate(90),
-    pos(15 * blockSize, 40 * blockSize),
-    scale(planetScale),
-    layer("game"),
-    origin("center"),
-    "planet",
-    {
-      realPos: [
-        15 * blockSize,
-        20 * blockSize
-      ],
-      startingPos: [15 * blockSize, 20 * blockSize],
-      name: "blue",
-      passengers: [],
-      size: 1
-    }
-  ]));
-  planetsVars.push(add([
-    sprite("planetWhite"),
-    area(),
-    solid(),
-    color(0, 255, 0),
-    rotate(90),
-    pos(15 * blockSize, 40 * blockSize),
-    scale(planetScale),
-    layer("game"),
-    origin("center"),
-    "planet",
-    {
-      realPos: [
-        7 * blockSize,
-        12 * blockSize
-      ],
-      startingPos: [
-        7 * blockSize,
-        12 * blockSize
-      ],
-      name: "green",
       passengers: [],
       size: 1
     }
@@ -2612,7 +2547,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         acceleration: 2.5,
         deceleration: 4,
         animation_frame: 0,
-        money: 1e18,
+        money: 100,
         capacityMax: 14,
         capacity: 14,
         passengers: [],

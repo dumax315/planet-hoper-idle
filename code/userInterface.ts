@@ -10,22 +10,29 @@ let textLeftModifer = width()/1000;
 let textLeftModiferHeight = width()*.025;
 
 
+function addPlayerStatInfo() {
+  add([
+    text("Planet: ", <TextCompConf>{size:8}),
+    scale(fontSize * textLeftModifer),
+    pos(5, 50),
+    origin(<Origin>"topleft"),
+    layer("ui"),
+  ]);
+}
 
-add([
-	text("Planet: ", <TextCompConf>{size:8}),
-	scale(fontSize * textLeftModifer),
-	pos(5, 50),
-	origin(<Origin>"topleft"),
-	layer("ui"),
-]);
+// planetText
+export function addPlayerStat() {
+  return add([
+    text(player.planetAt, <TextCompConf>{size:8}),
+    scale(fontSize * textLeftModifer),
+    pos(120*textLeftModifer, 50+textLeftModiferHeight*0),
+    origin(<Origin>"topleft"),
+    layer("ui"),
+  ]);
+}
+  
 
-const planetText = add([
-	text(player.planetAt, <TextCompConf>{size:8}),
-	scale(fontSize * textLeftModifer),
-	pos(120*textLeftModifer, 50+textLeftModiferHeight*0),
-	origin(<Origin>"topleft"),
-	layer("ui"),
-]);
+
 
 //money indicator
 add([
@@ -62,30 +69,46 @@ const speedText = add([
 ]);
 
 //capacity
-
-add([
+function addCapacityStatInfo() {
+  add([
 	text("Capacity:", <TextCompConf>{size:8}),
 	scale(fontSize*textLeftModifer),
 	pos(5, 50+textLeftModiferHeight*3),
 	origin("topleft"),
 	layer("ui"),
 ]);
+}
 
-const capacityText = add([
-	text(player.capacity, <TextCompConf>{size:8}),
-	scale(fontSize*textLeftModifer),
-	pos(150*textLeftModifer, 50+textLeftModiferHeight*3),
-	origin("topleft"),
-	layer("ui"),
-]);
-//passengers
-add([
-	text("Passengers:", <TextCompConf>{size:8}),
-	scale(fontSize*textLeftModifer),
-	pos(5, 50+textLeftModiferHeight*4),
-	origin("topleft"),
-	layer("ui"),
-]);
+
+// capacityStatText
+export function addCapacityStat () {
+  return add([
+    text(player.capacity, <TextCompConf>{size:8}),
+    scale(fontSize*textLeftModifer),
+    pos(150*textLeftModifer, 50+textLeftModiferHeight*3),
+    origin("topleft"),
+    layer("ui"),
+  ]);
+}
+
+
+function addPassengerStatInfo() {
+  add([
+    text("Passengers:", <TextCompConf>{size:8}),
+    scale(fontSize*textLeftModifer),
+    pos(5, 50+textLeftModiferHeight*4),
+    origin("topleft"),
+    layer("ui"),
+  ]);
+}
+
+
+
+export function initUserInterfaceInfo() {
+  addPlayerStatInfo();
+  addPassengerStatInfo();
+  
+};
 
 //store 
 const storeBg = add([
@@ -240,6 +263,8 @@ function genStoreItems() {
 		"inStoreButton",
 	]);
 
+  
+
 
 	for(let i = 0; i < storeData.length; i++){
 		let bgColor = colorUtil.ColorPaletteAlias.orange;
@@ -327,7 +352,8 @@ function genStoreItems() {
 }
 
 
-function showStore(){
+
+export function showStore(){
 	if(!storeBg.storeOpen){
 		storeBg.opacity = .8;
 		storeBg.storeOpen = true;
@@ -344,7 +370,7 @@ function showStore(){
 	}
 }
 
-function planetUi(isOn: boolean){
+export function planetUI (isOn: boolean){
 	if(!isOn){
 		every("atPanetUi", (uiEll) => {
 			uiEll.opacity = 0;
@@ -357,14 +383,14 @@ function planetUi(isOn: boolean){
 }
 
 //launch code
-function launch() {
+export function launch() {
 	if(storeBg.storeOpen){
 		return;
 	}
 	if(player.onPlanet){
 		player.speed = 1;
 		player.onPlanet = false;
-		planetUi(false);
+		planetUI(false);
 		player.planetAt = "none";
 		planetText.text = player.planetAt;
 		every("onPlanetPass", (passa) => {
