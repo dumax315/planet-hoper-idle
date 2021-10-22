@@ -27,6 +27,7 @@ loadAssets();
 
 let fontSize = 2;
 
+let planetsVars = [];
 
 let angleOfMovement = 0;
 // scale by screen size
@@ -51,52 +52,10 @@ layers([
 	"store",]
   , "game");
 
-// generate map
-const map = addLevel([
-	"        ",
-	"        ",
-	"        ",
-	"        ",
-	"        ",
-	"        ",
-	"        ",
-	"        ",
-], {
 
-  width: backgroundSize,
-  height: backgroundSize,
-  pos: vec2(width() / 2 - 10 * backgroundSize, height() / 2 - 10 * backgroundSize),
-  "=": () => [
-    rect(backgroundSize, backgroundSize),
-    color(255, 0, 0),
-    area(),
-    origin("center"),
-    // "planet",
-    layer("bg"),
-    "background",
-    {
-      startingPos: [0, 0],
-    }
-  ],
+import { generateMap } from "./mapGenerator";
 
-  " ": () => [
-    rect(backgroundSize, backgroundSize),
-    sprite("stars"),
-    // scale to match image size: 0.5484
-    // scale(400 * mapScale),
-		scale(0.5484 * mapScale),
-    // color(0,0,0),
-    area(),
-    origin("center"),
-    layer("bg"),
-    "background",
-    {
-      startingPos: [0, 0],
-    },
-  ],
-});
-
-let planetsVars = [];
+generateMap();
 
 // planets
 const planetHome = add([
@@ -257,56 +216,13 @@ function buyPlanets() {
 	// move(width() / -2, height() / -2, 1)
 }
 
+import { loadPlayer, loadMovementArrow } from "./player";
+// load objects
+movementArrow = loadMovementArrow();
+player = loadPlayer();
 
-// player
-const player = add([
-	sprite("ship_1"),
-	pos(width() / 2, height() / 2),
-	rotate(0),
-	scale(2),
-	area(),
-	layer("game"),
-	origin("center"),
-	"player",
-	{
-		speed: 0,
-		max_thrust: 400,
-		acceleration: 2.5,
-		deceleration: 4,
-		animation_frame: 0,
-		money: 100,
-		capacityMax: 14,
-		capacity: 14,
-		passengers: [],
-		realPos: [0, 0],
-		onPlanet: false,
-		startingPos: [width() / 2, height() / 2],
-		passengersSprite: [],
-		planetAt: "home",
-		anim: "thrust",
-		loadSpeed: 400,
-		baseMoneyPerPass: 50,
-	}
-]);
+movementArrow.play("spin");
 player.play("thrust");
-
-// The arrow
-const movementArrow = add([
-// was in experimental
-  sprite("arrow_1"),
-  pos(40, 80),
-  rotate(0),
-  scale(3),
-  layer("game"),
-  origin("center"),
-  "arrow",
-  {
-    animation_frame: 0,
-    anim: "spin",
-  },
-
-]);
-movementArrow.play("spin")
 
 //ui
 //planet indicator
@@ -730,6 +646,11 @@ clicks("inStoreButtonBg", (button) => {
   // debug.log(button.idbuy);
 });
 
+//hover
+// hovers("inStoreButtonBg", (button) => {
+
+// });
+
 //scroll?
 document.addEventListener("wheel", (event) =>{
 	if(!storeBg.storeOpen){
@@ -1079,7 +1000,7 @@ action("player", () => {
 	//new movement system
 	// debug.log(angleOfMovement)
 	//does the dt work?
-	angleOfMovement = meanAngleDeg([movementArrow.angle, angleOfMovement],.3/dt());
+	angleOfMovement = meanAngleDeg([movementArrow.angle, angleOfMovement],player.handling+.3/dt());
 	// debug.log(Math.round(.3/dt()))
 	player.angle = angleOfMovement;
 	calcRealPos(player)

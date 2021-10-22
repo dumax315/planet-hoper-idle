@@ -2374,6 +2374,103 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   }
   __name(loadAssets, "loadAssets");
 
+  // code/mapGenerator.ts
+  var mapScale = 1.5;
+  var blockSize = 64 * mapScale;
+  var backgroundSize = 64 * mapScale * 6;
+  var mapASCII = [
+    "        ",
+    "        ",
+    "        ",
+    "        ",
+    "        ",
+    "        ",
+    "        ",
+    "        "
+  ];
+  function generateMap() {
+    k.addLevel(mapASCII, {
+      width: backgroundSize,
+      height: backgroundSize,
+      pos: vec2(width() / 2 - 10 * backgroundSize, height() / 2 - 10 * backgroundSize),
+      "=": () => [
+        rect(backgroundSize, backgroundSize),
+        color(255, 0, 0),
+        area(),
+        origin("center"),
+        layer("bg"),
+        "background",
+        {
+          startingPos: [0, 0]
+        }
+      ],
+      " ": () => [
+        rect(backgroundSize, backgroundSize),
+        sprite("stars"),
+        scale(0.5484 * mapScale),
+        area(),
+        origin("center"),
+        layer("bg"),
+        "background",
+        {
+          startingPos: [0, 0]
+        }
+      ]
+    });
+  }
+  __name(generateMap, "generateMap");
+
+  // code/player.ts
+  var playerScale = 3;
+  function loadPlayer() {
+    return add([
+      sprite("ship_1"),
+      pos(width() / 2, height() / 2),
+      rotate(0),
+      scale(playerScale),
+      area(),
+      layer("game"),
+      origin("center"),
+      "player",
+      {
+        speed: 0,
+        max_thrust: 400,
+        acceleration: 2.5,
+        deceleration: 4,
+        animation_frame: 0,
+        money: 100,
+        capacityMax: 14,
+        capacity: 14,
+        passengers: [],
+        realPos: [0, 0],
+        onPlanet: false,
+        startingPos: [width() / 2, height() / 2],
+        passengersSprite: [],
+        planetAt: "home",
+        anim: "thrust",
+        loadSpeed: 400,
+        baseMoneyPerPass: 50
+      }
+    ]);
+  }
+  __name(loadPlayer, "loadPlayer");
+  function loadMovementArrow() {
+    return add([
+      sprite("arrow_1"),
+      pos(40, 80),
+      rotate(0),
+      scale(playerScale),
+      layer("game"),
+      origin("center"),
+      "arrow",
+      {
+        animation_frame: 0,
+        anim: "spin"
+      }
+    ]);
+  }
+  __name(loadMovementArrow, "loadMovementArrow");
+
   // code/main.js
   (function() {
     var script = document.createElement("script");
@@ -2394,11 +2491,12 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   var main_default = k;
   loadAssets();
   var fontSize = 2;
+  var planetsVars = [];
   var angleOfMovement = 0;
-  var mapScale = 1.5;
+  var mapScale2 = 1.5;
   var planetScale = 1.5;
-  var blockSize = 64 * mapScale;
-  var backgroundSize = 64 * mapScale * 6;
+  var blockSize2 = 64 * mapScale2;
+  var backgroundSize2 = 64 * mapScale2 * 6;
   var numberOfBackTiles = 48;
   var planets = [
     "white",
@@ -2413,44 +2511,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     "uiText",
     "store"
   ], "game");
-  var map = addLevel([
-    "        ",
-    "        ",
-    "        ",
-    "        ",
-    "        ",
-    "        ",
-    "        ",
-    "        "
-  ], {
-    width: backgroundSize,
-    height: backgroundSize,
-    pos: vec2(width() / 2 - 10 * backgroundSize, height() / 2 - 10 * backgroundSize),
-    "=": () => [
-      rect(backgroundSize, backgroundSize),
-      color(255, 0, 0),
-      area(),
-      origin("center"),
-      layer("bg"),
-      "background",
-      {
-        startingPos: [0, 0]
-      }
-    ],
-    " ": () => [
-      rect(backgroundSize, backgroundSize),
-      sprite("stars"),
-      scale(0.5484 * mapScale),
-      area(),
-      origin("center"),
-      layer("bg"),
-      "background",
-      {
-        startingPos: [0, 0]
-      }
-    ]
-  });
-  var planetsVars = [];
+  generateMap();
   var planetHome = add([
     sprite("planet1"),
     pos(0, 0),
@@ -2472,7 +2533,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     sprite("planetWhite"),
     area(),
     solid(),
-    pos(30 * blockSize, 15 * blockSize),
+    pos(30 * blockSize2, 15 * blockSize2),
     color(),
     scale(planetScale),
     layer("game"),
@@ -2480,12 +2541,12 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     "planet",
     {
       realPos: [
-        20 * blockSize,
-        15 * blockSize
+        20 * blockSize2,
+        15 * blockSize2
       ],
       startingPos: [
-        20 * blockSize,
-        15 * blockSize
+        20 * blockSize2,
+        15 * blockSize2
       ],
       name: "white",
       passengers: [],
@@ -2497,14 +2558,14 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     area(),
     solid(),
     color(255, 0, 0),
-    pos(12 * blockSize, 6 * blockSize),
+    pos(12 * blockSize2, 6 * blockSize2),
     scale(planetScale),
     layer("game"),
     origin("center"),
     "planet",
     {
-      realPos: [12 * blockSize, 6 * blockSize],
-      startingPos: [12 * blockSize, 6 * blockSize],
+      realPos: [12 * blockSize2, 6 * blockSize2],
+      startingPos: [12 * blockSize2, 6 * blockSize2],
       name: "red",
       passengers: [],
       size: 1
@@ -2516,17 +2577,17 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     solid(),
     color(0, 0, 255),
     rotate(90),
-    pos(15 * blockSize, 40 * blockSize),
+    pos(15 * blockSize2, 40 * blockSize2),
     scale(planetScale),
     layer("game"),
     origin("center"),
     "planet",
     {
       realPos: [
-        15 * blockSize,
-        20 * blockSize
+        15 * blockSize2,
+        20 * blockSize2
       ],
-      startingPos: [15 * blockSize, 20 * blockSize],
+      startingPos: [15 * blockSize2, 20 * blockSize2],
       name: "blue",
       passengers: [],
       size: 1
@@ -2538,19 +2599,19 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     solid(),
     color(0, 255, 0),
     rotate(90),
-    pos(15 * blockSize, 40 * blockSize),
+    pos(15 * blockSize2, 40 * blockSize2),
     scale(planetScale),
     layer("game"),
     origin("center"),
     "planet",
     {
       realPos: [
-        7 * blockSize,
-        12 * blockSize
+        7 * blockSize2,
+        12 * blockSize2
       ],
       startingPos: [
-        7 * blockSize,
-        12 * blockSize
+        7 * blockSize2,
+        12 * blockSize2
       ],
       name: "green",
       passengers: [],
@@ -2563,7 +2624,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         sprite("rainBowPlanet"),
         area(),
         solid(),
-        pos(2 * blockSize, 2 * blockSize),
+        pos(2 * blockSize2, 2 * blockSize2),
         scale(planetScale),
         layer("game"),
         origin("center"),
@@ -2571,12 +2632,12 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         z(0),
         {
           realPos: [
-            2 * blockSize + player.realPos[0],
-            2 * blockSize + player.realPos[1]
+            2 * blockSize2 + player.realPos[0],
+            2 * blockSize2 + player.realPos[1]
           ],
           startingPos: [
-            2 * blockSize,
-            2 * blockSize
+            2 * blockSize2,
+            2 * blockSize2
           ],
           name: "rainbow",
           passengers: [],
@@ -2593,50 +2654,10 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     });
   }
   __name(buyPlanets, "buyPlanets");
-  var player = add([
-    sprite("ship_1"),
-    pos(width() / 2, height() / 2),
-    rotate(0),
-    scale(2),
-    area(),
-    layer("game"),
-    origin("center"),
-    "player",
-    {
-      speed: 0,
-      max_thrust: 400,
-      acceleration: 2.5,
-      deceleration: 4,
-      animation_frame: 0,
-      money: 100,
-      capacityMax: 14,
-      capacity: 14,
-      passengers: [],
-      realPos: [0, 0],
-      onPlanet: false,
-      startingPos: [width() / 2, height() / 2],
-      passengersSprite: [],
-      planetAt: "home",
-      anim: "thrust",
-      loadSpeed: 400,
-      baseMoneyPerPass: 50
-    }
-  ]);
-  player.play("thrust");
-  var movementArrow = add([
-    sprite("arrow_1"),
-    pos(40, 80),
-    rotate(0),
-    scale(3),
-    layer("game"),
-    origin("center"),
-    "arrow",
-    {
-      animation_frame: 0,
-      anim: "spin"
-    }
-  ]);
+  movementArrow = loadMovementArrow();
+  player = loadPlayer();
   movementArrow.play("spin");
+  player.play("thrust");
   var textLeftModifer = width() / 1e3;
   var textLeftModiferHeight = width() * 0.025;
   add([
@@ -2709,7 +2730,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     opacity(0),
     pos(0, 0),
     rect(width(), height()),
-    scale(mapScale),
+    scale(mapScale2),
     layer("store"),
     origin("topleft"),
     {
@@ -2723,7 +2744,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     opacity(0),
     pos(width() - 20, 20),
     rect(width() / 6, width() / 1e3 * 50),
-    scale(mapScale),
+    scale(mapScale2),
     layer("store"),
     origin("topright"),
     "button",
@@ -2944,8 +2965,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
   }
   __name(launch, "launch");
-  var storeButX = width() - 20 - width() / 6 * mapScale;
-  var storeButY = (20 + width() / 1e3 * 50) * mapScale;
+  var storeButX = width() - 20 - width() / 6 * mapScale2;
+  var storeButY = (20 + width() / 1e3 * 50) * mapScale2;
   mouseClick(() => {
     if (!(mousePos().x > storeButX && mousePos().y < storeButY && player.onPlanet)) {
       launch();
@@ -3116,20 +3137,20 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   function calcRealPos(obj) {
     obj.realPos[0] += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
     obj.realPos[1] += Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
-    if (obj.realPos[0] >= numberOfBackTiles / 2 * blockSize) {
-      obj.realPos[0] = obj.realPos[0] - numberOfBackTiles * blockSize;
+    if (obj.realPos[0] >= numberOfBackTiles / 2 * blockSize2) {
+      obj.realPos[0] = obj.realPos[0] - numberOfBackTiles * blockSize2;
     }
     ;
-    if (obj.realPos[1] >= numberOfBackTiles / 2 * blockSize) {
-      obj.realPos[1] = obj.realPos[1] - numberOfBackTiles * blockSize;
+    if (obj.realPos[1] >= numberOfBackTiles / 2 * blockSize2) {
+      obj.realPos[1] = obj.realPos[1] - numberOfBackTiles * blockSize2;
     }
     ;
-    if (obj.realPos[0] <= -1 * (numberOfBackTiles / 2 * blockSize)) {
-      obj.realPos[0] = obj.realPos[0] + numberOfBackTiles * blockSize;
+    if (obj.realPos[0] <= -1 * (numberOfBackTiles / 2 * blockSize2)) {
+      obj.realPos[0] = obj.realPos[0] + numberOfBackTiles * blockSize2;
     }
     ;
-    if (obj.realPos[1] <= -1 * (numberOfBackTiles / 2 * blockSize)) {
-      obj.realPos[1] = obj.realPos[1] + numberOfBackTiles * blockSize;
+    if (obj.realPos[1] <= -1 * (numberOfBackTiles / 2 * blockSize2)) {
+      obj.realPos[1] = obj.realPos[1] + numberOfBackTiles * blockSize2;
     }
     ;
   }
@@ -3157,15 +3178,15 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   action("background", (background) => {
     background.pos.x += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
     background.pos.y += Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
-    if (background.pos.x >= numberOfBackTiles / 2 * blockSize + width() / 2) {
-      background.pos.x = background.pos.x - numberOfBackTiles * blockSize;
-    } else if (background.pos.x <= -1 * (numberOfBackTiles / 2 * blockSize) + width() / 2) {
-      background.pos.x = background.pos.x + numberOfBackTiles * blockSize;
+    if (background.pos.x >= numberOfBackTiles / 2 * blockSize2 + width() / 2) {
+      background.pos.x = background.pos.x - numberOfBackTiles * blockSize2;
+    } else if (background.pos.x <= -1 * (numberOfBackTiles / 2 * blockSize2) + width() / 2) {
+      background.pos.x = background.pos.x + numberOfBackTiles * blockSize2;
     }
-    if (background.pos.y >= numberOfBackTiles / 2 * blockSize + height() / 2) {
-      background.pos.y = background.pos.y - numberOfBackTiles * blockSize;
-    } else if (background.pos.y <= -1 * (numberOfBackTiles / 2 * blockSize) + height() / 2) {
-      background.pos.y = background.pos.y + numberOfBackTiles * blockSize;
+    if (background.pos.y >= numberOfBackTiles / 2 * blockSize2 + height() / 2) {
+      background.pos.y = background.pos.y - numberOfBackTiles * blockSize2;
+    } else if (background.pos.y <= -1 * (numberOfBackTiles / 2 * blockSize2) + height() / 2) {
+      background.pos.y = background.pos.y + numberOfBackTiles * blockSize2;
     }
   });
   action("planet", (planet) => {
