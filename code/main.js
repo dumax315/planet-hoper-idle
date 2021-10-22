@@ -1,16 +1,12 @@
 import kaboom from "kaboom";
 
-import * as colorUtil from "./util/colorUtil";
-import * as planetUtil from "./util/planetUtil";
-
-
 
 (function() { var script = document.createElement('script'); script.onload = function() { var stats = new Stats(); document.body.appendChild(stats.dom); requestAnimationFrame(function loop() { stats.update(); requestAnimationFrame(loop) }); }; script.src = '//mrdoob.github.io/stats.js/build/stats.min.js'; document.head.appendChild(script); })()
 
 // initialize context
 
 // init with some options (check out #KaboomOpt for full options list)
-// // create a game with custom dimension, but stretch to fit container, keeping aspect ratio, with a clear color
+// create a game with custom dimension, but stretch to fit container, keeping aspect ratio, with a clear color
 export const k = kaboom({
     // width: 320,
     // height: 240,
@@ -20,44 +16,22 @@ export const k = kaboom({
 		// crips: true,
     // background: [ 0, 0, 255, ],
 });
-//export default k
+
+export default k
+
+import * as colorUtil from "./util/colorUtil";
+import * as planetUtil from "./util/planetUtil";
+import { loadAssets } from "./util/assetLoader";
+
+loadAssets();
 
 let fontSize = 2;
-
-// load sprite assets
-loadSprite("bean", "sprites/bean.png");
-loadPedit("ship1", "sprites/ship_1.pedit");
-loadSprite("arrow", "sprites/arrow.png");
-loadSprite("planet1", "sprites/planet1.png");
-loadSprite("planet2", "sprites/planet 2.png");
-loadSprite("stars", "sprites/stars repeting.jpg");
-loadSprite("planetWhite", "sprites/planetWhite.png");
-
-loadPedit("arrow_1", "sprites/arrow_1.pedit");
-
-loadPedit("passenger", "sprites/cargo.pedit");
-loadPedit("passRainbow", "sprites/cargoRainbow.pedit");
-
-loadPedit("planet_1", "sprites/planet_1.pedit");
-loadPedit("planet_2", "sprites/planet_2.pedit");
-loadPedit("planet_3", "sprites/planet_3.pedit");
-
-loadPedit("ship_1", "sprites/ship_1.pedit");
-
-loadPedit("stars_1", "sprites/stars_1.pedit");
-loadPedit("stars_2", "sprites/stars_2.pedit");
-loadPedit("stars_3", "sprites/stars_3.pedit");
-
-loadPedit("void_1", "sprites/void_1.pedit")
-loadSprite("rainBowPlanet", "sprites/rainBowPlanet.png");
-
-//TODO: put color items in ColorUtil class
 
 
 let angleOfMovement = 0;
 // scale by screen size
 const mapScale = 1.5;
-const planetScale = 10;
+const planetScale = 1.5;
 const blockSize = 64 * mapScale;
 const backgroundSize = 64 * mapScale * 6;
 const numberOfBackTiles = 48;

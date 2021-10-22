@@ -2350,6 +2350,30 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   });
   var kaboom_default = xn();
 
+  // code/util/assetLoader.ts
+  function loadAssets() {
+    loadSprite("bean", "sprites/bean.png");
+    loadPedit("ship1", "sprites/ship_1.pedit");
+    loadSprite("arrow", "sprites/arrow.png");
+    loadSprite("planet1", "sprites/planet1.png");
+    loadSprite("planet2", "sprites/planet 2.png");
+    loadSprite("stars", "sprites/stars repeting.jpg");
+    loadSprite("planetWhite", "sprites/planetWhite.png");
+    loadPedit("arrow_1", "sprites/arrow_1.pedit");
+    loadPedit("passenger", "sprites/cargo.pedit");
+    loadPedit("passRainbow", "sprites/cargoRainbow.pedit");
+    loadPedit("planet_1", "sprites/planet_1.pedit");
+    loadPedit("planet_2", "sprites/planet_2.pedit");
+    loadPedit("planet_3", "sprites/planet_3.pedit");
+    loadPedit("ship_1", "sprites/ship_1.pedit");
+    loadPedit("stars_1", "sprites/stars_1.pedit");
+    loadPedit("stars_2", "sprites/stars_2.pedit");
+    loadPedit("stars_3", "sprites/stars_3.pedit");
+    loadPedit("void_1", "sprites/void_1.pedit");
+    loadSprite("rainBowPlanet", "sprites/rainBowPlanet.png");
+  }
+  __name(loadAssets, "loadAssets");
+
   // code/main.js
   (function() {
     var script = document.createElement("script");
@@ -2367,29 +2391,12 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   var k = kaboom_default({
     font: "sinko"
   });
+  var main_default = k;
+  loadAssets();
   var fontSize = 2;
-  loadSprite("bean", "sprites/bean.png");
-  loadPedit("ship1", "sprites/ship_1.pedit");
-  loadSprite("arrow", "sprites/arrow.png");
-  loadSprite("planet1", "sprites/planet1.png");
-  loadSprite("planet2", "sprites/planet 2.png");
-  loadSprite("stars", "sprites/stars repeting.jpg");
-  loadSprite("planetWhite", "sprites/planetWhite.png");
-  loadPedit("arrow_1", "sprites/arrow_1.pedit");
-  loadPedit("passenger", "sprites/cargo.pedit");
-  loadPedit("passRainbow", "sprites/cargoRainbow.pedit");
-  loadPedit("planet_1", "sprites/planet_1.pedit");
-  loadPedit("planet_2", "sprites/planet_2.pedit");
-  loadPedit("planet_3", "sprites/planet_3.pedit");
-  loadPedit("ship_1", "sprites/ship_1.pedit");
-  loadPedit("stars_1", "sprites/stars_1.pedit");
-  loadPedit("stars_2", "sprites/stars_2.pedit");
-  loadPedit("stars_3", "sprites/stars_3.pedit");
-  loadPedit("void_1", "sprites/void_1.pedit");
-  loadSprite("rainBowPlanet", "sprites/rainBowPlanet.png");
   var angleOfMovement = 0;
   var mapScale = 1.5;
-  var planetScale = 10;
+  var planetScale = 1.5;
   var blockSize = 64 * mapScale;
   var backgroundSize = 64 * mapScale * 6;
   var numberOfBackTiles = 48;
