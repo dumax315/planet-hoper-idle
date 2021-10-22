@@ -289,7 +289,7 @@ function genStoreItems() {
 					15+width()/1000*35+i*(width()/1000*100+30)+scrollAmount),
 			]),
 			boughtText: add([
-				text(storeData[i].amountBought),
+				text(<string><any>storeData[i].amountBought),
 				// color(0, 0, 0),
 				layer("store"),
 				origin("topleft"),

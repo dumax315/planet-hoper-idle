@@ -1,18 +1,30 @@
 import kaboom, { Character } from "kaboom";
 import { Vec2N, vec2N } from "./util/kaboomUtil";
-import { k } from "./main.js";
+import { k, player } from "./main.js";
 import * as planetUtil from "./util/planetUtil";
+import { mapScale } from "./mapGenerator";
+import { PassengerData, generatePassengers } from "./passenger";
 
-let planetScale = 1.5;
 
-let planetCount = 8;
+export let planetNames = [
+  "white",
+	"red",
+	"blue",
+	"green",
+  ];
 
-let planetMinBufferSpacing = 5;
+const blockSize = 64 * mapScale;
+
+const planetScale = 1.5;
+
+// let planetCount = 8;
+
+// let planetMinBufferSpacing = 5;
 
 let planetObjectArray = [];
 
-let planetScaleArray = planetUtil.getRandomPlanetScaleArray(planetCount);
-let planetPosArray = planetUtil.getRandomPlanetPositionArray(planetCount, 48, 48, planetMinBufferSpacing);
+// let planetScaleArray = planetUtil.getRandomPlanetScaleArray(planetCount);
+// let planetPosArray = planetUtil.getRandomPlanetPositionArray(planetCount, 48, 48, planetMinBufferSpacing);
 
 type PlanetData = {
   realPos: Vec2N;
@@ -20,10 +32,6 @@ type PlanetData = {
   name: string;
   passengers: PassengerData[];
   size: number;
-};
-
-type PassengerData = {
-
 };
 
 let homeAttributes: PlanetData = {
@@ -35,7 +43,7 @@ let homeAttributes: PlanetData = {
 };
 
 export function addBasePlanet(): Character {
-  return add([
+  return k.add([
     sprite("planet1"),
     pos(0, 0),
     scale(planetScale),
@@ -51,10 +59,13 @@ export function addBasePlanet(): Character {
   ]);
 }
 
+// planetObjectArray.push(
+//   add([])
+// )
 
-//TODO: randomize position of planets
+export let planetsVars = [];
 
-planetsVars.push(add([
+planetsVars.push(k.add([
 // was in experimental
   sprite("planetWhite"),
   area(),
@@ -81,7 +92,7 @@ planetsVars.push(add([
   },
 ]));
 
-planetsVars.push(add([
+planetsVars.push(k.add([
   sprite("planetWhite"),
   area(),
   solid(),
@@ -100,7 +111,7 @@ planetsVars.push(add([
   },
 ]));
 
-planetsVars.push(add([
+planetsVars.push(k.add([
   sprite("planetWhite"),
   area(),
   solid(),
@@ -122,7 +133,7 @@ planetsVars.push(add([
   },
 ]));
 
-planetsVars.push(add([
+planetsVars.push(k.add([
   sprite("planetWhite"),
   area(),
   solid(),
@@ -168,8 +179,8 @@ function buyPlanets() {
 		z(0),
 		{
 			realPos: [
-				2 * blockSize+player.realPos[0],
-				2 * blockSize+player.realPos[1]],
+				2 * blockSize + player.realPos[0],
+				2 * blockSize + player.realPos[1]],
 			startingPos: [
 				2 * blockSize,
 				2 * blockSize],
@@ -178,7 +189,7 @@ function buyPlanets() {
 			size: 1,
 		},
 	]));
-	planets.push("rainbow");
+	planetNames.push("rainbow");
 	}else if(planetsVars.length == 5){
 		planetsVars.push(add([
 		sprite("planetFace"),
@@ -235,13 +246,13 @@ function buyPlanets() {
 			size: 1,
 		},
 	]));
-	planets.push("spikes");
+	planetNames.push("spikes");
 	}
 	generatePassengers(planetsVars[planetsVars.length-1], 10);
 	player.z = 100;
 	every("planet", (planet) => {
 		planet.passengers = [];
 		generatePassengers(planet, 10)
-	})
-	// move(width() / -2, height() / -2, 1)
+	});
+
 }

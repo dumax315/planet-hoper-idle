@@ -23,6 +23,7 @@ export default k
 import * as colorUtil from "./util/colorUtil";
 import * as planetUtil from "./util/planetUtil";
 import { loadAssets } from "./util/assetLoader";
+import { planetNames } from "./planetGenerator";
 
 loadAssets();
 
@@ -34,12 +35,6 @@ const mapScale = 1.5;
 const planetScale = 1.5;
 const blockSize = 64 * mapScale;
 const numberOfBackTiles = 48;
-
-let planets = [
-  "white",
-	"red",
-	"blue",
-	"green",]
 
 
 import { generateMap, generateLayers } from "./mapGenerator";
@@ -71,18 +66,8 @@ function arrowRotateFromMouse() {
 }
 
 
-// action("inStoreButtonBg", (button) => {
-//   if (button.isHovered()){
-// 		button.color(ColorPalette.Rufous);
-// 	}else{
-// 		button.color(ColorPalette.Mahogany);
-// 	}
-// 	}
-// );
-
 // arrow indicator
 movementArrow.action(() => {
-
 	movementArrow.angle = arrowRotateFromMouse();
 	movementArrow.pos.x = width() / 2 + (Math.sin(movementArrow.angle * (Math.PI / 180))) * 60;
 	movementArrow.pos.y = height() / 2 + (-1 * Math.cos(movementArrow.angle * (Math.PI / 180))) * 60;
@@ -164,7 +149,7 @@ player.collides("planet", (planet) => {
 	//move pass to ship
 
 
-	if (planets.includes(player.planetAt)) {
+	if (planetNames.includes(player.planetAt)) {
 		//move ship pass to planet
 		let playerPassesToRemove = [];
 		for (let i = 0; i < player.passengers.length; i++) {
@@ -187,8 +172,8 @@ player.collides("planet", (planet) => {
 		refomatePassOnShip();
 		player.capacity += playerPassesToRemove.length;
 		capacityText.text = player.capacity;
-		for (let i = 0; i < planetsVars[planets.indexOf(player.planetAt)].passengers.length; i++) {
-			let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[i]
+		for (let i = 0; i < planetsVars[planetNames.indexOf(player.planetAt)].passengers.length; i++) {
+			let newPassData = planetsVars[planetNames.indexOf(player.planetAt)].passengers[i]
 			add([
 				sprite(newPassData.sprite),
 
@@ -215,7 +200,7 @@ action("onPlanetPass", (passenger) => {
 	if(passenger.pos.x <=width()/2){
 		// debug.log("asdf")
 		//update player object
-		player.passengers.push(planetsVars[planets.indexOf(player.planetAt)].passengers[0])
+		player.passengers.push(planetsVars[planetNames.indexOf(player.planetAt)].passengers[0])
 		player.capacity -= 1;
 		capacityText.text = player.capacity
 		//render in passengerarea
@@ -239,14 +224,14 @@ action("onPlanetPass", (passenger) => {
 
 		//remove passenger from planet
 		passenger.destroy()
-		planetsVars[planets.indexOf(player.planetAt)].passengers.shift()
+		planetsVars[planetNames.indexOf(player.planetAt)].passengers.shift()
 
 
 		//generate and render new passenger
 
 
-		generatePassengers(planetsVars[planets.indexOf(player.planetAt)], 1)
-		let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[planetsVars[planets.indexOf(player.planetAt)].passengers.length - 1]
+		generatePassengers(planetsVars[planetNames.indexOf(player.planetAt)], 1)
+		let newPassData = planetsVars[planetNames.indexOf(player.planetAt)].passengers[planetsVars[planetNames.indexOf(player.planetAt)].passengers.length - 1]
 		add([
 			sprite(newPassData.sprite),
 			//pos(width() / 2 + 50 + 10 * 30, height() / 2),
@@ -406,65 +391,6 @@ action("player", () => {
 	// debug.log(player.realPos)
 
 })
-
-function generatePassengers(planet, ammount) {
-
-	if (planets.includes(planet.name)) {
-		// debug.log(planets)
-		let otherPlanets = planets.slice();
-		// debug.log(planet.name)
-		otherPlanets.splice(planets.indexOf(planet.name), 1)
-		// if(planet.name == "red"){
-		// 	debug.log(otherPlanets)
-		// }
-		// debug.log(otherPlanets)
-		for (let i = 0; i < ammount; i++) {
-
-			let generatedPassId = Math.floor(Math.random() * otherPlanets.length);
-			let genPassColor = (0, 0, 0);
-			let genPassSprite = "passenger";
-			let genPassFare = 1;
-			switch (otherPlanets[generatedPassId]) {
-				case "white":
-					genPassColor = [255, 255, 255];
-					break;
-				case "blue":
-					genPassColor = [0, 0, 255];
-					break;
-				case "red":
-					genPassColor = [255, 0, 0];
-					break;
-				case "green":
-					genPassColor = [0, 255, 0];
-					break;
-				case "rainbow":
-					genPassSprite = "passRainbow";
-					genPassColor = [255, 255, 255];
-					genPassFare = 10;
-					break;
-				case "face":
-					genPassSprite = "cargoFace";
-					genPassColor = [255, 255, 255];
-					genPassFare = 50;
-					break;
-				case "spikes":
-					genPassSprite = "cargoSpikes";
-					genPassColor = [255, 255, 255];
-					genPassFare = 500;
-					break;
-				//add in ranbow
-			}
-			planet.passengers.push({
-				destanation: otherPlanets[generatedPassId],
-				color: genPassColor,
-				sprite: genPassSprite,
-				fare:genPassFare,
-			})
-		}
-	}
-// was in master
-
-}
 
 export let onStart = () => {
 	every("background", (background) => {

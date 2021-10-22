@@ -9,8 +9,6 @@ import { vec2N } from "./util/kaboomUtil";
 
 export const mapScale = 1.5;
 
-const blockSize = 64 * mapScale;
-
 const backgroundSize = 64 * mapScale * 6;
 
 const numberOfBackTiles = 48;
