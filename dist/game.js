@@ -1,5 +1,6 @@
 (() => {
   var __defProp = Object.defineProperty;
+  var __pow = Math.pow;
   var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 
   // node_modules/kaboom/dist/kaboom.mjs
@@ -2349,44 +2350,19 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   });
   var kaboom_default = xn();
 
-  // code/util/moneyUtil.ts
-  var moneySuffixes = [];
-  var alpha = Array.from(Array(26)).map((e, i) => i + 65);
-  var alphabet = alpha.map((x) => String.fromCharCode(x));
-  var alphabetLower = alphabet.map((x) => x.toLowerCase());
-  function generateMoneySuffixes1() {
-    return alphabetLower;
-  }
-  __name(generateMoneySuffixes1, "generateMoneySuffixes1");
-  function generateMoneySuffixes2() {
-    let moneySuffixes2 = [];
-    for (let char1 in alphabetLower) {
-      for (let char2 in alphabetLower) {
-        moneySuffixes2.push(char1 + char2);
-      }
-    }
-    return moneySuffixes2;
-  }
-  __name(generateMoneySuffixes2, "generateMoneySuffixes2");
-  function generateMoneySuffixes3() {
-    let moneySuffixes2 = [];
-    for (let char1 in alphabetLower) {
-      for (let char2 in alphabetLower) {
-        for (let char3 in alphabetLower) {
-          moneySuffixes2.push(char1 + char2 + char3);
-        }
-      }
-    }
-    return moneySuffixes2;
-  }
-  __name(generateMoneySuffixes3, "generateMoneySuffixes3");
-  moneySuffixes = generateMoneySuffixes1().concat(generateMoneySuffixes2()).concat(generateMoneySuffixes3());
-
-  // code/util/kaboomUtil.ts
-  function vec2N(x, y) {
-    return { x, y };
-  }
-  __name(vec2N, "vec2N");
+  // code/util/colorUtil.ts
+  var ColorPaletteAlias = {
+    "black": [0, 18, 25],
+    "blue": [0, 95, 115],
+    "green": [10, 147, 150],
+    "foam": [148, 210, 189],
+    "zest": [233, 216, 166],
+    "orange": [238, 155, 0],
+    "rust": [202, 103, 2],
+    "sunset": [187, 62, 3],
+    "red": [174, 32, 18],
+    "maroon": [155, 34, 38]
+  };
 
   // code/util/assetLoader.ts
   function loadAssets() {
@@ -2409,26 +2385,13 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     loadPedit("stars_3", "sprites/stars_3.pedit");
     loadPedit("void_1", "sprites/void_1.pedit");
     loadSprite("rainBowPlanet", "sprites/rainBowPlanet.png");
-    loadSprite("planetSpikes", "sprites/planetSpikes.png");
-    loadSprite("planetFace", "sprites/planetFace.png");
-    loadPedit("cargoSpikes", "sprites/cargoSpikes.pedit");
-    loadPedit("cargoFace", "sprites/cargoFace.pedit");
   }
   __name(loadAssets, "loadAssets");
 
   // code/mapGenerator.ts
   var mapScale = 1.5;
+  var blockSize = 64 * mapScale;
   var backgroundSize = 64 * mapScale * 6;
-  function generateLayers() {
-    k.layers([
-      "bg",
-      "game",
-      "ui",
-      "uiText",
-      "store"
-    ], "game");
-  }
-  __name(generateLayers, "generateLayers");
   var mapASCII = [
     "        ",
     "        ",
@@ -2471,133 +2434,10 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   }
   __name(generateMap, "generateMap");
 
-  // code/planetGenerator.ts
-  var planetNames = [
-    "white",
-    "red",
-    "blue",
-    "green"
-  ];
-  var blockSize = 64 * mapScale;
-  var planetScale = 1.5;
-  var homeAttributes = {
-    realPos: vec2N(0, 0),
-    startingPos: vec2N(0, 0),
-    name: "Home",
-    passengers: [],
-    size: 1
-  };
-  function addBasePlanet() {
-    return k.add([
-      sprite("planet1"),
-      pos(0, 0),
-      scale(planetScale),
-      area({ scale: 1.5 }),
-      solid(),
-      layer("game"),
-      origin("center"),
-      "planet",
-      {
-        homeAttributes
-      }
-    ]);
-  }
-  __name(addBasePlanet, "addBasePlanet");
-  var planetsVars = [];
-  planetsVars.push(add([
-    sprite("planetWhite"),
-    area(),
-    solid(),
-    pos(30 * blockSize, 15 * blockSize),
-    color(),
-    scale(planetScale),
-    layer("game"),
-    origin("center"),
-    "planet",
-    {
-      realPos: [
-        20 * blockSize,
-        15 * blockSize
-      ],
-      startingPos: [
-        20 * blockSize,
-        15 * blockSize
-      ],
-      name: "white",
-      passengers: [],
-      size: 1
-    }
-  ]));
-  planetsVars.push(add([
-    sprite("planetWhite"),
-    area(),
-    solid(),
-    color(255, 0, 0),
-    pos(12 * blockSize, 6 * blockSize),
-    scale(planetScale),
-    layer("game"),
-    origin("center"),
-    "planet",
-    {
-      realPos: [12 * blockSize, 6 * blockSize],
-      startingPos: [12 * blockSize, 6 * blockSize],
-      name: "red",
-      passengers: [],
-      size: 1
-    }
-  ]));
-  planetsVars.push(add([
-    sprite("planetWhite"),
-    area(),
-    solid(),
-    color(0, 0, 255),
-    rotate(90),
-    pos(15 * blockSize, 40 * blockSize),
-    scale(planetScale),
-    layer("game"),
-    origin("center"),
-    "planet",
-    {
-      realPos: [
-        15 * blockSize,
-        20 * blockSize
-      ],
-      startingPos: [15 * blockSize, 20 * blockSize],
-      name: "blue",
-      passengers: [],
-      size: 1
-    }
-  ]));
-  planetsVars.push(add([
-    sprite("planetWhite"),
-    area(),
-    solid(),
-    color(0, 255, 0),
-    rotate(90),
-    pos(15 * blockSize, 40 * blockSize),
-    scale(planetScale),
-    layer("game"),
-    origin("center"),
-    "planet",
-    {
-      realPos: [
-        7 * blockSize,
-        12 * blockSize
-      ],
-      startingPos: [
-        7 * blockSize,
-        12 * blockSize
-      ],
-      name: "green",
-      passengers: [],
-      size: 1
-    }
-  ]));
-
   // code/player.ts
-  var playerScale = 3;
+  var playerScale = 2;
   function loadPlayer() {
-    return k.add([
+    return add([
       sprite("ship_1"),
       pos(width() / 2, height() / 2),
       rotate(0),
@@ -2612,7 +2452,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         acceleration: 2.5,
         deceleration: 4,
         animation_frame: 0,
-        money: 1e18,
+        money: 100,
         capacityMax: 14,
         capacity: 14,
         passengers: [],
@@ -2630,7 +2470,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   }
   __name(loadPlayer, "loadPlayer");
   function loadMovementArrow() {
-    return k.add([
+    return add([
       sprite("arrow_1"),
       pos(40, 80),
       rotate(0),
@@ -2665,19 +2505,467 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   });
   var main_default = k;
   loadAssets();
-  var planetsVars2 = [];
+  var fontSize = 2;
+  var planetsVars = [];
   var angleOfMovement = 0;
   var mapScale2 = 1.5;
-  var planetScale2 = 1.5;
+  var planetScale = 1.5;
   var blockSize2 = 64 * mapScale2;
+  var backgroundSize2 = 64 * mapScale2 * 6;
   var numberOfBackTiles = 48;
-  generateLayers();
+  var planets = [
+    "white",
+    "red",
+    "blue",
+    "green"
+  ];
+  layers([
+    "bg",
+    "game",
+    "ui",
+    "uiText",
+    "store"
+  ], "game");
   generateMap();
-  var planetHome = addBasePlanet();
-  var movementArrow = loadMovementArrow();
-  var player2 = loadPlayer();
+  var planetHome = add([
+    sprite("planet1"),
+    pos(0, 0),
+    scale(planetScale),
+    area({ scale: 1.5 }),
+    solid(),
+    layer("game"),
+    origin("center"),
+    "planet",
+    {
+      realPos: [0, 0],
+      startingPos: [0, 0],
+      name: "home",
+      passengers: [],
+      size: 1
+    }
+  ]);
+  planetsVars.push(add([
+    sprite("planetWhite"),
+    area(),
+    solid(),
+    pos(30 * blockSize2, 15 * blockSize2),
+    color(),
+    scale(planetScale),
+    layer("game"),
+    origin("center"),
+    "planet",
+    {
+      realPos: [
+        20 * blockSize2,
+        15 * blockSize2
+      ],
+      startingPos: [
+        20 * blockSize2,
+        15 * blockSize2
+      ],
+      name: "white",
+      passengers: [],
+      size: 1
+    }
+  ]));
+  planetsVars.push(add([
+    sprite("planetWhite"),
+    area(),
+    solid(),
+    color(255, 0, 0),
+    pos(12 * blockSize2, 6 * blockSize2),
+    scale(planetScale),
+    layer("game"),
+    origin("center"),
+    "planet",
+    {
+      realPos: [12 * blockSize2, 6 * blockSize2],
+      startingPos: [12 * blockSize2, 6 * blockSize2],
+      name: "red",
+      passengers: [],
+      size: 1
+    }
+  ]));
+  planetsVars.push(add([
+    sprite("planetWhite"),
+    area(),
+    solid(),
+    color(0, 0, 255),
+    rotate(90),
+    pos(15 * blockSize2, 40 * blockSize2),
+    scale(planetScale),
+    layer("game"),
+    origin("center"),
+    "planet",
+    {
+      realPos: [
+        15 * blockSize2,
+        20 * blockSize2
+      ],
+      startingPos: [15 * blockSize2, 20 * blockSize2],
+      name: "blue",
+      passengers: [],
+      size: 1
+    }
+  ]));
+  planetsVars.push(add([
+    sprite("planetWhite"),
+    area(),
+    solid(),
+    color(0, 255, 0),
+    rotate(90),
+    pos(15 * blockSize2, 40 * blockSize2),
+    scale(planetScale),
+    layer("game"),
+    origin("center"),
+    "planet",
+    {
+      realPos: [
+        7 * blockSize2,
+        12 * blockSize2
+      ],
+      startingPos: [
+        7 * blockSize2,
+        12 * blockSize2
+      ],
+      name: "green",
+      passengers: [],
+      size: 1
+    }
+  ]));
+  function buyPlanets() {
+    if (planetsVars.length == 4) {
+      planetsVars.push(add([
+        sprite("rainBowPlanet"),
+        area(),
+        solid(),
+        pos(2 * blockSize2, 2 * blockSize2),
+        scale(planetScale),
+        layer("game"),
+        origin("center"),
+        "planet",
+        z(0),
+        {
+          realPos: [
+            2 * blockSize2 + player.realPos[0],
+            2 * blockSize2 + player.realPos[1]
+          ],
+          startingPos: [
+            2 * blockSize2,
+            2 * blockSize2
+          ],
+          name: "rainbow",
+          passengers: [],
+          size: 1
+        }
+      ]));
+      planets.push("rainbow");
+    }
+    generatePassengers(planetsVars[planetsVars.length - 1], 10);
+    player.z = 100;
+    every("planet", (planet) => {
+      planet.passengers = [];
+      generatePassengers(planet, 10);
+    });
+  }
+  __name(buyPlanets, "buyPlanets");
+  movementArrow = loadMovementArrow();
+  player = loadPlayer();
   movementArrow.play("spin");
-  player2.play("thrust");
+  player.play("thrust");
+  var textLeftModifer = width() / 1e3;
+  var textLeftModiferHeight = width() * 0.025;
+  add([
+    text("Planet: ", 8),
+    scale(fontSize * textLeftModifer),
+    pos(5, 50),
+    origin("topleft"),
+    layer("ui")
+  ]);
+  var planetText = add([
+    text(player.planetAt, 8),
+    scale(fontSize * textLeftModifer),
+    pos(120 * textLeftModifer, 50 + textLeftModiferHeight * 0),
+    origin("topleft"),
+    layer("ui")
+  ]);
+  add([
+    text("Money:", 8),
+    scale(fontSize * textLeftModifer),
+    pos(5, 50 + textLeftModiferHeight * 1),
+    origin("topleft"),
+    layer("ui")
+  ]);
+  var moneyText = add([
+    text(player.money, 8),
+    scale(fontSize * textLeftModifer),
+    pos(100 * textLeftModifer, 50 + textLeftModiferHeight * 1),
+    origin("topleft"),
+    layer("ui")
+  ]);
+  add([
+    text("Speed: ", 8),
+    scale(fontSize * textLeftModifer),
+    pos(5, 50 + textLeftModiferHeight * 2),
+    origin("topleft"),
+    layer("ui")
+  ]);
+  var speedText = add([
+    text(player.speed, 8),
+    scale(fontSize * textLeftModifer),
+    pos(100 * textLeftModifer, 50 + textLeftModiferHeight * 2),
+    origin("topleft"),
+    layer("ui")
+  ]);
+  add([
+    text("Capacity:", 8),
+    scale(fontSize * textLeftModifer),
+    pos(5, 50 + textLeftModiferHeight * 3),
+    origin("topleft"),
+    layer("ui")
+  ]);
+  var capacityText = add([
+    text(player.capacity, 8),
+    scale(fontSize * textLeftModifer),
+    pos(150 * textLeftModifer, 50 + textLeftModiferHeight * 3),
+    origin("topleft"),
+    layer("ui")
+  ]);
+  add([
+    text("Passengers:", 8),
+    scale(fontSize * textLeftModifer),
+    pos(5, 50 + textLeftModiferHeight * 4),
+    origin("topleft"),
+    layer("ui")
+  ]);
+  var storeBg = add([
+    area(),
+    solid(),
+    color(50, 50, 50),
+    opacity(0),
+    pos(0, 0),
+    rect(width(), height()),
+    scale(mapScale2),
+    layer("store"),
+    origin("topleft"),
+    {
+      storeOpen: false
+    }
+  ]);
+  var storeButton = add([
+    area(),
+    solid(),
+    color(28, 71, 88),
+    opacity(0),
+    pos(width() - 20, 20),
+    rect(width() / 6, width() / 1e3 * 50),
+    scale(mapScale2),
+    layer("store"),
+    origin("topright"),
+    "button",
+    "atPanetUi",
+    "storeButton",
+    {}
+  ]);
+  var storeText = add([
+    text("Store"),
+    pos(240, 180),
+    layer("store"),
+    scale(width() / 1e3 * 3 * fontSize),
+    origin("topright"),
+    "atPanetUi",
+    "storeButton",
+    pos(width() - 20, 20),
+    opacity(0)
+  ]);
+  var scrollAmount = 0;
+  var storeData = [
+    {
+      name: "Upgrade Capacity",
+      id: 0,
+      amountBought: 0,
+      cost: 50,
+      functionToRun: () => {
+        player.capacity = Math.floor(player.capacity + 2);
+        capacityText.text = player.capacity;
+      }
+    },
+    {
+      name: "Upgrade Max Speed",
+      id: 1,
+      amountBought: 0,
+      cost: 200,
+      max: 40,
+      functionToRun: () => {
+        player.max_thrust += 20;
+      }
+    },
+    {
+      name: "Upgrade Acceleration",
+      id: 2,
+      amountBought: 0,
+      cost: 200,
+      max: 20,
+      functionToRun: () => {
+        player.acceleration *= 1.1;
+      }
+    },
+    {
+      name: "Upgrade Money/Passenger",
+      id: 3,
+      amountBought: 0,
+      cost: 100,
+      functionToRun: () => {
+        player.baseMoneyPerPass *= 1.2;
+      }
+    },
+    {
+      name: "Upgrade Fill Speed",
+      id: 4,
+      amountBought: 0,
+      cost: 300,
+      max: 20,
+      functionToRun: () => {
+        player.loadSpeed = Math.round(player.loadSpeed * 1.2);
+      }
+    },
+    {
+      name: "Unlock Planets",
+      id: 5,
+      amountBought: 0,
+      cost: "prog",
+      costProgression: [100, 100, 100, 100],
+      costProgression: [5e3, 5e4, 5e4, 5e6],
+      max: 4,
+      functionToRun: () => {
+        buyPlanets();
+      }
+    },
+    {
+      name: "Upgrade Handling",
+      id: 6,
+      amountBought: 0,
+      cost: 200,
+      max: 20,
+      functionToRun: () => {
+        player.handling *= 0.9;
+      }
+    }
+  ];
+  var storeButtonSprites = [];
+  function genStoreItems() {
+    add([
+      text("Money:"),
+      scale(width() / 1e3 * 3.5),
+      pos(5, 50 + textLeftModiferHeight * 5),
+      origin("topleft"),
+      layer("store"),
+      "currentMoneyInStore",
+      "inStoreButton"
+    ]);
+    add([
+      text(player.money),
+      scale(width() / 1e3 * 3.5),
+      pos(5, 50 + textLeftModiferHeight * 5 + width() / 1e3 * 2 * 25),
+      origin("topleft"),
+      layer("store"),
+      "currentMoneyInStore",
+      "inStoreButton"
+    ]);
+    for (let i = 0; i < storeData.length; i++) {
+      let bgColor = ColorPaletteAlias.orange;
+      if (storeData[i].max <= storeData[i].amountBought) {
+        bgColor = ColorPaletteAlias.rust;
+        storeData[i].cost = "max";
+      }
+      storeButtonSprites.push({
+        bg: add([
+          area(),
+          solid(),
+          color(bgColor),
+          pos(width() / 2, 15 + i * (width() / 1e3 * 100 + 30) + scrollAmount),
+          rect(width() / 2.5, width() / 1e3 * 100),
+          layer("store"),
+          origin("top"),
+          "button",
+          "inStoreButton",
+          "inStoreButtonBg",
+          {
+            idbuy: i,
+            functionToRun: storeData[i].functionToRun
+          }
+        ]),
+        title: add([
+          text(storeData[i].name),
+          layer("store"),
+          origin("top"),
+          scale(width() / 1e3 * 2),
+          "inStoreButton",
+          pos(width() / 2, 20 + i * (width() / 1e3 * 100 + 30) + scrollAmount)
+        ]),
+        boughtTextDis: add([
+          text("bought:"),
+          layer("store"),
+          origin("topleft"),
+          scale(width() / 1e3 * 2),
+          "inStoreButton",
+          pos(width() / 2 - width() / 6 + 5, 15 + width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30) + scrollAmount)
+        ]),
+        boughtText: add([
+          text(storeData[i].amountBought),
+          layer("store"),
+          origin("topleft"),
+          scale(width() / 1e3 * 2),
+          "inStoreButton",
+          pos(width() / 2 - width() / 24, 15 + width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30) + scrollAmount)
+        ]),
+        costText: add([
+          text("cost:"),
+          layer("store"),
+          origin("topleft"),
+          scale(width() / 1e3 * 2),
+          "inStoreButton",
+          pos(width() / 2 - width() / 6 + 5, 15 + 2 * width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30) + scrollAmount)
+        ]),
+        cost: add([
+          text(genPrice(storeData[i], storeData[i].amountBought)),
+          layer("store"),
+          origin("topleft"),
+          scale(width() / 1e3 * 2),
+          "inStoreButton",
+          pos(width() / 2 - width() / 24, 15 + 2 * width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30) + scrollAmount)
+        ])
+      });
+    }
+  }
+  __name(genStoreItems, "genStoreItems");
+  function showStore() {
+    if (!storeBg.storeOpen) {
+      storeBg.opacity = 0.8;
+      storeBg.storeOpen = true;
+      storeText.text = "Game";
+      genStoreItems();
+    } else {
+      storeBg.opacity = 0;
+      storeBg.storeOpen = false;
+      storeText.text = "Store";
+      destroyAll("inStoreButton");
+      storeButtonSprites = [];
+    }
+  }
+  __name(showStore, "showStore");
+  function planetUi(isOn) {
+    if (!isOn) {
+      every("atPanetUi", (uiEll) => {
+        uiEll.opacity = 0;
+      });
+    } else {
+      every("atPanetUi", (uiEll) => {
+        uiEll.opacity = 1;
+      });
+    }
+  }
+  __name(planetUi, "planetUi");
   function arrowRotateFromMouse() {
     mouseRotationToSend = Math.atan((mousePos().y - height() / 2) / (mousePos().x - width() / 2)) * 180 / Math.PI - 90;
     if (mousePos().x - width() / 2 >= 0) {
@@ -2686,6 +2974,68 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     return mouseRotationToSend;
   }
   __name(arrowRotateFromMouse, "arrowRotateFromMouse");
+  function launch() {
+    if (storeBg.storeOpen) {
+      return;
+    }
+    if (player.onPlanet) {
+      player.speed = 1;
+      player.onPlanet = false;
+      planetUi(false);
+      player.planetAt = "none";
+      planetText.text = player.planetAt;
+      every("onPlanetPass", (passa) => {
+        destroy(passa);
+      });
+    }
+  }
+  __name(launch, "launch");
+  var storeButX = width() - 20 - width() / 6 * mapScale2;
+  var storeButY = (20 + width() / 1e3 * 50) * mapScale2;
+  mouseClick(() => {
+    if (!(mousePos().x > storeButX && mousePos().y < storeButY && player.onPlanet)) {
+      launch();
+    }
+  });
+  function genPrice(item, time) {
+    if (item.cost == "max") {
+      return "Max Bought";
+    }
+    if (item.cost == "prog") {
+      return item.costProgression[time];
+    }
+    return Math.round(__pow(item.cost, (time + 20) / 20));
+  }
+  __name(genPrice, "genPrice");
+  clicks("inStoreButtonBg", (button) => {
+    if (player.money >= genPrice(storeData[button.idbuy], storeData[button.idbuy].amountBought)) {
+      player.money -= genPrice(storeData[button.idbuy], storeData[button.idbuy].amountBought);
+      storeData[button.idbuy].functionToRun();
+      storeData[button.idbuy].amountBought++;
+      moneyText.text = player.money;
+      destroyAll("inStoreButton");
+      storeButtonSprites = [];
+      genStoreItems();
+    } else {
+      shake();
+    }
+  });
+  document.addEventListener("wheel", (event) => {
+    if (!storeBg.storeOpen) {
+      return;
+    }
+    destroyAll("inStoreButton");
+    storeButtonSprites = [];
+    scrollAmount += event.wheelDelta / 2;
+    scrollAmount = Math.min(scrollAmount, 0);
+    scrollAmount = Math.max(scrollAmount, -1 * (15 + (storeData.length - 1) * (width() / 1e3 * 100 + 30)));
+    genStoreItems();
+  });
+  storeButton.clicks(() => {
+    if (player.onPlanet) {
+      showStore();
+    }
+  });
   movementArrow.action(() => {
     movementArrow.angle = arrowRotateFromMouse();
     movementArrow.pos.x = width() / 2 + Math.sin(movementArrow.angle * (Math.PI / 180)) * 60;
@@ -2707,36 +3057,60 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }, 10);
   }
   __name(moveToSlow, "moveToSlow");
-  player2.collides("planet", (planet) => {
-    if (player2.onPlanet) {
+  function refomatePassOnShip() {
+    every("onShipPass", (todestroy) => {
+      if (!todestroy.moving) {
+        todestroy.destroy();
+      }
+    });
+    for (let i = 0; i < player.passengers.length; i++) {
+      let newPassDataShip = player.passengers[i];
+      player.passengersSprite.push(add([
+        sprite(newPassDataShip.sprite),
+        pos(i % 6 * 30 + 15, 50 + textLeftModiferHeight * 5 + (Math.floor(i / 6) + 1) * 20),
+        color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
+        origin("center"),
+        area(),
+        layer("game"),
+        "passenger",
+        "onShipPass",
+        {
+          moving: false
+        }
+      ]));
+    }
+  }
+  __name(refomatePassOnShip, "refomatePassOnShip");
+  player.collides("planet", (planet) => {
+    if (player.onPlanet) {
       return;
     }
-    player2.speed = 0;
+    player.speed = 0;
     move(-1 * planet.startingPos[0] + width() / 2, -1 * planet.startingPos[1] + height() / 2, 10);
-    player2.onPlanet = true;
-    player2.planetAt = planet.name;
-    planetText.text = player2.planetAt;
+    player.onPlanet = true;
+    player.planetAt = planet.name;
+    planetText.text = player.planetAt;
     planetUi(true);
-    if (planetNames.includes(player2.planetAt)) {
+    if (planets.includes(player.planetAt)) {
       let playerPassesToRemove = [];
-      for (let i = 0; i < player2.passengers.length; i++) {
-        if (player2.passengers[i].destanation == player2.planetAt) {
-          moveToSlow(width() / 2, height() / 2, player2.passengersSprite[i], 25, true);
-          player2.passengersSprite[i].moving = true;
+      for (let i = 0; i < player.passengers.length; i++) {
+        if (player.passengers[i].destanation == player.planetAt) {
+          moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true);
+          player.passengersSprite[i].moving = true;
           playerPassesToRemove.push(i);
-          player2.money += Math.round(player2.baseMoneyPerPass * player2.passengers[i].fare);
-          moneyText.text = player2.money;
+          player.money += Math.round(player.baseMoneyPerPass * player.passengers[i].fare);
+          moneyText.text = player.money;
         }
       }
       for (let i = playerPassesToRemove.length - 1; i >= 0; i--) {
-        player2.passengers.splice(playerPassesToRemove[i], 1);
+        player.passengers.splice(playerPassesToRemove[i], 1);
       }
-      player2.passengersSprite = [];
+      player.passengersSprite = [];
       refomatePassOnShip();
-      player2.capacity += playerPassesToRemove.length;
-      capacityText.text = player2.capacity;
-      for (let i = 0; i < planetsVars2[planetNames.indexOf(player2.planetAt)].passengers.length; i++) {
-        let newPassData = planetsVars2[planetNames.indexOf(player2.planetAt)].passengers[i];
+      player.capacity += playerPassesToRemove.length;
+      capacityText.text = player.capacity;
+      for (let i = 0; i < planetsVars[planets.indexOf(player.planetAt)].passengers.length; i++) {
+        let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[i];
         add([
           sprite(newPassData.sprite),
           pos(width() / 2 + 50 + i * 30, height() / 2),
@@ -2751,17 +3125,17 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
   });
   action("onPlanetPass", (passenger) => {
-    if (player2.capacity > 0) {
-      passenger.move(dir(180).scale(player2.loadSpeed * dt() * 40));
+    if (player.capacity > 0) {
+      passenger.move(dir(180).scale(player.loadSpeed * dt() * 40));
     }
     if (passenger.pos.x <= width() / 2) {
-      player2.passengers.push(planetsVars2[planetNames.indexOf(player2.planetAt)].passengers[0]);
-      player2.capacity -= 1;
-      capacityText.text = player2.capacity;
-      let newPassDataShip = player2.passengers[player2.passengers.length - 1];
-      player2.passengersSprite.push(add([
+      player.passengers.push(planetsVars[planets.indexOf(player.planetAt)].passengers[0]);
+      player.capacity -= 1;
+      capacityText.text = player.capacity;
+      let newPassDataShip = player.passengers[player.passengers.length - 1];
+      player.passengersSprite.push(add([
         sprite(newPassDataShip.sprite),
-        pos((player2.passengers.length - 1) % 6 * 30 + 15, 50 + textLeftModiferHeight * 5 + (Math.floor((player2.passengers.length - 1) / 6) + 1) * 20),
+        pos((player.passengers.length - 1) % 6 * 30 + 15, 50 + textLeftModiferHeight * 5 + (Math.floor((player.passengers.length - 1) / 6) + 1) * 20),
         color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
         origin("center"),
         area(),
@@ -2773,9 +3147,9 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         }
       ]));
       passenger.destroy();
-      planetsVars2[planetNames.indexOf(player2.planetAt)].passengers.shift();
-      generatePassengers(planetsVars2[planetNames.indexOf(player2.planetAt)], 1);
-      let newPassData = planetsVars2[planetNames.indexOf(player2.planetAt)].passengers[planetsVars2[planetNames.indexOf(player2.planetAt)].passengers.length - 1];
+      planetsVars[planets.indexOf(player.planetAt)].passengers.shift();
+      generatePassengers(planetsVars[planets.indexOf(player.planetAt)], 1);
+      let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[planetsVars[planets.indexOf(player.planetAt)].passengers.length - 1];
       add([
         sprite(newPassData.sprite),
         pos(width() / 2 + 10 * 30, height() / 2),
@@ -2789,8 +3163,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
   });
   function calcRealPos(obj) {
-    obj.realPos[0] += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player2.speed * dt();
-    obj.realPos[1] += Math.cos(angleOfMovement * (Math.PI / 180)) * player2.speed * dt();
+    obj.realPos[0] += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
+    obj.realPos[1] += Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
     if (obj.realPos[0] >= numberOfBackTiles / 2 * blockSize2) {
       obj.realPos[0] = obj.realPos[0] - numberOfBackTiles * blockSize2;
     }
@@ -2810,10 +3184,10 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   }
   __name(calcRealPos, "calcRealPos");
   var move = /* @__PURE__ */ __name((x, y, slow) => {
-    let moveAmountX = (x - player2.realPos[0]) / slow;
-    player2.realPos[0] = x;
-    let moveAmountY = (y - player2.realPos[1]) / slow;
-    player2.realPos[1] = y;
+    let moveAmountX = (x - player.realPos[0]) / slow;
+    player.realPos[0] = x;
+    let moveAmountY = (y - player.realPos[1]) / slow;
+    player.realPos[1] = y;
     let timerreset = 0;
     let intervalID = setInterval(function() {
       every("background", (background) => {
@@ -2830,8 +3204,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }, 10);
   }, "move");
   action("background", (background) => {
-    background.pos.x += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player2.speed * dt();
-    background.pos.y += Math.cos(angleOfMovement * (Math.PI / 180)) * player2.speed * dt();
+    background.pos.x += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
+    background.pos.y += Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
     if (background.pos.x >= numberOfBackTiles / 2 * blockSize2 + width() / 2) {
       background.pos.x = background.pos.x - numberOfBackTiles * blockSize2;
     } else if (background.pos.x <= -1 * (numberOfBackTiles / 2 * blockSize2) + width() / 2) {
@@ -2862,9 +3236,9 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
     ;
     if (planet.pos.x !== planet.realPos[0] || planet.pos.y !== planet.realPos[1]) {
-      planet.scaleTo(planetScale2 * planet.size / 2);
+      planet.scaleTo(planetScale * planet.size / 2);
     } else {
-      planet.scaleTo(planetScale2 * planet.size);
+      planet.scaleTo(planetScale * planet.size);
     }
   });
   function sum(a, offset) {
@@ -2881,14 +3255,51 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   }
   __name(meanAngleDeg, "meanAngleDeg");
   action("player", () => {
-    if (player2.speed > 0) {
-      player2.speed = Math.min(player2.speed + player2.acceleration, player2.max_thrust);
+    if (player.speed > 0) {
+      player.speed = Math.min(player.speed + player.acceleration, player.max_thrust);
     }
-    speedText.text = Math.round(player2.speed);
-    angleOfMovement = meanAngleDeg([movementArrow.angle, angleOfMovement], player2.handling * 0.3 / dt());
-    player2.angle = angleOfMovement;
-    calcRealPos(player2);
+    speedText.text = Math.round(player.speed);
+    angleOfMovement = meanAngleDeg([movementArrow.angle, angleOfMovement], player.handling * 0.3 / dt());
+    player.angle = angleOfMovement;
+    calcRealPos(player);
   });
+  function generatePassengers(planet, ammount) {
+    if (planets.includes(planet.name)) {
+      let otherPlanets = planets.slice();
+      otherPlanets.splice(planets.indexOf(planet.name), 1);
+      for (let i = 0; i < ammount; i++) {
+        let generatedPassId = Math.floor(Math.random() * otherPlanets.length);
+        let genPassColor = (0, 0, 0);
+        let genPassSprite = "passenger";
+        let genPassFare = 1;
+        switch (otherPlanets[generatedPassId]) {
+          case "white":
+            genPassColor = [255, 255, 255];
+            break;
+          case "blue":
+            genPassColor = [0, 0, 255];
+            break;
+          case "red":
+            genPassColor = [255, 0, 0];
+            break;
+          case "green":
+            genPassColor = [0, 255, 0];
+            break;
+          case "rainbow":
+            genPassSprite = "passRainbow";
+            genPassColor = [255, 255, 255];
+            genPassFare = 10;
+        }
+        planet.passengers.push({
+          destanation: otherPlanets[generatedPassId],
+          color: genPassColor,
+          sprite: genPassSprite,
+          fare: genPassFare
+        });
+      }
+    }
+  }
+  __name(generatePassengers, "generatePassengers");
   var onStart = /* @__PURE__ */ __name(() => {
     every("background", (background) => {
       background.startingPos[0] = background.pos.x;

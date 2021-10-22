@@ -1,14 +1,7 @@
 import kaboom from "kaboom";
+import { Vec2 } from "kaboom";
 
 
-
-export type Vec2N = {
-  x: number;
-  y: number;
-}
-
-export function vec2N(x: number, y: number): Vec2N { return <Vec2N>{x, y}; }
-
-export function vec2NToString(vec: Vec2N): string {
+export function vec2ToString(vec: Vec2): string {
   return vec.x + ", " + vec.y;
 }
