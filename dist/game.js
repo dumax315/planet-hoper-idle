@@ -461,12 +461,12 @@
         throw new Error(g);
       if (g = e.getShaderInfoLog(z2))
         throw new Error(g);
-      let k2 = e.createProgram();
-      if (e.attachShader(k2, R), e.attachShader(k2, z2), e.bindAttribLocation(k2, 0, "a_pos"), e.bindAttribLocation(k2, 1, "a_uv"), e.bindAttribLocation(k2, 2, "a_color"), e.linkProgram(k2), (g = e.getProgramInfoLog(k2)) && g !== `
+      let k3 = e.createProgram();
+      if (e.attachShader(k3, R), e.attachShader(k3, z2), e.bindAttribLocation(k3, 0, "a_pos"), e.bindAttribLocation(k3, 1, "a_uv"), e.bindAttribLocation(k3, 2, "a_color"), e.linkProgram(k3), (g = e.getProgramInfoLog(k3)) && g !== `
 `)
         throw new Error(g);
       return { bind() {
-        e.useProgram(k2);
+        e.useProgram(k3);
       }, unbind() {
         e.useProgram(null);
       }, bindAttribs() {
@@ -474,7 +474,7 @@
       }, send(T) {
         this.bind();
         for (let Q in T) {
-          let q = T[Q], K = e.getUniformLocation(k2, Q);
+          let q = T[Q], K = e.getUniformLocation(k3, Q);
           typeof q == "number" ? e.uniform1f(K, q) : kt(q) ? e.uniformMatrix4fv(K, false, new Float32Array(q.m)) : We(q) ? e.uniform4f(K, q.r, q.g, q.b, q.a) : At(q) ? e.uniform3f(K, q.x, q.y, q.z) : Fe(q) && e.uniform2f(K, q.x, q.y);
         }
         this.unbind();
@@ -483,20 +483,20 @@
     __name(P, "P");
     s(P, "makeProgram");
     function w(l, y, g, v) {
-      let A = l.width / y, R = l.height / g, z2 = 1 / A, k2 = 1 / R, T = {}, Q = v.split("").entries();
+      let A = l.width / y, R = l.height / g, z2 = 1 / A, k3 = 1 / R, T = {}, Q = v.split("").entries();
       for (let [q, K] of Q)
-        T[K] = u(q % A * z2, Math.floor(q / A) * k2);
-      return { tex: l, map: T, qw: z2, qh: k2 };
+        T[K] = u(q % A * z2, Math.floor(q / A) * k3);
+      return { tex: l, map: T, qw: z2, qh: k3 };
     }
     __name(w, "w");
     s(w, "makeFont");
     function C(l, y, g = t.defTex, v = t.defProg, A = {}) {
       g = g != null ? g : t.defTex, v = v != null ? v : t.defProg, (g !== t.curTex || v !== t.curProg || !pt(t.curUniform, A) || t.vqueue.length + l.length * Ye > tt || t.iqueue.length + y.length > tt) && S(), t.curTex = g, t.curProg = v, t.curUniform = A;
-      let R = y.map((k2) => k2 + t.vqueue.length / Ye), z2 = l.map((k2) => {
-        let T = G(t.transform.multVec2(k2.pos.xy()));
-        return [T.x, T.y, k2.pos.z, k2.uv.x, k2.uv.y, k2.color.r / 255, k2.color.g / 255, k2.color.b / 255, k2.opacity];
+      let R = y.map((k3) => k3 + t.vqueue.length / Ye), z2 = l.map((k3) => {
+        let T = G(t.transform.multVec2(k3.pos.xy()));
+        return [T.x, T.y, k3.pos.z, k3.uv.x, k3.uv.y, k3.color.r / 255, k3.color.g / 255, k3.color.b / 255, k3.opacity];
       }).flat();
-      R.forEach((k2) => t.iqueue.push(k2)), z2.forEach((k2) => t.vqueue.push(k2));
+      R.forEach((k3) => t.iqueue.push(k3)), z2.forEach((k3) => t.vqueue.push(k3));
     }
     __name(C, "C");
     s(C, "drawRaw");
@@ -567,8 +567,8 @@
     s(D, "popTransform");
     function E(l = {}) {
       var K, oe, ge, ae, ye, Ue;
-      let y = l.width || 0, g = l.height || 0, v = l.pos || u(0, 0), R = Xe(l.origin || et).scale(u(y, g).scale(-0.5)), z2 = u((K = l.scale) != null ? K : 1), k2 = l.rot || 0, T = l.quad || he(0, 0, 1, 1), Q = 1 - ((oe = l.z) != null ? oe : 0), q = l.color || H();
-      pe(), O(v), m(k2), j(z2), O(R), C([{ pos: we(-y / 2, g / 2, Q), uv: u(l.flipX ? T.x + T.w : T.x, l.flipY ? T.y : T.y + T.h), color: q, opacity: (ge = l.opacity) != null ? ge : 1 }, { pos: we(-y / 2, -g / 2, Q), uv: u(l.flipX ? T.x + T.w : T.x, l.flipY ? T.y + T.h : T.y), color: q, opacity: (ae = l.opacity) != null ? ae : 1 }, { pos: we(y / 2, -g / 2, Q), uv: u(l.flipX ? T.x : T.x + T.w, l.flipY ? T.y + T.h : T.y), color: q, opacity: (ye = l.opacity) != null ? ye : 1 }, { pos: we(y / 2, g / 2, Q), uv: u(l.flipX ? T.x : T.x + T.w, l.flipY ? T.y : T.y + T.h), color: q, opacity: (Ue = l.opacity) != null ? Ue : 1 }], [0, 1, 3, 1, 2, 3], l.tex, l.prog, l.uniform), D();
+      let y = l.width || 0, g = l.height || 0, v = l.pos || u(0, 0), R = Xe(l.origin || et).scale(u(y, g).scale(-0.5)), z2 = u((K = l.scale) != null ? K : 1), k3 = l.rot || 0, T = l.quad || he(0, 0, 1, 1), Q = 1 - ((oe = l.z) != null ? oe : 0), q = l.color || H();
+      pe(), O(v), m(k3), j(z2), O(R), C([{ pos: we(-y / 2, g / 2, Q), uv: u(l.flipX ? T.x + T.w : T.x, l.flipY ? T.y : T.y + T.h), color: q, opacity: (ge = l.opacity) != null ? ge : 1 }, { pos: we(-y / 2, -g / 2, Q), uv: u(l.flipX ? T.x + T.w : T.x, l.flipY ? T.y + T.h : T.y), color: q, opacity: (ae = l.opacity) != null ? ae : 1 }, { pos: we(y / 2, -g / 2, Q), uv: u(l.flipX ? T.x : T.x + T.w, l.flipY ? T.y + T.h : T.y), color: q, opacity: (ye = l.opacity) != null ? ye : 1 }, { pos: we(y / 2, g / 2, Q), uv: u(l.flipX ? T.x : T.x + T.w, l.flipY ? T.y : T.y + T.h), color: q, opacity: (Ue = l.opacity) != null ? Ue : 1 }], [0, 1, 3, 1, 2, 3], l.tex, l.prog, l.uniform), D();
     }
     __name(E, "E");
     s(E, "drawQuad");
@@ -576,8 +576,8 @@
       var z2;
       let g = (z2 = y.quad) != null ? z2 : he(0, 0, 1, 1), v = l.width * g.w, A = l.height * g.h, R = u(1);
       if (y.tiled) {
-        let k2 = Math.ceil((y.width || v) / v), T = Math.ceil((y.height || A) / A), q = Xe(y.origin || et).add(u(1, 1)).scale(0.5).scale(k2 * v, T * A);
-        for (let K = 0; K < k2; K++)
+        let k3 = Math.ceil((y.width || v) / v), T = Math.ceil((y.height || A) / A), q = Xe(y.origin || et).add(u(1, 1)).scale(0.5).scale(k3 * v, T * A);
+        for (let K = 0; K < k3; K++)
           for (let oe = 0; oe < T; oe++)
             E(Re(Ce({}, y), { pos: (y.pos || u(0)).add(u(v * K, A * oe)).sub(q), scale: R.scale(y.scale || u(1)), tex: l, quad: g, width: v, height: A, origin: "topleft" }));
       } else
@@ -595,8 +595,8 @@
         let Q = u(v.scale);
         y = y * Q.x, g = g * Q.y, v.scale = 1;
       }
-      let A = Xe(v.origin || et).scale(u(y, g)).scale(0.5), R = l.add(u(-y / 2, -g / 2)).sub(A), z2 = l.add(u(-y / 2, g / 2)).sub(A), k2 = l.add(u(y / 2, g / 2)).sub(A), T = l.add(u(y / 2, -g / 2)).sub(A);
-      W(R, z2, v), W(z2, k2, v), W(k2, T, v), W(T, R, v);
+      let A = Xe(v.origin || et).scale(u(y, g)).scale(0.5), R = l.add(u(-y / 2, -g / 2)).sub(A), z2 = l.add(u(-y / 2, g / 2)).sub(A), k3 = l.add(u(y / 2, g / 2)).sub(A), T = l.add(u(y / 2, -g / 2)).sub(A);
+      W(R, z2, v), W(z2, k3, v), W(k3, T, v), W(T, R, v);
     }
     __name(_, "_");
     s(_, "drawRectStroke");
@@ -607,14 +607,14 @@
     __name(W, "W");
     s(W, "drawLine");
     function V(l, y, g, v = {}) {
-      var z2, k2, T;
+      var z2, k3, T;
       let A = v.z, R = v.color || H();
-      C([{ pos: we(l.x, l.y, A), uv: u(0, 0), color: R, opacity: (z2 = v.opacity) != null ? z2 : 1 }, { pos: we(y.x, y.y, A), uv: u(0, 0), color: R, opacity: (k2 = v.opacity) != null ? k2 : 1 }, { pos: we(g.x, g.y, A), uv: u(0, 0), color: R, opacity: (T = v.opacity) != null ? T : 1 }], [0, 1, 2], t.defTex, v.prog, v.uniform);
+      C([{ pos: we(l.x, l.y, A), uv: u(0, 0), color: R, opacity: (z2 = v.opacity) != null ? z2 : 1 }, { pos: we(y.x, y.y, A), uv: u(0, 0), color: R, opacity: (k3 = v.opacity) != null ? k3 : 1 }, { pos: we(g.x, g.y, A), uv: u(0, 0), color: R, opacity: (T = v.opacity) != null ? T : 1 }], [0, 1, 2], t.defTex, v.prog, v.uniform);
     }
     __name(V, "V");
     s(V, "drawTri");
     function F(l, y, g = {}) {
-      let v = (l + "").split(""), A = y.qw * y.tex.width, R = y.qh * y.tex.height, z2 = g.size || R, k2 = u(z2 / R).scale(u(g.scale || 1)), T = k2.x * A, Q = k2.y * R, q = 0, K = Q, oe = 0, ge = [], ae = [], ye = null, Ue = 0;
+      let v = (l + "").split(""), A = y.qw * y.tex.width, R = y.qh * y.tex.height, z2 = g.size || R, k3 = u(z2 / R).scale(u(g.scale || 1)), T = k3.x * A, Q = k3.y * R, q = 0, K = Q, oe = 0, ge = [], ae = [], ye = null, Ue = 0;
       for (; Ue < v.length; ) {
         let be = v[Ue];
         be === `
@@ -627,7 +627,7 @@
         let Ze = (oe - be.length * T) * (ve.x + 0.5);
         be.forEach((Ge, Je) => {
           let Ie = y.map[Ge], st = Je * T, it = nt * Q;
-          Ie && Ee.push({ tex: y.tex, quad: he(Ie.x, Ie.y, y.qw, y.qh), ch: Ge, pos: u(xe.x + st + Ve + Ze, xe.y + it + rt), opacity: g.opacity, color: g.color, origin: g.origin, scale: k2 });
+          Ie && Ee.push({ tex: y.tex, quad: he(Ie.x, Ie.y, y.qw, y.qh), ch: Ge, pos: u(xe.x + st + Ve + Ze, xe.y + it + rt), opacity: g.opacity, color: g.color, origin: g.origin, scale: k3 });
         });
       }), { width: oe, height: K, chars: Ee };
     }
@@ -1600,15 +1600,15 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       }
       __name(z2, "z");
       s(z2, "keyPressRep");
-      function k2(n, i) {
+      function k3(n, i) {
         if (Array.isArray(n)) {
-          let o = n.map((d) => k2(d, i));
+          let o = n.map((d) => k3(d, i));
           return () => o.forEach((d) => d());
         } else
           return typeof n == "function" ? m.on("input", () => t.keyPressed() && n()) : m.on("input", () => t.keyReleased(n) && i());
       }
-      __name(k2, "k");
-      s(k2, "keyRelease");
+      __name(k3, "k");
+      s(k3, "keyRelease");
       function T(n) {
         return m.on("input", () => t.mouseDown() && n(G()));
       }
@@ -2319,7 +2319,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       }
       __name(Hr, "Hr");
       s(Hr, "addLevel");
-      let Me = { loadRoot: w.loadRoot, loadSprite: w.loadSprite, loadSpriteAtlas: w.loadSpriteAtlas, loadSound: w.loadSound, loadFont: w.loadFont, loadShader: w.loadShader, loadAseprite: w.loadAseprite, loadPedit: w.loadPedit, loadBean: w.loadBean, load: w.load, width: x, height: P, center: ut, dt: X, time: t.time, screenshot: t.screenshot, focused: t.focused, focus: t.focus, cursor: t.cursor, regCursor: nt, fullscreen: t.fullscreen, ready: Le, isTouch: () => t.isTouch, layers: pe, camPos: D, camScale: E, camRot: M, shake: J, toScreen: _, toWorld: W, gravity: be, add: p, readd: $, destroy: Ve, destroyAll: rt, get: Ee, every: xe, revery: ve, pos: Je, scale: Ie, rotate: st, color: it, opacity: vr, origin: Br, layer: Cr, area: Rr, sprite: Ar, text: kr, rect: Vr, outline: Ir, body: Wr, shader: Xr, timer: Mr, solid: Lr, fixed: qr, stay: $r, health: Yr, lifespan: zr, z: Pr, move: Dr, cleanup: Tr, follow: Sr, on: ce, action: ie, render: N, collides: ze, clicks: l, hovers: y, keyDown: A, keyPress: R, keyPressRep: z2, keyRelease: k2, mouseDown: T, mouseClick: Q, mouseRelease: q, mouseMove: K, charInput: oe, touchStart: ge, touchMove: ae, touchEnd: ye, mousePos: G, mouseWorldPos: re, mouseDeltaPos: t.mouseDeltaPos, keyIsDown: t.keyDown, keyIsPressed: t.keyPressed, keyIsPressedRep: t.keyPressedRep, keyIsReleased: t.keyReleased, mouseIsDown: t.mouseDown, mouseIsClicked: t.mouseClicked, mouseIsReleased: t.mouseReleased, mouseIsMoved: t.mouseMoved, loop: v, wait: g, play: ee, volume: r.volume, burp: r.burp, audioCtx: r.ctx, rng: ft, rand: $e, randi: mt, randSeed: Mt, vec2: u, dir: je, rgb: H, quad: he, choose: Ft, chance: _t, lerp: qe, map: Ae, mapc: Rt, wave: Vt, deg2rad: _e, rad2deg: ht, colLineLine: Lt, colRectRect: Oe, drawSprite: O, drawText: j, drawRect: c.drawRect, drawRectStroke: c.drawRectStroke, drawLine: c.drawLine, drawTri: c.drawTri, debug: ne, scene: Zr, go: Gr, addLevel: Hr, getData: Jr, setData: wt, plug: at, ASCII_CHARS: xt, CP437_CHARS: dr, LEFT: u(-1, 0), RIGHT: u(1, 0), UP: u(0, -1), DOWN: u(0, 1), canvas: t.canvas };
+      let Me = { loadRoot: w.loadRoot, loadSprite: w.loadSprite, loadSpriteAtlas: w.loadSpriteAtlas, loadSound: w.loadSound, loadFont: w.loadFont, loadShader: w.loadShader, loadAseprite: w.loadAseprite, loadPedit: w.loadPedit, loadBean: w.loadBean, load: w.load, width: x, height: P, center: ut, dt: X, time: t.time, screenshot: t.screenshot, focused: t.focused, focus: t.focus, cursor: t.cursor, regCursor: nt, fullscreen: t.fullscreen, ready: Le, isTouch: () => t.isTouch, layers: pe, camPos: D, camScale: E, camRot: M, shake: J, toScreen: _, toWorld: W, gravity: be, add: p, readd: $, destroy: Ve, destroyAll: rt, get: Ee, every: xe, revery: ve, pos: Je, scale: Ie, rotate: st, color: it, opacity: vr, origin: Br, layer: Cr, area: Rr, sprite: Ar, text: kr, rect: Vr, outline: Ir, body: Wr, shader: Xr, timer: Mr, solid: Lr, fixed: qr, stay: $r, health: Yr, lifespan: zr, z: Pr, move: Dr, cleanup: Tr, follow: Sr, on: ce, action: ie, render: N, collides: ze, clicks: l, hovers: y, keyDown: A, keyPress: R, keyPressRep: z2, keyRelease: k3, mouseDown: T, mouseClick: Q, mouseRelease: q, mouseMove: K, charInput: oe, touchStart: ge, touchMove: ae, touchEnd: ye, mousePos: G, mouseWorldPos: re, mouseDeltaPos: t.mouseDeltaPos, keyIsDown: t.keyDown, keyIsPressed: t.keyPressed, keyIsPressedRep: t.keyPressedRep, keyIsReleased: t.keyReleased, mouseIsDown: t.mouseDown, mouseIsClicked: t.mouseClicked, mouseIsReleased: t.mouseReleased, mouseIsMoved: t.mouseMoved, loop: v, wait: g, play: ee, volume: r.volume, burp: r.burp, audioCtx: r.ctx, rng: ft, rand: $e, randi: mt, randSeed: Mt, vec2: u, dir: je, rgb: H, quad: he, choose: Ft, chance: _t, lerp: qe, map: Ae, mapc: Rt, wave: Vt, deg2rad: _e, rad2deg: ht, colLineLine: Lt, colRectRect: Oe, drawSprite: O, drawText: j, drawRect: c.drawRect, drawRectStroke: c.drawRectStroke, drawLine: c.drawLine, drawTri: c.drawTri, debug: ne, scene: Zr, go: Gr, addLevel: Hr, getData: Jr, setData: wt, plug: at, ASCII_CHARS: xt, CP437_CHARS: dr, LEFT: u(-1, 0), RIGHT: u(1, 0), UP: u(0, -1), DOWN: u(0, 1), canvas: t.canvas };
       if (at(gr), e.plugins && e.plugins.forEach(at), e.global !== false)
         for (let n in Me)
           window[n] = Me[n];
@@ -2385,6 +2385,10 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     loadPedit("stars_3", "sprites/stars_3.pedit");
     loadPedit("void_1", "sprites/void_1.pedit");
     loadSprite("rainBowPlanet", "sprites/rainBowPlanet.png");
+    loadPedit("cargoSpikes", "sprites/cargoSpikes.pedit");
+    loadPedit("cargoFace", "sprites/cargoFace.pedit");
+    loadSprite("planetSpikes", "sprites/planetSpikes.png");
+    loadSprite("planetFace", "sprites/planetFace.png");
   }
   __name(loadAssets, "loadAssets");
 
@@ -2435,7 +2439,6 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   __name(generateMap, "generateMap");
 
   // code/player.ts
-  var playerScale = 2;
   function loadPlayer() {
     return add([
       sprite("ship_1"),
@@ -2474,7 +2477,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       sprite("arrow_1"),
       pos(40, 80),
       rotate(0),
-      scale(playerScale),
+      scale(playerScale * 1.3),
       layer("game"),
       origin("center"),
       "arrow",
@@ -2504,15 +2507,22 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     font: "sinko"
   });
   var main_default = k;
+  var playerScale = 2 * width() / 750;
+  var getWW = width();
+  function getWidth() {
+    return getWW;
+  }
+  __name(getWidth, "getWidth");
   loadAssets();
   var fontSize = 2;
   var planetsVars = [];
   var angleOfMovement = 0;
   var mapScale2 = 1.5;
-  var planetScale = 1.5;
+  var planetScale = 1.5 * width() / 750;
   var blockSize2 = 64 * mapScale2;
   var backgroundSize2 = 64 * mapScale2 * 6;
   var numberOfBackTiles = 48;
+  var passengerScale = width() / 750;
   var planets = [
     "white",
     "red",
@@ -2579,8 +2589,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     origin("center"),
     "planet",
     {
-      realPos: [12 * blockSize2, 6 * blockSize2],
-      startingPos: [12 * blockSize2, 6 * blockSize2],
+      realPos: [20 * blockSize2, 2 * blockSize2],
+      startingPos: [20 * blockSize2, 2 * blockSize2],
       name: "red",
       passengers: [],
       size: 1
@@ -2660,6 +2670,58 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         }
       ]));
       planets.push("rainbow");
+    } else if (planetsVars.length == 5) {
+      planetsVars.push(add([
+        sprite("planetFace"),
+        area(),
+        solid(),
+        pos(15 * blockSize2, 8 * blockSize2),
+        scale(planetScale),
+        layer("game"),
+        origin("center"),
+        "planet",
+        z(0),
+        {
+          realPos: [
+            15 * blockSize2 + player.realPos[0],
+            8 * blockSize2 + player.realPos[1]
+          ],
+          startingPos: [
+            15 * blockSize2,
+            8 * blockSize2
+          ],
+          name: "face",
+          passengers: [],
+          size: 1
+        }
+      ]));
+      planets.push("face");
+    } else if (planetsVars.length == 6) {
+      planetsVars.push(add([
+        sprite("planetSpikes"),
+        area(),
+        solid(),
+        pos(1 * blockSize2, 16 * blockSize2),
+        scale(planetScale),
+        layer("game"),
+        origin("center"),
+        "planet",
+        z(0),
+        {
+          realPos: [
+            1 * blockSize2 + player.realPos[0],
+            16 * blockSize2 + player.realPos[1]
+          ],
+          startingPos: [
+            1 * blockSize2,
+            16 * blockSize2
+          ],
+          name: "spikes",
+          passengers: [],
+          size: 1
+        }
+      ]));
+      planets.push("spikes");
     }
     generatePassengers(planetsVars[planetsVars.length - 1], 10);
     player.z = 100;
@@ -2697,7 +2759,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     layer("ui")
   ]);
   var moneyText = add([
-    text(player.money, 8),
+    text(largeNumberToConcat(player.money), 8),
     scale(fontSize * textLeftModifer),
     pos(100 * textLeftModifer, 50 + textLeftModiferHeight * 1),
     origin("topleft"),
@@ -2791,8 +2853,18 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       }
     },
     {
-      name: "Upgrade Max Speed",
+      name: "Upgrade Handling",
       id: 1,
+      amountBought: 0,
+      cost: 200,
+      max: 20,
+      functionToRun: () => {
+        player.handling *= 0.9;
+      }
+    },
+    {
+      name: "Upgrade Max Speed",
+      id: 2,
       amountBought: 0,
       cost: 200,
       max: 40,
@@ -2802,7 +2874,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     },
     {
       name: "Upgrade Acceleration",
-      id: 2,
+      id: 3,
       amountBought: 0,
       cost: 200,
       max: 20,
@@ -2812,7 +2884,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     },
     {
       name: "Upgrade Money/Passenger",
-      id: 3,
+      id: 4,
       amountBought: 0,
       cost: 100,
       functionToRun: () => {
@@ -2821,7 +2893,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     },
     {
       name: "Upgrade Fill Speed",
-      id: 4,
+      id: 5,
       amountBought: 0,
       cost: 300,
       max: 20,
@@ -2831,24 +2903,14 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     },
     {
       name: "Unlock Planets",
-      id: 5,
+      id: 6,
       amountBought: 0,
       cost: "prog",
       costProgression: [100, 100, 100, 100],
-      costProgression: [5e3, 5e4, 5e4, 5e6],
-      max: 4,
+      costProgression: [5e3, 5e4, 5e7, 5e10],
+      max: 3,
       functionToRun: () => {
         buyPlanets();
-      }
-    },
-    {
-      name: "Upgrade Handling",
-      id: 6,
-      amountBought: 0,
-      cost: 200,
-      max: 20,
-      functionToRun: () => {
-        player.handling *= 0.9;
       }
     }
   ];
@@ -2864,7 +2926,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       "inStoreButton"
     ]);
     add([
-      text(player.money),
+      text(largeNumberToConcat(player.money)),
       scale(width() / 1e3 * 3.5),
       pos(5, 50 + textLeftModiferHeight * 5 + width() / 1e3 * 2 * 25),
       origin("topleft"),
@@ -2928,7 +2990,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
           pos(width() / 2 - width() / 6 + 5, 15 + 2 * width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30) + scrollAmount)
         ]),
         cost: add([
-          text(genPrice(storeData[i], storeData[i].amountBought)),
+          text(largeNumberToConcat(genPrice(storeData[i], storeData[i].amountBought))),
           layer("store"),
           origin("topleft"),
           scale(width() / 1e3 * 2),
@@ -2939,6 +3001,26 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
   }
   __name(genStoreItems, "genStoreItems");
+  function largeNumberToConcat(value) {
+    var newValue = value;
+    if (value >= 1e3) {
+      var suffixes = ["", "k", "m", "b", "t", "Quad", "Quint", "Sext", "Sept", "Oct", "Nov"];
+      var suffixNum = Math.floor(("" + value).length / 3);
+      var shortValue = "";
+      for (var precision = 2; precision >= 1; precision--) {
+        shortValue = parseFloat((suffixNum != 0 ? value / Math.pow(1e3, suffixNum) : value).toPrecision(precision));
+        var dotLessShortValue = (shortValue + "").replace(/[^a-zA-Z 0-9]+/g, "");
+        if (dotLessShortValue.length <= 2) {
+          break;
+        }
+      }
+      if (shortValue % 1 != 0)
+        shortValue = shortValue.toFixed(1);
+      newValue = shortValue + suffixes[suffixNum];
+    }
+    return newValue;
+  }
+  __name(largeNumberToConcat, "largeNumberToConcat");
   function showStore() {
     if (!storeBg.storeOpen) {
       storeBg.opacity = 0.8;
@@ -3012,7 +3094,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       player.money -= genPrice(storeData[button.idbuy], storeData[button.idbuy].amountBought);
       storeData[button.idbuy].functionToRun();
       storeData[button.idbuy].amountBought++;
-      moneyText.text = player.money;
+      moneyText.text = largeNumberToConcat(player.money);
       destroyAll("inStoreButton");
       storeButtonSprites = [];
       genStoreItems();
@@ -3038,8 +3120,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   });
   movementArrow.action(() => {
     movementArrow.angle = arrowRotateFromMouse();
-    movementArrow.pos.x = width() / 2 + Math.sin(movementArrow.angle * (Math.PI / 180)) * 60;
-    movementArrow.pos.y = height() / 2 + -1 * Math.cos(movementArrow.angle * (Math.PI / 180)) * 60;
+    movementArrow.pos.x = width() / 2 + Math.sin(movementArrow.angle * (Math.PI / 180)) * 30 * playerScale;
+    movementArrow.pos.y = height() / 2 + -1 * Math.cos(movementArrow.angle * (Math.PI / 180)) * 30 * playerScale;
   });
   function moveToSlow(x, y, objToMove, speed, delAfter) {
     let moveAmountX = -1 * (objToMove.pos.x - x) / speed;
@@ -3067,10 +3149,11 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       let newPassDataShip = player.passengers[i];
       player.passengersSprite.push(add([
         sprite(newPassDataShip.sprite),
-        pos(i % 6 * 30 + 15, 50 + textLeftModiferHeight * 5 + (Math.floor(i / 6) + 1) * 20),
+        pos(i % 6 * 30 * passengerScale + 15 * passengerScale, 50 + textLeftModiferHeight * 5 + (Math.floor(i / 6) + 1) * 20 * passengerScale),
         color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
         origin("center"),
         area(),
+        scale(passengerScale),
         layer("game"),
         "passenger",
         "onShipPass",
@@ -3099,7 +3182,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
           player.passengersSprite[i].moving = true;
           playerPassesToRemove.push(i);
           player.money += Math.round(player.baseMoneyPerPass * player.passengers[i].fare);
-          moneyText.text = player.money;
+          moneyText.text = largeNumberToConcat(player.money);
         }
       }
       for (let i = playerPassesToRemove.length - 1; i >= 0; i--) {
@@ -3113,7 +3196,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[i];
         add([
           sprite(newPassData.sprite),
-          pos(width() / 2 + 50 + i * 30, height() / 2),
+          pos(width() / 2 + 20 + 30 * passengerScale + i * 30 * passengerScale, height() / 2),
+          scale(passengerScale),
           color(newPassData.color[0], newPassData.color[1], newPassData.color[2]),
           origin("center"),
           area(),
@@ -3135,10 +3219,11 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       let newPassDataShip = player.passengers[player.passengers.length - 1];
       player.passengersSprite.push(add([
         sprite(newPassDataShip.sprite),
-        pos((player.passengers.length - 1) % 6 * 30 + 15, 50 + textLeftModiferHeight * 5 + (Math.floor((player.passengers.length - 1) / 6) + 1) * 20),
+        pos((player.passengers.length - 1) % 6 * 30 * passengerScale + 15 * passengerScale, 50 + textLeftModiferHeight * 5 + (Math.floor((player.passengers.length - 1) / 6) + 1) * 20 * passengerScale),
         color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
         origin("center"),
         area(),
+        scale(passengerScale),
         layer("game"),
         "passenger",
         "onShipPass",
@@ -3152,9 +3237,10 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       let newPassData = planetsVars[planets.indexOf(player.planetAt)].passengers[planetsVars[planets.indexOf(player.planetAt)].passengers.length - 1];
       add([
         sprite(newPassData.sprite),
-        pos(width() / 2 + 10 * 30, height() / 2),
+        pos(width() / 2 + 10 * 30 * passengerScale, height() / 2),
         color(newPassData.color[0], newPassData.color[1], newPassData.color[2]),
         origin("center"),
+        scale(passengerScale),
         area(),
         layer("game"),
         "passenger",
@@ -3289,6 +3375,16 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
             genPassSprite = "passRainbow";
             genPassColor = [255, 255, 255];
             genPassFare = 10;
+          case "face":
+            genPassSprite = "cargoFace";
+            genPassColor = [255, 255, 255];
+            genPassFare = 50;
+            break;
+          case "spikes":
+            genPassSprite = "cargoSpikes";
+            genPassColor = [255, 255, 255];
+            genPassFare = 500;
+            break;
         }
         planet.passengers.push({
           destanation: otherPlanets[generatedPassId],
@@ -3308,6 +3404,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     every("planet", (planet) => {
       generatePassengers(planet, 10);
     });
+    player.onPlanet = true;
     move(width() / 2, height() / 2, 1);
   }, "onStart");
   onStart();

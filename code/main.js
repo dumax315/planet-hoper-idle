@@ -19,6 +19,14 @@ export const k = kaboom({
 
 export default k
 
+export let playerScale = 2*width()/750;
+//for map gen
+let getWW = width();
+export function getWidth() {
+	return getWW
+}
+
+
 import * as colorUtil from "./util/colorUtil";
 import * as planetUtil from "./util/planetUtil";
 import { loadAssets } from "./util/assetLoader";
@@ -32,10 +40,12 @@ let planetsVars = [];
 let angleOfMovement = 0;
 // scale by screen size
 const mapScale = 1.5;
-const planetScale = 1.5;
+const planetScale = 1.5*width()/750;
 const blockSize = 64 * mapScale;
 const backgroundSize = 64 * mapScale * 6;
 const numberOfBackTiles = 48;
+let passengerScale = width()/750;
+
 
 let planets = [
   "white",
@@ -119,8 +129,8 @@ planetsVars.push(add([
   origin("center"),
   "planet",
   {
-    realPos: [12 * blockSize, 6 * blockSize],
-    startingPos: [12 * blockSize, 6 * blockSize],
+    realPos: [20 * blockSize, 2 * blockSize],
+    startingPos: [20 * blockSize, 2 * blockSize],
     name: "red",
     passengers: [],
     size: 1,
@@ -184,7 +194,7 @@ function buyPlanets() {
 		solid(),
 		// color(0, 255, 0),
 		// rotate(90),
-		// debug.log(player.realPos),
+		// debug.log(main.player.realPos),
 		pos(
 			2 * blockSize,
 			2 * blockSize),
@@ -195,8 +205,8 @@ function buyPlanets() {
 		z(0),
 		{
 			realPos: [
-				2 * blockSize+player.realPos[0],
-				2 * blockSize+player.realPos[1]],
+				2 * blockSize + player.realPos[0],
+				2 * blockSize + player.realPos[1]],
 			startingPos: [
 				2 * blockSize,
 				2 * blockSize],
@@ -206,14 +216,72 @@ function buyPlanets() {
 		},
 	]));
 	planets.push("rainbow");
+	}else if(planetsVars.length == 5){
+		planetsVars.push(add([
+		sprite("planetFace"),
+		area(),
+		solid(),
+		// color(0, 255, 0),
+		// rotate(90),
+		// debug.log(main.player.realPos),
+		pos(
+			15 * blockSize,
+			8 * blockSize),
+		scale(planetScale),
+		layer("game"),
+		origin("center"),
+		"planet",
+		z(0),
+		{
+			realPos: [
+				15 * blockSize+player.realPos[0],
+				8 * blockSize+player.realPos[1]],
+			startingPos: [
+				15 * blockSize,
+				8 * blockSize],
+			name: "face",
+			passengers: [],
+			size: 1,
+		}]));
+		planets.push("face");
+	}
+	else if(planetsVars.length == 6){
+		planetsVars.push(add([
+		sprite("planetSpikes"),
+		area(),
+		solid(),
+		// color(0, 255, 0),
+		// rotate(90),
+		// debug.log(main.player.realPos),
+		pos(
+			1 * blockSize,
+			16 * blockSize),
+		scale(planetScale),
+		layer("game"),
+		origin("center"),
+		"planet",
+		z(0),
+		{
+			realPos: [
+				1 * blockSize+player.realPos[0],
+				16 * blockSize+player.realPos[1]],
+			startingPos: [
+				1 * blockSize,
+				16 * blockSize],
+			name: "spikes",
+			passengers: [],
+			size: 1,
+		},
+		]));
+		planets.push("spikes");
 	}
 	generatePassengers(planetsVars[planetsVars.length-1], 10);
 	player.z = 100;
 	every("planet", (planet) => {
 		planet.passengers = [];
 		generatePassengers(planet, 10)
-	})
-	// move(width() / -2, height() / -2, 1)
+	});
+
 }
 
 import { loadPlayer, loadMovementArrow } from "./player";
@@ -254,7 +322,7 @@ add([
 ]);
 
 const moneyText = add([
-	text(player.money, 8),
+	text(largeNumberToConcat(player.money), 8),
 	scale(fontSize*textLeftModifer),
 	pos(100*textLeftModifer, 50+textLeftModiferHeight*1),
 	origin("topleft"),
@@ -375,8 +443,19 @@ let storeData = [{
 			capacityText.text = player.capacity
 		},
 	},{
-		name:"Upgrade Max Speed",
+		name:"Upgrade Handling",
 		id:1,
+		amountBought:0,
+		cost: 200,
+		// costProgression: [5000, 50000, 50000,5000000],
+		max:20,
+		functionToRun: () => {
+			// player.handling 
+			player.handling *= .9;
+		},
+	},{
+		name:"Upgrade Max Speed",
+		id:2,
 		amountBought:0,
 		cost: 200,
 		max:40,
@@ -385,7 +464,7 @@ let storeData = [{
 		},
 	},{
 		name:"Upgrade Acceleration",
-		id:2,
+		id:3,
 		amountBought:0,
 		cost: 200,
 		max:20,
@@ -394,7 +473,7 @@ let storeData = [{
 		},
 	},{
 		name:"Upgrade Money/Passenger",
-		id:3,
+		id:4,
 		amountBought:0,
 		cost: 100,
 		functionToRun: () => {
@@ -402,7 +481,7 @@ let storeData = [{
 		},
 	},{
 		name:"Upgrade Fill Speed",
-		id:4,
+		id:5,
 		amountBought:0,
 		cost: 300,
 		max:20,
@@ -411,25 +490,14 @@ let storeData = [{
 		},
 	},{
 		name:"Unlock Planets",
-		id:5,
+		id:6,
 		amountBought:0,
 		cost: "prog",
 		costProgression: [100, 100, 100,100],
-		costProgression: [5000, 50000, 50000,5000000],
-		max:4,
+		costProgression: [5000, 50000, 50000000,50000000000],
+		max:3,
 		functionToRun: () => {
 			buyPlanets()
-		},
-	},{
-		name:"Upgrade Handling",
-		id:6,
-		amountBought:0,
-		cost: 200,
-		// costProgression: [5000, 50000, 50000,5000000],
-		max:20,
-		functionToRun: () => {
-			// player.handling 
-			player.handling *= .9;
 		},
 	},
 ];
@@ -448,7 +516,7 @@ function genStoreItems() {
 		"inStoreButton",
 	]);
 	add([
-		text(player.money),
+		text(largeNumberToConcat(player.money)),
 		scale(width()/1000*3.5),
 		pos(5, (50+textLeftModiferHeight*5)+width()/1000*2*25),
 		origin("topleft"),
@@ -528,7 +596,7 @@ function genStoreItems() {
 					15+2*width()/1000*35+i*(width()/1000*100+30)+scrollAmount),
 			]),
 			cost: add([
-				text(genPrice(storeData[i],storeData[i].amountBought)),
+				text(largeNumberToConcat(genPrice(storeData[i],storeData[i].amountBought))),
 				// color(0, 0, 0),
 				layer("store"),
 				origin("topleft"),
@@ -543,9 +611,24 @@ function genStoreItems() {
 	}
 }
 
-function largeNumberToConcat(numberToCon){
-	
+//https://stackoverflow.com/questions/10599933/convert-long-number-into-abbreviated-string-in-javascript-with-a-special-shortn
+function largeNumberToConcat(value){
+	var newValue = value;
+    if (value >= 1000) {
+        var suffixes = ["", "k", "m", "b","t","Quad","Quint","Sext","Sept","Oct","Nov"];
+        var suffixNum = Math.floor( (""+value).length/3 );
+        var shortValue = '';
+        for (var precision = 2; precision >= 1; precision--) {
+            shortValue = parseFloat( (suffixNum != 0 ? (value / Math.pow(1000,suffixNum) ) : value).toPrecision(precision));
+            var dotLessShortValue = (shortValue + '').replace(/[^a-zA-Z 0-9]+/g,'');
+            if (dotLessShortValue.length <= 2) { break; }
+        }
+        if (shortValue % 1 != 0)  shortValue = shortValue.toFixed(1);
+        newValue = shortValue+suffixes[suffixNum];
+    }
+    return newValue;
 }
+
 
 function showStore(){
 	if(!storeBg.storeOpen){
@@ -651,7 +734,7 @@ clicks("inStoreButtonBg", (button) => {
 		player.money -= genPrice(storeData[button.idbuy],storeData[button.idbuy].amountBought);
 		storeData[button.idbuy].functionToRun();
 		storeData[button.idbuy].amountBought++;
-		moneyText.text = player.money;
+		moneyText.text = largeNumberToConcat(player.money);
 		destroyAll("inStoreButton");
 		storeButtonSprites = [];
 		genStoreItems();
@@ -701,8 +784,8 @@ storeButton.clicks( () => {
 movementArrow.action(() => {
 
 	movementArrow.angle = arrowRotateFromMouse();
-	movementArrow.pos.x = width() / 2 + (Math.sin(movementArrow.angle * (Math.PI / 180))) * 60;
-	movementArrow.pos.y = height() / 2 + (-1 * Math.cos(movementArrow.angle * (Math.PI / 180))) * 60;
+	movementArrow.pos.x = width() / 2 + (Math.sin(movementArrow.angle * (Math.PI / 180))) * 30*playerScale;
+	movementArrow.pos.y = height() / 2 + (-1 * Math.cos(movementArrow.angle * (Math.PI / 180))) * 30*playerScale;
 	// e.resolve();
 });
 
@@ -743,10 +826,12 @@ function refomatePassOnShip() {
 		player.passengersSprite.push(add([
 			sprite(newPassDataShip.sprite),
 			// debug.log((i+1) % 6 * 30 + 15),
-			pos((i) % 6 * 30 + 15, 50+textLeftModiferHeight*5 + (Math.floor(i / 6) + 1) * 20),
+			pos((i) % 6 * 30*passengerScale + 15*passengerScale, 50+textLeftModiferHeight*5 + (Math.floor(i / 6) + 1) * 20*passengerScale),
 			color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
 			origin("center"),
 			area(),
+			scale(passengerScale),
+			// debug.log(passengerScale),
 			layer("game"),
 			"passenger",
 			"onShipPass",
@@ -791,7 +876,7 @@ player.collides("planet", (planet) => {
 				playerPassesToRemove.push(i);
 				player.money += Math.round(player.baseMoneyPerPass*player.passengers[i].fare);
 				// debug.log(player.passengers[i].fare)
-				moneyText.text = player.money;
+				moneyText.text = largeNumberToConcat(player.money);
 
 			}
 		}
@@ -809,7 +894,8 @@ player.collides("planet", (planet) => {
 			add([
 				sprite(newPassData.sprite),
 
-				pos(width() / 2 + 50 + i * 30, height() / 2),
+				pos(width() / 2 + 20 + 30*passengerScale + i * 30*passengerScale, height() / 2),
+				scale(passengerScale),
 				color(newPassData.color[0], newPassData.color[1], newPassData.color[2]),
 				origin("center"),
 				area(),
@@ -842,10 +928,11 @@ action("onPlanetPass", (passenger) => {
 		player.passengersSprite.push(add([
 			sprite(newPassDataShip.sprite),
 
-			pos((player.passengers.length - 1) % 6 * 30 + 15, 50+textLeftModiferHeight*5 + (Math.floor((player.passengers.length - 1) / 6) + 1) * 20),
+			pos((player.passengers.length - 1) % 6 * 30*passengerScale + 15*passengerScale, 50+textLeftModiferHeight*5 + (Math.floor((player.passengers.length - 1) / 6) + 1) * 20*passengerScale),
 			color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
 			origin("center"),
 			area(),
+			scale(passengerScale),
 			layer("game"),
 			"passenger",
 			"onShipPass",
@@ -867,9 +954,10 @@ action("onPlanetPass", (passenger) => {
 		add([
 			sprite(newPassData.sprite),
 			//pos(width() / 2 + 50 + 10 * 30, height() / 2),
-			pos(width() / 2 + 10 * 30, height() / 2),
+			pos(width() / 2 + 10 * 30*passengerScale, height() / 2),
 			color(newPassData.color[0], newPassData.color[1], newPassData.color[2]),
 			origin("center"),
+			scale(passengerScale),
 			area(),
 			layer("game"),
 			"passenger",
@@ -1057,7 +1145,16 @@ function generatePassengers(planet, ammount) {
 					genPassSprite = "passRainbow";
 					genPassColor = [255, 255, 255];
 					genPassFare = 10;
-				//add in ranbow
+				case "face":
+					genPassSprite = "cargoFace";
+					genPassColor = [255, 255, 255];
+					genPassFare = 50;
+					break;
+				case "spikes":
+					genPassSprite = "cargoSpikes";
+					genPassColor = [255, 255, 255];
+					genPassFare = 500;
+					break;
 			}
 			planet.passengers.push({
 				destanation: otherPlanets[generatedPassId],
@@ -1079,6 +1176,7 @@ export let onStart = () => {
 	every("planet", (planet) => {
 		generatePassengers(planet, 10)
 	})
+	player.onPlanet = true
 	move(width() / 2, height() / 2, 1)
 }
 

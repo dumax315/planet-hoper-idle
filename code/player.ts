@@ -1,8 +1,8 @@
 import kaboom, { Character } from "kaboom";
 
-import { k } from "./main.js";
+import { k, playerScale } from "./main.js";
 
-let playerScale = 2;
+
 
 export function loadPlayer(): void {
   return add([
@@ -42,7 +42,7 @@ export function loadMovementArrow(): void {
     sprite("arrow_1"),
     pos(40, 80),
     rotate(0),
-    scale(playerScale),
+    scale(playerScale*1.3),
     layer("game"),
     origin("center"),
     "arrow",
