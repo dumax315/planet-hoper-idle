@@ -16,7 +16,7 @@ export function loadPlayer(): void {
     "player",
     {
       speed: 0,
-      max_thrust: 400,
+      max_thrust: 340,
       acceleration: 2.5,
       deceleration: 4,
       animation_frame: 0,
@@ -32,6 +32,7 @@ export function loadPlayer(): void {
       anim: "thrust",
       loadSpeed: 400,
       baseMoneyPerPass: 50,
+			handling: 2,
     }
   ]);
 }

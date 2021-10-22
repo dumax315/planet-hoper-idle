@@ -379,6 +379,7 @@ let storeData = [{
 		id:1,
 		amountBought:0,
 		cost: 200,
+		max:40,
 		functionToRun: () => {
 			player.max_thrust += 20;
 		},
@@ -387,6 +388,7 @@ let storeData = [{
 		id:2,
 		amountBought:0,
 		cost: 200,
+		max:20,
 		functionToRun: () => {
 			player.acceleration *= 1.1
 		},
@@ -396,15 +398,16 @@ let storeData = [{
 		amountBought:0,
 		cost: 100,
 		functionToRun: () => {
-			player.baseMoneyPerPass *= 1.2
+			player.baseMoneyPerPass *= 1.2;
 		},
 	},{
 		name:"Upgrade Fill Speed",
 		id:4,
 		amountBought:0,
 		cost: 300,
+		max:20,
 		functionToRun: () => {
-			player.loadSpeed = Math.round(player.loadSpeed*1.5);
+			player.loadSpeed = Math.round(player.loadSpeed*1.2);
 		},
 	},{
 		name:"Unlock Planets",
@@ -412,20 +415,21 @@ let storeData = [{
 		amountBought:0,
 		cost: "prog",
 		costProgression: [100, 100, 100,100],
-		// costProgression: [5000, 50000, 50000,5000000],
+		costProgression: [5000, 50000, 50000,5000000],
 		max:4,
 		functionToRun: () => {
 			buyPlanets()
 		},
 	},{
-		name:"UpGrade Handling",
+		name:"Upgrade Handling",
 		id:6,
 		amountBought:0,
-		cost: 500,
+		cost: 200,
 		// costProgression: [5000, 50000, 50000,5000000],
-		max:10,
+		max:20,
 		functionToRun: () => {
 			// player.handling 
+			player.handling *= .9;
 		},
 	},
 ];
@@ -455,11 +459,16 @@ function genStoreItems() {
 
 
 	for(let i = 0; i < storeData.length; i++){
-		storeButtonSprites.push({bg:
-			add([
+		let bgColor = colorUtil.ColorPaletteAlias.orange;
+		if(storeData[i].max <= storeData[i].amountBought){
+			bgColor = colorUtil.ColorPaletteAlias.rust;
+			storeData[i].cost = "max"
+		}
+		storeButtonSprites.push({
+			bg:add([
 				area(),
 				solid(),
-				color(255,165,0),
+				color(bgColor),
 				pos(
 					width()/2,
 					15+i*(width()/1000*100+30)+scrollAmount),
@@ -624,6 +633,9 @@ mouseClick( () => {
 
 //The the price of a thing in the shop
 function genPrice(item, time){
+	if(item.cost == "max"){
+		return "Max Bought";
+	}
 	if(item.cost == "prog"){
 		return item.costProgression[time]
 	}
@@ -1000,7 +1012,7 @@ action("player", () => {
 	//new movement system
 	// debug.log(angleOfMovement)
 	//does the dt work?
-	angleOfMovement = meanAngleDeg([movementArrow.angle, angleOfMovement],player.handling+.3/dt());
+	angleOfMovement = meanAngleDeg([movementArrow.angle, angleOfMovement],player.handling*.3/dt());
 	// debug.log(Math.round(.3/dt()))
 	player.angle = angleOfMovement;
 	calcRealPos(player)

@@ -2350,6 +2350,20 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   });
   var kaboom_default = xn();
 
+  // code/util/colorUtil.ts
+  var ColorPaletteAlias = {
+    "black": [0, 18, 25],
+    "blue": [0, 95, 115],
+    "green": [10, 147, 150],
+    "foam": [148, 210, 189],
+    "zest": [233, 216, 166],
+    "orange": [238, 155, 0],
+    "rust": [202, 103, 2],
+    "sunset": [187, 62, 3],
+    "red": [174, 32, 18],
+    "maroon": [155, 34, 38]
+  };
+
   // code/util/assetLoader.ts
   function loadAssets() {
     loadSprite("bean", "sprites/bean.png");
@@ -2434,7 +2448,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       "player",
       {
         speed: 0,
-        max_thrust: 400,
+        max_thrust: 340,
         acceleration: 2.5,
         deceleration: 4,
         animation_frame: 0,
@@ -2449,7 +2463,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         planetAt: "home",
         anim: "thrust",
         loadSpeed: 400,
-        baseMoneyPerPass: 50
+        baseMoneyPerPass: 50,
+        handling: 2
       }
     ]);
   }
@@ -2780,6 +2795,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       id: 1,
       amountBought: 0,
       cost: 200,
+      max: 40,
       functionToRun: () => {
         player.max_thrust += 20;
       }
@@ -2789,6 +2805,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       id: 2,
       amountBought: 0,
       cost: 200,
+      max: 20,
       functionToRun: () => {
         player.acceleration *= 1.1;
       }
@@ -2807,8 +2824,9 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       id: 4,
       amountBought: 0,
       cost: 300,
+      max: 20,
       functionToRun: () => {
-        player.loadSpeed = Math.round(player.loadSpeed * 1.5);
+        player.loadSpeed = Math.round(player.loadSpeed * 1.2);
       }
     },
     {
@@ -2817,18 +2835,20 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       amountBought: 0,
       cost: "prog",
       costProgression: [100, 100, 100, 100],
+      costProgression: [5e3, 5e4, 5e4, 5e6],
       max: 4,
       functionToRun: () => {
         buyPlanets();
       }
     },
     {
-      name: "UpGrade Handling",
+      name: "Upgrade Handling",
       id: 6,
       amountBought: 0,
-      cost: 500,
-      max: 10,
+      cost: 200,
+      max: 20,
       functionToRun: () => {
+        player.handling *= 0.9;
       }
     }
   ];
@@ -2853,11 +2873,16 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       "inStoreButton"
     ]);
     for (let i = 0; i < storeData.length; i++) {
+      let bgColor = ColorPaletteAlias.orange;
+      if (storeData[i].max <= storeData[i].amountBought) {
+        bgColor = ColorPaletteAlias.rust;
+        storeData[i].cost = "max";
+      }
       storeButtonSprites.push({
         bg: add([
           area(),
           solid(),
-          color(255, 165, 0),
+          color(bgColor),
           pos(width() / 2, 15 + i * (width() / 1e3 * 100 + 30) + scrollAmount),
           rect(width() / 2.5, width() / 1e3 * 100),
           layer("store"),
@@ -2973,6 +2998,9 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
   });
   function genPrice(item, time) {
+    if (item.cost == "max") {
+      return "Max Bought";
+    }
     if (item.cost == "prog") {
       return item.costProgression[time];
     }
@@ -3231,7 +3259,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       player.speed = Math.min(player.speed + player.acceleration, player.max_thrust);
     }
     speedText.text = Math.round(player.speed);
-    angleOfMovement = meanAngleDeg([movementArrow.angle, angleOfMovement], 0.3 / dt());
+    angleOfMovement = meanAngleDeg([movementArrow.angle, angleOfMovement], player.handling * 0.3 / dt());
     player.angle = angleOfMovement;
     calcRealPos(player);
   });
