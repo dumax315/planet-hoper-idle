@@ -20,7 +20,7 @@ export function loadPlayer(): void {
       acceleration: 2.5,
       deceleration: 4,
       animation_frame: 0,
-      money: 100,
+      money: 10000000,
       capacityMax: 14,
       capacity: 14,
       passengers: [],

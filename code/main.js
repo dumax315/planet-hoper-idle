@@ -46,7 +46,6 @@ const backgroundSize = 64 * mapScale * 6;
 const numberOfBackTiles = 48;
 let passengerScale = width()/750;
 
-
 let planets = [
   "white",
 	"red",
@@ -59,7 +58,8 @@ layers([
 	"game",
 	"ui",
 	"uiText",
-	"store",]
+	"store",
+	"earnMoney",]
   , "game");
 
 
@@ -129,8 +129,8 @@ planetsVars.push(add([
   origin("center"),
   "planet",
   {
-    realPos: [20 * blockSize, 2 * blockSize],
-    startingPos: [20 * blockSize, 2 * blockSize],
+    realPos: [22 * blockSize, 2 * blockSize],
+    startingPos: [22 * blockSize, 2 * blockSize],
     name: "red",
     passengers: [],
     size: 1,
@@ -703,6 +703,32 @@ function launch() {
 	}
 }
 
+//make money (show some money on scre)
+function earnMoney(amount, x, y){
+	let colorto = [255,0,0]
+	let sign = ""
+	if(amount >0){
+		colorto = [0,255,0];
+		sign = "+"
+	}
+	add([
+    text(sign+largeNumberToConcat(Math.round(amount))),
+    pos(x,y),
+		scale(playerScale),
+		color(colorto[0],colorto[1],colorto[2]),
+		origin("center"),
+		layer("earnMoney"),
+		z(0),
+		lifespan(2, { fade: 0.5 }),
+		"earnedMon",
+    { },
+]);
+}
+
+action("earnedMon", (obj) => {
+	obj.move(dir(270).scale(dt()*4000))
+})
+
 
 let storeButX = (width()-20)-(width()/6)*mapScale;
 let storeButY = (20+width()/1000*50)*mapScale;
@@ -732,6 +758,7 @@ function genPrice(item, time){
 clicks("inStoreButtonBg", (button) => {
 	if(player.money >= genPrice(storeData[button.idbuy],storeData[button.idbuy].amountBought)){
 		player.money -= genPrice(storeData[button.idbuy],storeData[button.idbuy].amountBought);
+		earnMoney(-1*genPrice(storeData[button.idbuy],storeData[button.idbuy].amountBought),mousePos().x,mousePos().y)
 		storeData[button.idbuy].functionToRun();
 		storeData[button.idbuy].amountBought++;
 		moneyText.text = largeNumberToConcat(player.money);
@@ -794,24 +821,33 @@ movementArrow.action(() => {
 
 // });
 
-function moveToSlow(x, y, objToMove, speed, delAfter) {
-	let moveAmountX = -1 * (objToMove.pos.x - x) / speed;
-	// debug.log(moveAmountX)
-	let moveAmountY = -1 * (objToMove.pos.y - y) / speed;
-	let timerreset = 0;
-	let intervalID = setInterval(function() {
-		objToMove.pos.x += moveAmountX;
-		objToMove.pos.y += moveAmountY;
-		if (++timerreset === speed) {
-			if (delAfter) {
-				objToMove.destroy();
-				// player.passengersSprite.splice(index,1);
+// function moveToSlow(x, y, objToMove, speed, delAfter) {
+// 	let moveAmountX = -1 * (objToMove.pos.x - x) / speed;
+// 	// debug.log(moveAmountX)
+// 	let moveAmountY = -1 * (objToMove.pos.y - y) / speed;
+// 	let timerreset = 0;
+// 	let intervalID = setInterval(function() {
+// 		objToMove.pos.x += moveAmountX;
+// 		objToMove.pos.y += moveAmountY;
+// 		if (++timerreset === speed) {
+// 			if (delAfter) {
+// 				objToMove.destroy();
+// 				// player.passengersSprite.splice(index,1);
 
-			}
-			window.clearInterval(intervalID);
+// 			}
+// 			window.clearInterval(intervalID);
+// 		}
+// 	}, 10);
+// }
+action("onShipPass", (todestroy) => {
+	// debug.log(todestroy)
+	if(todestroy.moving){
+		// todestroy.move(player.pos.angle(todestroy.pos), 1000*dt());
+		if(todestroy.pos.x >= width()/2-5){
+			todestroy.destroy();
 		}
-	}, 10);
-}
+	}
+});
 
 //reformats the passengers on the ship after people go home
 function refomatePassOnShip() {
@@ -820,8 +856,13 @@ function refomatePassOnShip() {
 			todestroy.destroy();
 		}
 	});
+	destroyAll("passXtext");
+	player.passengersSprite = [];
 	// debug.log(player.passengers.length)
 	for (let i = 0; i < player.passengers.length; i++) {
+		if(i == 18) {
+			break;
+		}
 		let newPassDataShip = player.passengers[i]
 		player.passengersSprite.push(add([
 			sprite(newPassDataShip.sprite),
@@ -839,9 +880,77 @@ function refomatePassOnShip() {
 				moving: false,
 			}
 		]));
+
+	}
+	let passToRenderMany = {
+		red:0,
+		blue:0,
+		white:0,
+		green:0,
+		face:0,
+		rainbow:0,
+		spikes:0,
+	};
+	for (let i = 18; i < player.passengers.length; i++) {
+		passToRenderMany[player.passengers[i].destanation] += 1;
+	}
+	for (let i = 0; i < planets.length; i++) {
+		// debug.log(planets[i])
+		if(passToRenderMany[planets[i]] > 0){
+			let genPassColor = [0, 0, 0];
+			let genPassSprite = "passenger";
+			let genPassFare = 1;
+			switch (planets[i]) {
+				case "white":
+					genPassColor = [255, 255, 255];
+					break;
+				case "blue":
+					genPassColor = [0, 0, 255];
+					break;
+				case "red":
+					genPassColor = [255, 0, 0];
+					break;
+				case "green":
+					genPassColor = [0, 255, 0];
+					break;
+				case "rainbow":
+					genPassSprite = "passRainbow";
+					genPassColor = [255, 255, 255];
+					break;
+				case "face":
+					genPassSprite = "cargoFace";
+					genPassColor = [255, 255, 255];
+					break;
+				case "spikes":
+					genPassSprite = "cargoSpikes";
+					genPassColor = [255, 255, 255];
+					break;
+			}
+			player.passengersSprite.push(add([
+				sprite(genPassSprite),
+				pos(15*passengerScale, 50+textLeftModiferHeight*5 + (i + 4) * 20*passengerScale),
+				color(genPassColor[0], genPassColor[1], genPassColor[2]),
+				origin("center"),
+				area(),
+				scale(passengerScale),
+				// debug.log(passengerScale),
+				layer("game"),
+				"passenger",
+				"onShipPass",
+				{
+					moving: false,
+				}
+			]));
+			add([
+				text("x"+passToRenderMany[planets[i]]),
+				pos(15*passengerScale+passengerScale*30, 50+textLeftModiferHeight*5 + (i + 4) * 20*passengerScale),
+				scale(passengerScale*2),
+				origin("topleft"),
+				"passXtext",
+			]);
+		}
 	}
 }
-//Todo: make it only show the amount from each
 
 
 player.collides("planet", (planet) => {
@@ -852,7 +961,7 @@ player.collides("planet", (planet) => {
 	player.speed = 0;
 
 	//why did -1 work
-	move(-1 * planet.startingPos[0] + width() / 2, -1 * planet.startingPos[1] + height() / 2, 10);
+	moveBg(-1 * planet.startingPos[0] + width() / 2, -1 * planet.startingPos[1] + height() / 2, 10);
 	player.onPlanet = true;
 	//update planet
 	player.planetAt = planet.name;
@@ -864,28 +973,52 @@ player.collides("planet", (planet) => {
 	//add planet ui, store button
 	planetUi(true);
 	//move pass to ship
-
+	
 
 	if (planets.includes(player.planetAt)) {
 		//move ship pass to planet
 		let playerPassesToRemove = [];
 		for (let i = 0; i < player.passengers.length; i++) {
+			if(i == 18){
+				break;
+			}
 			if (player.passengers[i].destanation == player.planetAt) {
-				moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true);
+				// moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true);
 				player.passengersSprite[i].moving = true;
+				// debug.log(player.passengersSprite[i])
+				// move(player.pos.angle(todestroy.pos), 1000*dt())
+				player.passengersSprite[i].use(move(player.pos.angle(player.passengersSprite[i].pos), 300))
+				player.passengersSprite[i].use("moveMeToCenter");
+				// debug.log(player.passengersSprite[i].moving)
 				playerPassesToRemove.push(i);
 				player.money += Math.round(player.baseMoneyPerPass*player.passengers[i].fare);
+				// earnMoney(player.baseMoneyPerPass*player.passengers[i].fare, width()/2, height()/2)
+				// debug.log(player.passengers[i].fare)
+				moneyText.text = largeNumberToConcat(player.money);
+
+			}
+		}
+		for (let i = 18; i < player.passengers.length; i++) {
+			if (player.passengers[i].destanation == player.planetAt) {
+				// moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true);
+				// player.passengersSprite[i].moving = true;
+				playerPassesToRemove.push(i);
+				player.money += Math.round(player.baseMoneyPerPass*player.passengers[i].fare);
+				// earnMoney(player.baseMoneyPerPass*player.passengers[i].fare, width()/2, height()/2)
 				// debug.log(player.passengers[i].fare)
 				moneyText.text = largeNumberToConcat(player.money);
 
 			}
 		}
 
+		if(playerPassesToRemove.length >0){
+			earnMoney(player.baseMoneyPerPass*player.passengers[playerPassesToRemove[0]].fare*playerPassesToRemove.length, width()/2, height()/2)
+		}
+
 		for (let i = playerPassesToRemove.length - 1; i >= 0; i--) {
 			player.passengers.splice(playerPassesToRemove[i], 1);
 
 		}
-		player.passengersSprite = []
 		refomatePassOnShip();
 		player.capacity += playerPassesToRemove.length;
 		capacityText.text = player.capacity;
@@ -925,22 +1058,8 @@ action("onPlanetPass", (passenger) => {
 
 		//reneder for pass in ship
 		let newPassDataShip = player.passengers[player.passengers.length - 1]
-		player.passengersSprite.push(add([
-			sprite(newPassDataShip.sprite),
 
-			pos((player.passengers.length - 1) % 6 * 30*passengerScale + 15*passengerScale, 50+textLeftModiferHeight*5 + (Math.floor((player.passengers.length - 1) / 6) + 1) * 20*passengerScale),
-			color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
-			origin("center"),
-			area(),
-			scale(passengerScale),
-			layer("game"),
-			"passenger",
-			"onShipPass",
-			{
-				moving: false,
-			}
-		]));
-
+		refomatePassOnShip()
 		//remove passenger from planet
 		passenger.destroy()
 		planetsVars[planets.indexOf(player.planetAt)].passengers.shift()
@@ -1000,7 +1119,7 @@ function calcRealPos(obj) {
 // was in master
 
 // need a move function this isnt working
-let move = (x, y, slow) => {
+function moveBg(x, y, slow) {
 	let moveAmountX = (x - player.realPos[0]) / slow
 	player.realPos[0] = x
 	let moveAmountY = (y - player.realPos[1]) / slow
@@ -1145,6 +1264,7 @@ function generatePassengers(planet, ammount) {
 					genPassSprite = "passRainbow";
 					genPassColor = [255, 255, 255];
 					genPassFare = 10;
+					break;
 				case "face":
 					genPassSprite = "cargoFace";
 					genPassColor = [255, 255, 255];
@@ -1176,8 +1296,9 @@ export let onStart = () => {
 	every("planet", (planet) => {
 		generatePassengers(planet, 10)
 	})
-	player.onPlanet = true
-	move(width() / 2, height() / 2, 1)
+	player.onPlanet = true;
+	planetUi(true);
+	moveBg(width() / 2, height() / 2, 1)
 }
 
 

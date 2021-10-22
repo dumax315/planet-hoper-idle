@@ -29,6 +29,7 @@ export function loadAssets() {
   loadPedit("void_1", "sprites/void_1.pedit")
   loadSprite("rainBowPlanet", "sprites/rainBowPlanet.png");
 	
+	loadPedit("cargoRainbow", "sprites/cargoRainbow.pedit");
   loadPedit("cargoSpikes", "sprites/cargoSpikes.pedit");
   loadPedit("cargoFace", "sprites/cargoFace.pedit");
 	

@@ -2385,6 +2385,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     loadPedit("stars_3", "sprites/stars_3.pedit");
     loadPedit("void_1", "sprites/void_1.pedit");
     loadSprite("rainBowPlanet", "sprites/rainBowPlanet.png");
+    loadPedit("cargoRainbow", "sprites/cargoRainbow.pedit");
     loadPedit("cargoSpikes", "sprites/cargoSpikes.pedit");
     loadPedit("cargoFace", "sprites/cargoFace.pedit");
     loadSprite("planetSpikes", "sprites/planetSpikes.png");
@@ -2455,7 +2456,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         acceleration: 2.5,
         deceleration: 4,
         animation_frame: 0,
-        money: 100,
+        money: 1e7,
         capacityMax: 14,
         capacity: 14,
         passengers: [],
@@ -2534,7 +2535,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     "game",
     "ui",
     "uiText",
-    "store"
+    "store",
+    "earnMoney"
   ], "game");
   generateMap();
   var planetHome = add([
@@ -2589,8 +2591,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     origin("center"),
     "planet",
     {
-      realPos: [20 * blockSize2, 2 * blockSize2],
-      startingPos: [20 * blockSize2, 2 * blockSize2],
+      realPos: [22 * blockSize2, 2 * blockSize2],
+      startingPos: [22 * blockSize2, 2 * blockSize2],
       name: "red",
       passengers: [],
       size: 1
@@ -3072,6 +3074,30 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
   }
   __name(launch, "launch");
+  function earnMoney(amount, x, y) {
+    let colorto = [255, 0, 0];
+    let sign = "";
+    if (amount > 0) {
+      colorto = [0, 255, 0];
+      sign = "+";
+    }
+    add([
+      text(sign + largeNumberToConcat(Math.round(amount))),
+      pos(x, y),
+      scale(playerScale),
+      color(colorto[0], colorto[1], colorto[2]),
+      origin("center"),
+      layer("earnMoney"),
+      z(0),
+      lifespan(2, { fade: 0.5 }),
+      "earnedMon",
+      {}
+    ]);
+  }
+  __name(earnMoney, "earnMoney");
+  action("earnedMon", (obj) => {
+    obj.move(dir(270).scale(dt() * 4e3));
+  });
   var storeButX = width() - 20 - width() / 6 * mapScale2;
   var storeButY = (20 + width() / 1e3 * 50) * mapScale2;
   mouseClick(() => {
@@ -3092,6 +3118,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   clicks("inStoreButtonBg", (button) => {
     if (player.money >= genPrice(storeData[button.idbuy], storeData[button.idbuy].amountBought)) {
       player.money -= genPrice(storeData[button.idbuy], storeData[button.idbuy].amountBought);
+      earnMoney(-1 * genPrice(storeData[button.idbuy], storeData[button.idbuy].amountBought), mousePos().x, mousePos().y);
       storeData[button.idbuy].functionToRun();
       storeData[button.idbuy].amountBought++;
       moneyText.text = largeNumberToConcat(player.money);
@@ -3123,29 +3150,25 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     movementArrow.pos.x = width() / 2 + Math.sin(movementArrow.angle * (Math.PI / 180)) * 30 * playerScale;
     movementArrow.pos.y = height() / 2 + -1 * Math.cos(movementArrow.angle * (Math.PI / 180)) * 30 * playerScale;
   });
-  function moveToSlow(x, y, objToMove, speed, delAfter) {
-    let moveAmountX = -1 * (objToMove.pos.x - x) / speed;
-    let moveAmountY = -1 * (objToMove.pos.y - y) / speed;
-    let timerreset = 0;
-    let intervalID = setInterval(function() {
-      objToMove.pos.x += moveAmountX;
-      objToMove.pos.y += moveAmountY;
-      if (++timerreset === speed) {
-        if (delAfter) {
-          objToMove.destroy();
-        }
-        window.clearInterval(intervalID);
+  action("onShipPass", (todestroy) => {
+    if (todestroy.moving) {
+      if (todestroy.pos.x >= width() / 2 - 5) {
+        todestroy.destroy();
       }
-    }, 10);
-  }
-  __name(moveToSlow, "moveToSlow");
+    }
+  });
   function refomatePassOnShip() {
     every("onShipPass", (todestroy) => {
       if (!todestroy.moving) {
         todestroy.destroy();
       }
     });
+    destroyAll("passXtext");
+    player.passengersSprite = [];
     for (let i = 0; i < player.passengers.length; i++) {
+      if (i == 18) {
+        break;
+      }
       let newPassDataShip = player.passengers[i];
       player.passengersSprite.push(add([
         sprite(newPassDataShip.sprite),
@@ -3162,6 +3185,72 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         }
       ]));
     }
+    let passToRenderMany = {
+      red: 0,
+      blue: 0,
+      white: 0,
+      green: 0,
+      face: 0,
+      rainbow: 0,
+      spikes: 0
+    };
+    for (let i = 18; i < player.passengers.length; i++) {
+      passToRenderMany[player.passengers[i].destanation] += 1;
+    }
+    for (let i = 0; i < planets.length; i++) {
+      if (passToRenderMany[planets[i]] > 0) {
+        let genPassColor = [0, 0, 0];
+        let genPassSprite = "passenger";
+        let genPassFare = 1;
+        switch (planets[i]) {
+          case "white":
+            genPassColor = [255, 255, 255];
+            break;
+          case "blue":
+            genPassColor = [0, 0, 255];
+            break;
+          case "red":
+            genPassColor = [255, 0, 0];
+            break;
+          case "green":
+            genPassColor = [0, 255, 0];
+            break;
+          case "rainbow":
+            genPassSprite = "passRainbow";
+            genPassColor = [255, 255, 255];
+            break;
+          case "face":
+            genPassSprite = "cargoFace";
+            genPassColor = [255, 255, 255];
+            break;
+          case "spikes":
+            genPassSprite = "cargoSpikes";
+            genPassColor = [255, 255, 255];
+            break;
+        }
+        player.passengersSprite.push(add([
+          sprite(genPassSprite),
+          pos(15 * passengerScale, 50 + textLeftModiferHeight * 5 + (i + 4) * 20 * passengerScale),
+          color(genPassColor[0], genPassColor[1], genPassColor[2]),
+          origin("center"),
+          area(),
+          scale(passengerScale),
+          layer("game"),
+          "passenger",
+          "onShipPass",
+          {
+            moving: false
+          }
+        ]));
+        add([
+          text("x" + passToRenderMany[planets[i]]),
+          pos(15 * passengerScale + passengerScale * 30, 50 + textLeftModiferHeight * 5 + (i + 4) * 20 * passengerScale),
+          scale(passengerScale * 2),
+          origin("topleft"),
+          "passXtext"
+        ]);
+      }
+    }
   }
   __name(refomatePassOnShip, "refomatePassOnShip");
   player.collides("planet", (planet) => {
@@ -3169,7 +3258,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       return;
     }
     player.speed = 0;
-    move(-1 * planet.startingPos[0] + width() / 2, -1 * planet.startingPos[1] + height() / 2, 10);
+    moveBg(-1 * planet.startingPos[0] + width() / 2, -1 * planet.startingPos[1] + height() / 2, 10);
     player.onPlanet = true;
     player.planetAt = planet.name;
     planetText.text = player.planetAt;
@@ -3177,18 +3266,31 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     if (planets.includes(player.planetAt)) {
       let playerPassesToRemove = [];
       for (let i = 0; i < player.passengers.length; i++) {
+        if (i == 18) {
+          break;
+        }
         if (player.passengers[i].destanation == player.planetAt) {
-          moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true);
           player.passengersSprite[i].moving = true;
+          player.passengersSprite[i].use(move(player.pos.angle(player.passengersSprite[i].pos), 300));
+          player.passengersSprite[i].use("moveMeToCenter");
           playerPassesToRemove.push(i);
           player.money += Math.round(player.baseMoneyPerPass * player.passengers[i].fare);
           moneyText.text = largeNumberToConcat(player.money);
         }
       }
+      for (let i = 18; i < player.passengers.length; i++) {
+        if (player.passengers[i].destanation == player.planetAt) {
+          playerPassesToRemove.push(i);
+          player.money += Math.round(player.baseMoneyPerPass * player.passengers[i].fare);
+          moneyText.text = largeNumberToConcat(player.money);
+        }
+      }
+      if (playerPassesToRemove.length > 0) {
+        earnMoney(player.baseMoneyPerPass * player.passengers[playerPassesToRemove[0]].fare * playerPassesToRemove.length, width() / 2, height() / 2);
+      }
       for (let i = playerPassesToRemove.length - 1; i >= 0; i--) {
         player.passengers.splice(playerPassesToRemove[i], 1);
       }
-      player.passengersSprite = [];
       refomatePassOnShip();
       player.capacity += playerPassesToRemove.length;
       capacityText.text = player.capacity;
@@ -3217,20 +3319,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       player.capacity -= 1;
       capacityText.text = player.capacity;
       let newPassDataShip = player.passengers[player.passengers.length - 1];
-      player.passengersSprite.push(add([
-        sprite(newPassDataShip.sprite),
-        pos((player.passengers.length - 1) % 6 * 30 * passengerScale + 15 * passengerScale, 50 + textLeftModiferHeight * 5 + (Math.floor((player.passengers.length - 1) / 6) + 1) * 20 * passengerScale),
-        color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
-        origin("center"),
-        area(),
-        scale(passengerScale),
-        layer("game"),
-        "passenger",
-        "onShipPass",
-        {
-          moving: false
-        }
-      ]));
+      refomatePassOnShip();
       passenger.destroy();
       planetsVars[planets.indexOf(player.planetAt)].passengers.shift();
       generatePassengers(planetsVars[planets.indexOf(player.planetAt)], 1);
@@ -3269,7 +3358,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     ;
   }
   __name(calcRealPos, "calcRealPos");
-  var move = /* @__PURE__ */ __name((x, y, slow) => {
+  function moveBg(x, y, slow) {
     let moveAmountX = (x - player.realPos[0]) / slow;
     player.realPos[0] = x;
     let moveAmountY = (y - player.realPos[1]) / slow;
@@ -3288,7 +3377,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         window.clearInterval(intervalID);
       }
     }, 10);
-  }, "move");
+  }
+  __name(moveBg, "moveBg");
   action("background", (background) => {
     background.pos.x += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
     background.pos.y += Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
@@ -3375,6 +3465,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
             genPassSprite = "passRainbow";
             genPassColor = [255, 255, 255];
             genPassFare = 10;
+            break;
           case "face":
             genPassSprite = "cargoFace";
             genPassColor = [255, 255, 255];
@@ -3405,7 +3496,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       generatePassengers(planet, 10);
     });
     player.onPlanet = true;
-    move(width() / 2, height() / 2, 1);
+    planetUi(true);
+    moveBg(width() / 2, height() / 2, 1);
   }, "onStart");
   onStart();
 })();
