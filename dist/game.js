@@ -2675,9 +2675,9 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   generateMap();
   var planetHome = addBasePlanet();
   var movementArrow = loadMovementArrow();
-  var player = loadPlayer();
+  var player2 = loadPlayer();
   movementArrow.play("spin");
-  player.play("thrust");
+  player2.play("thrust");
   function arrowRotateFromMouse() {
     mouseRotationToSend = Math.atan((mousePos().y - height() / 2) / (mousePos().x - width() / 2)) * 180 / Math.PI - 90;
     if (mousePos().x - width() / 2 >= 0) {
@@ -2707,60 +2707,36 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }, 10);
   }
   __name(moveToSlow, "moveToSlow");
-  function refomatePassOnShip() {
-    every("onShipPass", (todestroy) => {
-      if (!todestroy.moving) {
-        todestroy.destroy();
-      }
-    });
-    for (let i = 0; i < player.passengers.length; i++) {
-      let newPassDataShip = player.passengers[i];
-      player.passengersSprite.push(add([
-        sprite(newPassDataShip.sprite),
-        pos(i % 6 * 30 + 15, 50 + textLeftModiferHeight * 5 + (Math.floor(i / 6) + 1) * 20),
-        color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
-        origin("center"),
-        area(),
-        layer("game"),
-        "passenger",
-        "onShipPass",
-        {
-          moving: false
-        }
-      ]));
-    }
-  }
-  __name(refomatePassOnShip, "refomatePassOnShip");
-  player.collides("planet", (planet) => {
-    if (player.onPlanet) {
+  player2.collides("planet", (planet) => {
+    if (player2.onPlanet) {
       return;
     }
-    player.speed = 0;
+    player2.speed = 0;
     move(-1 * planet.startingPos[0] + width() / 2, -1 * planet.startingPos[1] + height() / 2, 10);
-    player.onPlanet = true;
-    player.planetAt = planet.name;
-    planetText.text = player.planetAt;
+    player2.onPlanet = true;
+    player2.planetAt = planet.name;
+    planetText.text = player2.planetAt;
     planetUi(true);
-    if (planetNames.includes(player.planetAt)) {
+    if (planetNames.includes(player2.planetAt)) {
       let playerPassesToRemove = [];
-      for (let i = 0; i < player.passengers.length; i++) {
-        if (player.passengers[i].destanation == player.planetAt) {
-          moveToSlow(width() / 2, height() / 2, player.passengersSprite[i], 25, true);
-          player.passengersSprite[i].moving = true;
+      for (let i = 0; i < player2.passengers.length; i++) {
+        if (player2.passengers[i].destanation == player2.planetAt) {
+          moveToSlow(width() / 2, height() / 2, player2.passengersSprite[i], 25, true);
+          player2.passengersSprite[i].moving = true;
           playerPassesToRemove.push(i);
-          player.money += Math.round(player.baseMoneyPerPass * player.passengers[i].fare);
-          moneyText.text = player.money;
+          player2.money += Math.round(player2.baseMoneyPerPass * player2.passengers[i].fare);
+          moneyText.text = player2.money;
         }
       }
       for (let i = playerPassesToRemove.length - 1; i >= 0; i--) {
-        player.passengers.splice(playerPassesToRemove[i], 1);
+        player2.passengers.splice(playerPassesToRemove[i], 1);
       }
-      player.passengersSprite = [];
+      player2.passengersSprite = [];
       refomatePassOnShip();
-      player.capacity += playerPassesToRemove.length;
-      capacityText.text = player.capacity;
-      for (let i = 0; i < planetsVars2[planetNames.indexOf(player.planetAt)].passengers.length; i++) {
-        let newPassData = planetsVars2[planetNames.indexOf(player.planetAt)].passengers[i];
+      player2.capacity += playerPassesToRemove.length;
+      capacityText.text = player2.capacity;
+      for (let i = 0; i < planetsVars2[planetNames.indexOf(player2.planetAt)].passengers.length; i++) {
+        let newPassData = planetsVars2[planetNames.indexOf(player2.planetAt)].passengers[i];
         add([
           sprite(newPassData.sprite),
           pos(width() / 2 + 50 + i * 30, height() / 2),
@@ -2775,17 +2751,17 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
   });
   action("onPlanetPass", (passenger) => {
-    if (player.capacity > 0) {
-      passenger.move(dir(180).scale(player.loadSpeed * dt() * 40));
+    if (player2.capacity > 0) {
+      passenger.move(dir(180).scale(player2.loadSpeed * dt() * 40));
     }
     if (passenger.pos.x <= width() / 2) {
-      player.passengers.push(planetsVars2[planetNames.indexOf(player.planetAt)].passengers[0]);
-      player.capacity -= 1;
-      capacityText.text = player.capacity;
-      let newPassDataShip = player.passengers[player.passengers.length - 1];
-      player.passengersSprite.push(add([
+      player2.passengers.push(planetsVars2[planetNames.indexOf(player2.planetAt)].passengers[0]);
+      player2.capacity -= 1;
+      capacityText.text = player2.capacity;
+      let newPassDataShip = player2.passengers[player2.passengers.length - 1];
+      player2.passengersSprite.push(add([
         sprite(newPassDataShip.sprite),
-        pos((player.passengers.length - 1) % 6 * 30 + 15, 50 + textLeftModiferHeight * 5 + (Math.floor((player.passengers.length - 1) / 6) + 1) * 20),
+        pos((player2.passengers.length - 1) % 6 * 30 + 15, 50 + textLeftModiferHeight * 5 + (Math.floor((player2.passengers.length - 1) / 6) + 1) * 20),
         color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
         origin("center"),
         area(),
@@ -2797,9 +2773,9 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         }
       ]));
       passenger.destroy();
-      planetsVars2[planetNames.indexOf(player.planetAt)].passengers.shift();
-      generatePassengers(planetsVars2[planetNames.indexOf(player.planetAt)], 1);
-      let newPassData = planetsVars2[planetNames.indexOf(player.planetAt)].passengers[planetsVars2[planetNames.indexOf(player.planetAt)].passengers.length - 1];
+      planetsVars2[planetNames.indexOf(player2.planetAt)].passengers.shift();
+      generatePassengers(planetsVars2[planetNames.indexOf(player2.planetAt)], 1);
+      let newPassData = planetsVars2[planetNames.indexOf(player2.planetAt)].passengers[planetsVars2[planetNames.indexOf(player2.planetAt)].passengers.length - 1];
       add([
         sprite(newPassData.sprite),
         pos(width() / 2 + 10 * 30, height() / 2),
@@ -2813,8 +2789,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
   });
   function calcRealPos(obj) {
-    obj.realPos[0] += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
-    obj.realPos[1] += Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
+    obj.realPos[0] += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player2.speed * dt();
+    obj.realPos[1] += Math.cos(angleOfMovement * (Math.PI / 180)) * player2.speed * dt();
     if (obj.realPos[0] >= numberOfBackTiles / 2 * blockSize2) {
       obj.realPos[0] = obj.realPos[0] - numberOfBackTiles * blockSize2;
     }
@@ -2834,10 +2810,10 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   }
   __name(calcRealPos, "calcRealPos");
   var move = /* @__PURE__ */ __name((x, y, slow) => {
-    let moveAmountX = (x - player.realPos[0]) / slow;
-    player.realPos[0] = x;
-    let moveAmountY = (y - player.realPos[1]) / slow;
-    player.realPos[1] = y;
+    let moveAmountX = (x - player2.realPos[0]) / slow;
+    player2.realPos[0] = x;
+    let moveAmountY = (y - player2.realPos[1]) / slow;
+    player2.realPos[1] = y;
     let timerreset = 0;
     let intervalID = setInterval(function() {
       every("background", (background) => {
@@ -2854,8 +2830,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }, 10);
   }, "move");
   action("background", (background) => {
-    background.pos.x += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
-    background.pos.y += Math.cos(angleOfMovement * (Math.PI / 180)) * player.speed * dt();
+    background.pos.x += -1 * Math.sin(angleOfMovement * (Math.PI / 180)) * player2.speed * dt();
+    background.pos.y += Math.cos(angleOfMovement * (Math.PI / 180)) * player2.speed * dt();
     if (background.pos.x >= numberOfBackTiles / 2 * blockSize2 + width() / 2) {
       background.pos.x = background.pos.x - numberOfBackTiles * blockSize2;
     } else if (background.pos.x <= -1 * (numberOfBackTiles / 2 * blockSize2) + width() / 2) {
@@ -2905,13 +2881,13 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   }
   __name(meanAngleDeg, "meanAngleDeg");
   action("player", () => {
-    if (player.speed > 0) {
-      player.speed = Math.min(player.speed + player.acceleration, player.max_thrust);
+    if (player2.speed > 0) {
+      player2.speed = Math.min(player2.speed + player2.acceleration, player2.max_thrust);
     }
-    speedText.text = Math.round(player.speed);
-    angleOfMovement = meanAngleDeg([movementArrow.angle, angleOfMovement], player.handling * 0.3 / dt());
-    player.angle = angleOfMovement;
-    calcRealPos(player);
+    speedText.text = Math.round(player2.speed);
+    angleOfMovement = meanAngleDeg([movementArrow.angle, angleOfMovement], player2.handling * 0.3 / dt());
+    player2.angle = angleOfMovement;
+    calcRealPos(player2);
   });
   var onStart = /* @__PURE__ */ __name(() => {
     every("background", (background) => {

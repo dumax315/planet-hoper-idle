@@ -1,4 +1,4 @@
-import kaboom, { Character } from "kaboom";
+import { Character } from "kaboom";
 import { Vec2N, vec2N } from "./util/kaboomUtil";
 import { k, player } from "./main.js";
 import * as planetUtil from "./util/planetUtil";
@@ -158,6 +158,7 @@ planetsVars.push(k.add([
     size: 1,
   },
 ]));
+
 
 function buyPlanets() {
 	// debug.log(planetsVars.length)

@@ -98,34 +98,6 @@ function moveToSlow(x, y, objToMove, speed, delAfter) {
 	}, 10);
 }
 
-//reformats the passengers on the ship after people go home
-function refomatePassOnShip() {
-	every("onShipPass", (todestroy) => {
-		if (!todestroy.moving) {
-			todestroy.destroy();
-		}
-	});
-	// debug.log(player.passengers.length)
-	for (let i = 0; i < player.passengers.length; i++) {
-		let newPassDataShip = player.passengers[i]
-		player.passengersSprite.push(add([
-			sprite(newPassDataShip.sprite),
-			// debug.log((i+1) % 6 * 30 + 15),
-			pos((i) % 6 * 30 + 15, 50+textLeftModiferHeight*5 + (Math.floor(i / 6) + 1) * 20),
-			color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
-			origin("center"),
-			area(),
-			layer("game"),
-			"passenger",
-			"onShipPass",
-			{
-				moving: false,
-			}
-		]));
-	}
-}
-//Todo: make it only show the amount from each
-
 
 player.collides("planet", (planet) => {
 	// debug.log("yo");
