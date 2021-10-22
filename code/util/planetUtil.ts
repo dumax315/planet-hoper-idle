@@ -1,7 +1,6 @@
-import { Vec2 } from "kaboom";
 import { k } from "../main";
 
-import * as kaboomUtil from "./kaboomUtil";
+import { Vec2N, vec2N, vec2NToString } from "./kaboomUtil";
 
 
 //its lower case
@@ -42,7 +41,7 @@ export function getRandomPlanetScaleArray(planetCount: number): number[] {
   return planetScales;
 }
 
-export function getVectorDistance(vec1: Vec2, vec2: Vec2) {
+export function getVectorDistance(vec1: Vec2N, vec2: Vec2N) {
   return (
     Math.sqrt(
       Math.pow((vec1.x + vec2.x), 2) +
@@ -52,7 +51,7 @@ export function getVectorDistance(vec1: Vec2, vec2: Vec2) {
 
 function getVectorDistanceEstimate(vec1, vec2) {}
 
-export function getVectorWithinDistance(vec1: Vec2, vec2: Vec2, dist: number): boolean {
+export function getVectorWithinDistance(vec1: Vec2N, vec2: Vec2N, dist: number): boolean {
   try {
     if (
     betweenRange(vec1.x, vec2.x, dist) && 
@@ -60,30 +59,30 @@ export function getVectorWithinDistance(vec1: Vec2, vec2: Vec2, dist: number): b
     ) {
       return true;
   } else { return false; }
-  } catch { debug.log("Received an undefined vector") }
+  } catch { /*k.debug.log("Received an undefined vector");*/ }
 }
+
+
 
 export function getRandomPlanetPositionArray(
   planetCount: number, 
   xBound: number, 
   yBound: number, 
-  bufferDistance: number): Vec2[] {
-  let planetPositions: Vec2[] = [
-    vec2( /*propagate list with one value*/
-      Math.floor(0 + Math.random() * (xBound + 1)),
-      Math.floor(0 + Math.random() * (yBound + 1)))
-  ];
-
-  debug.log(planetPositions[0][0] + ", " + planetPositions[0][1]);
+  bufferDistance: number): Vec2N[] {
+  let planetPositions: Vec2N[] = [];
+  planetPositions.push(vec2N(
+      (Math.floor(Math.random() * (xBound + 1))),
+      (Math.floor(Math.random() * (yBound + 1)))
+    ));
 
   loopFill:
     while (planetPositions.length < planetCount) {
-      let tempPlanetPos: Vec2 = k.vec2(
+      let tempPlanetPos: Vec2N = vec2N(
         Math.floor(0 + Math.random() * (xBound + 1)),
         Math.floor(0 + Math.random() * (yBound + 1)));
       loopTestFor:
         for (let j = 0; j <= planetPositions.length; j++) {
-          debug.log(kaboomUtil.vec2ToString(tempPlanetPos))
+          //debug.log(vec2NToString(tempPlanetPos))
           if (getVectorWithinDistance(tempPlanetPos, planetPositions[j], bufferDistance)) {
             break loopTestFor; }}
         planetPositions.push(tempPlanetPos); 
@@ -105,8 +104,3 @@ export const PlanetNames = {
   "red": "Red",
   "maroon": "Maroon",
 }
-
-// let planetArray = getRandomPlanetPositionArray(8, 48, 48, 5);
-// for (let item in planetArray) {
-//   console.log(item);
-// }

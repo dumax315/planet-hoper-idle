@@ -3,16 +3,27 @@ import kaboom from "kaboom";
 import { LevelConf } from "kaboom";
 
 import { k } from "./main.js";
+import { vec2N } from "./util/kaboomUtil";
 
 
 
-const mapScale = 1.5;
+export const mapScale = 1.5;
 
 const blockSize = 64 * mapScale;
 
 const backgroundSize = 64 * mapScale * 6;
 
 const numberOfBackTiles = 48;
+
+export function generateLayers(): void {
+  k.layers([
+	"bg",
+	"game",
+	"ui",
+	"uiText",
+	"store",]
+  , "game");
+}
 
 
 const mapASCII =

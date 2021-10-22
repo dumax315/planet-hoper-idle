@@ -2,10 +2,11 @@ import kaboom, { Character } from "kaboom";
 
 import { k } from "./main.js";
 
-let playerScale = 3;
 
-export function loadPlayer(): void {
-  return add([
+export let playerScale = 3;
+
+export function loadPlayer(): Character {
+  return k.add([
     sprite("ship_1"),
     pos(width() / 2, height() / 2),
     rotate(0),
@@ -20,7 +21,7 @@ export function loadPlayer(): void {
       acceleration: 2.5,
       deceleration: 4,
       animation_frame: 0,
-      money: 100,
+      money: 1000000000000000000,
       capacityMax: 14,
       capacity: 14,
       passengers: [],
@@ -37,8 +38,9 @@ export function loadPlayer(): void {
   ]);
 }
 
-export function loadMovementArrow(): void {
-  return add([
+
+export function loadMovementArrow(): Character {
+  return k.add([
     sprite("arrow_1"),
     pos(40, 80),
     rotate(0),

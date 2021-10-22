@@ -28,6 +28,12 @@ export function loadAssets() {
 
   loadPedit("void_1", "sprites/void_1.pedit")
   loadSprite("rainBowPlanet", "sprites/rainBowPlanet.png");
+	
+  loadSprite("planetSpikes", "sprites/planetSpikes.png");
+  loadSprite("planetFace", "sprites/planetFace.png");
+	
+  loadPedit("cargoSpikes", "sprites/cargoSpikes.pedit");
+  loadPedit("cargoFace", "sprites/cargoFace.pedit");
 }
 
 //export { loadAssets }
