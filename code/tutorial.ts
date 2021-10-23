@@ -2,7 +2,7 @@ import kaboom, { Character } from "kaboom";
 
 import { k, playerScale } from "./main.js";
 
-
+let firstPlanet;
 export function loadTutorialOne(): void {
 	add([
     rect(width()*.7,width()/12),
@@ -16,7 +16,7 @@ export function loadTutorialOne(): void {
   ]);
 	add([
     pos(width() / 2, height()*.8),
-		text("Click anywhere to launch"),
+		text("Click space to launch"),
 		scale(width()/400),
     rotate(0),
     area(),
@@ -25,8 +25,8 @@ export function loadTutorialOne(): void {
     "tutorialOne",
   ]);
   action("tutorialOne", () => {
-		if (mouseIsClicked()) {
-			every("tutorialOne", (t) => {t.use(lifespan(0.5, { fade: 0.5 }),)});
+		if (keyIsPressed("space") ){
+			destroyAll("tutorialOne");
 			loadTutorial2()
 		}
 	});
@@ -45,7 +45,7 @@ export function loadTutorial2(): void {
   ]);
 	add([
     pos(width() / 2, height()*.8),
-		text("Hold space to boost speed\n(buy upgrades in the Store)"),
+		text("Hold space to boost speed"),
     rotate(0),
 		scale(width()/400),
     area(),
@@ -55,8 +55,8 @@ export function loadTutorial2(): void {
   ]);
   action("tutorial2", () => {
 		if (keyIsPressed("space")) {
-			every("tutorial2", (t) => {t.use(lifespan(2, { fade: 0.5 }),)});
-			setTimeout(loadTutorial3(), 2000);
+			destroyAll("tutorial2");
+			loadTutorial3();
 		}
 	});
 }
@@ -84,7 +84,92 @@ export function loadTutorial3() {
   ]);
   action("tutorial3", () => {
 		if (mouseIsClicked()) {
-			every("tutorial3", (t) => {t.use(lifespan(0.5, { fade: 0.5 }),)});
+			destroyAll("tutorial3");
+			loadTutorial4()
 		}
 	});
+}
+
+export function loadTutorial4() {
+	add([
+    rect(width()*.7,width()/12),
+    pos(width() / 2, height()*.8),
+    rotate(0),
+    area(),
+		color(238, 155, 0),
+    layer("ui"),
+    origin("center"),
+    "tutorial4",
+  ]);
+	add([
+    pos(width() / 2, height()*.8),
+		text("Go to a Planet \n Pick Up Passengers"),
+    rotate(0),
+		scale(width()/400),
+    area(),
+    layer("ui"),
+    origin("center"),
+    "tutorial4",
+  ]);
+  action("tutorial4", () => {
+		if(player.onPlanet && "home" != player.planetAt) {
+			firstPlanet = player.planetAt;
+			destroyAll("tutorial4");
+			loadTutorial5();
+		}
+	});
+}
+
+export function loadTutorial5() {
+	add([
+    rect(width()*.7,width()/12),
+    pos(width() / 2, height()*.8),
+    rotate(0),
+    area(),
+		color(238, 155, 0),
+    layer("ui"),
+    origin("center"),
+    "tutorial5",
+  ]);
+	add([
+    pos(width() / 2, height()*.8),
+		text("Go to another Planet \n Drop Off Passengers"),
+    rotate(0),
+		scale(width()/400),
+    area(),
+    layer("ui"),
+    origin("center"),
+    "tutorial5",
+  ]);
+  action("tutorial5", () => {
+		if(player.onPlanet && firstPlanet != player.planetAt && "home" != player.planetAt) {
+			destroyAll("tutorial5");
+			loadTutorial6();
+		}
+	});
+}
+
+export function loadTutorial6() {
+	add([
+    rect(width()*.7,width()/12),
+    pos(width() / 2, height()*.8),
+    rotate(0),
+    area(),
+		color(238, 155, 0),
+    layer("ui"),
+		lifespan(6, { fade: 0.5 }),
+    origin("center"),
+    "tutorial6",
+  ]);
+	add([
+    pos(width() / 2, height()*.8),
+		text("Don't forget to buy upgrades\nShop is availbe at planets"),
+    rotate(0),
+		scale(width()/400),
+    area(),
+    layer("ui"),
+    origin("center"),
+		lifespan(8, { fade: 0.5 }),
+    "tutorial6",
+  ]);
 }

@@ -2390,6 +2390,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     loadPedit("cargoFace", "sprites/cargoFace.pedit");
     loadSprite("planetSpikes", "sprites/planetSpikes.png");
     loadSprite("planetFace", "sprites/planetFace.png");
+    loadSprite("alien", "sprites/alien.png");
   }
   __name(loadAssets, "loadAssets");
 
@@ -2404,6 +2405,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       layer("game"),
       origin("center"),
       "player",
+      z(2),
       {
         speed: 0,
         max_thrust: 340,
@@ -2422,7 +2424,10 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         anim: "thrust",
         loadSpeed: 400,
         baseMoneyPerPass: 50,
-        handling: 2
+        handling: 2,
+        bulletSpeed: 450,
+        moneyPerAlien: 50,
+        health: 3
       }
     ]);
   }
@@ -2445,6 +2450,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   __name(loadMovementArrow, "loadMovementArrow");
 
   // code/tutorial.ts
+  var firstPlanet;
   function loadTutorialOne() {
     add([
       rect(width() * 0.7, width() / 12),
@@ -2458,7 +2464,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     ]);
     add([
       pos(width() / 2, height() * 0.8),
-      text("Click anywhere to launch"),
+      text("Click space to launch"),
       scale(width() / 400),
       rotate(0),
       area(),
@@ -2467,10 +2473,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       "tutorialOne"
     ]);
     action("tutorialOne", () => {
-      if (mouseIsClicked()) {
-        every("tutorialOne", (t) => {
-          t.use(lifespan(0.5, { fade: 0.5 }));
-        });
+      if (keyIsPressed("space")) {
+        destroyAll("tutorialOne");
         loadTutorial2();
       }
     });
@@ -2489,7 +2493,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     ]);
     add([
       pos(width() / 2, height() * 0.8),
-      text("Hold space to boost speed\n(buy upgrades in the Store)"),
+      text("Hold space to boost speed"),
       rotate(0),
       scale(width() / 400),
       area(),
@@ -2499,10 +2503,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     ]);
     action("tutorial2", () => {
       if (keyIsPressed("space")) {
-        every("tutorial2", (t) => {
-          t.use(lifespan(2, { fade: 0.5 }));
-        });
-        setTimeout(loadTutorial3(), 2e3);
+        destroyAll("tutorial2");
+        loadTutorial3();
       }
     });
   }
@@ -2530,13 +2532,96 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     ]);
     action("tutorial3", () => {
       if (mouseIsClicked()) {
-        every("tutorial3", (t) => {
-          t.use(lifespan(0.5, { fade: 0.5 }));
-        });
+        destroyAll("tutorial3");
+        loadTutorial4();
       }
     });
   }
   __name(loadTutorial3, "loadTutorial3");
+  function loadTutorial4() {
+    add([
+      rect(width() * 0.7, width() / 12),
+      pos(width() / 2, height() * 0.8),
+      rotate(0),
+      area(),
+      color(238, 155, 0),
+      layer("ui"),
+      origin("center"),
+      "tutorial4"
+    ]);
+    add([
+      pos(width() / 2, height() * 0.8),
+      text("Go to a Planet \n Pick Up Passengers"),
+      rotate(0),
+      scale(width() / 400),
+      area(),
+      layer("ui"),
+      origin("center"),
+      "tutorial4"
+    ]);
+    action("tutorial4", () => {
+      if (player.onPlanet && player.planetAt != "home") {
+        firstPlanet = player.planetAt;
+        destroyAll("tutorial4");
+        loadTutorial5();
+      }
+    });
+  }
+  __name(loadTutorial4, "loadTutorial4");
+  function loadTutorial5() {
+    add([
+      rect(width() * 0.7, width() / 12),
+      pos(width() / 2, height() * 0.8),
+      rotate(0),
+      area(),
+      color(238, 155, 0),
+      layer("ui"),
+      origin("center"),
+      "tutorial5"
+    ]);
+    add([
+      pos(width() / 2, height() * 0.8),
+      text("Go to another Planet \n Drop Off Passengers"),
+      rotate(0),
+      scale(width() / 400),
+      area(),
+      layer("ui"),
+      origin("center"),
+      "tutorial5"
+    ]);
+    action("tutorial5", () => {
+      if (player.onPlanet && firstPlanet != player.planetAt && player.planetAt != "home") {
+        destroyAll("tutorial5");
+        loadTutorial6();
+      }
+    });
+  }
+  __name(loadTutorial5, "loadTutorial5");
+  function loadTutorial6() {
+    add([
+      rect(width() * 0.7, width() / 12),
+      pos(width() / 2, height() * 0.8),
+      rotate(0),
+      area(),
+      color(238, 155, 0),
+      layer("ui"),
+      lifespan(6, { fade: 0.5 }),
+      origin("center"),
+      "tutorial6"
+    ]);
+    add([
+      pos(width() / 2, height() * 0.8),
+      text("Don't forget to buy upgrades\nShop is availbe at planets"),
+      rotate(0),
+      scale(width() / 400),
+      area(),
+      layer("ui"),
+      origin("center"),
+      lifespan(8, { fade: 0.5 }),
+      "tutorial6"
+    ]);
+  }
+  __name(loadTutorial6, "loadTutorial6");
 
   // code/mapGenerator.ts
   var mapScale = 1.5;
@@ -2602,7 +2687,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     font: "sinko"
   });
   var main_default = k;
-  var playerScale = 2 * width() / 750;
+  var playerScale = Math.min(2 * width() / 750, 3);
   var getWW = width();
   function getWidth() {
     return getWW;
@@ -2982,8 +3067,18 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         }
       },
       {
-        name: "Upgrade Money/Passenger",
+        name: "Upgrade Bullet Speed",
         id: 4,
+        amountBought: 0,
+        cost: 200,
+        max: 30,
+        functionToRun: () => {
+          player.bulletSpeed += 30;
+        }
+      },
+      {
+        name: "Upgrade Money/Passenger",
+        id: 5,
         amountBought: 0,
         cost: 100,
         functionToRun: () => {
@@ -2991,8 +3086,17 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         }
       },
       {
+        name: "Upgrade Money/Alien",
+        id: 6,
+        amountBought: 0,
+        cost: 200,
+        functionToRun: () => {
+          player.moneyPerAlien *= 1.2;
+        }
+      },
+      {
         name: "Upgrade Fill Speed",
-        id: 5,
+        id: 7,
         amountBought: 0,
         cost: 300,
         max: 20,
@@ -3002,7 +3106,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       },
       {
         name: "Unlock Planets",
-        id: 6,
+        id: 8,
         amountBought: 0,
         cost: "prog",
         costProgression: [100, 100, 100, 100],
@@ -3015,6 +3119,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     ];
     let storeButtonSprites = [];
     function genStoreItems() {
+      destroyAll("inStoreButton");
+      storeButtonSprites = [];
       add([
         z(10),
         text("Money:"),
@@ -3183,6 +3289,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     function earnMoney(amount, x, y) {
       let colorto = [255, 0, 0];
       let sign = "";
+      moneyText.text = largeNumberToConcat(player.money);
       if (amount > 0) {
         colorto = [0, 255, 0];
         sign = "+";
@@ -3207,9 +3314,98 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     let storeButX = width() - 20 - width() / 6 * mapScale2;
     let storeButY = (20 + width() / 1e3 * 50) * mapScale2;
     mouseClick(() => {
+      spawnBullet(movementArrow.angle);
+    });
+    keyPress("space", () => {
       if (!(mousePos().x > storeButX && mousePos().y < storeButY && player.onPlanet)) {
         launch();
       }
+    });
+    function spawnBullet(bulletAngleGot) {
+      add([
+        rect(8, 3),
+        scale(playerScale),
+        pos(width() / 2, height() / 2),
+        area(),
+        rotate(bulletAngleGot - 90),
+        origin("center"),
+        "bullet",
+        {
+          bulletAngle: bulletAngleGot + 180,
+          realPos: [width() / 2, height() / 2]
+        }
+      ]);
+    }
+    __name(spawnBullet, "spawnBullet");
+    ;
+    action("bullet", (b) => {
+      calcRealPos(b);
+      b.realPos[0] += -1 * Math.sin(b.bulletAngle * (Math.PI / 180)) * player.bulletSpeed * dt();
+      b.realPos[1] += Math.cos(b.bulletAngle * (Math.PI / 180)) * player.bulletSpeed * dt();
+      if (b.realPos[0] <= 0) {
+        b.destroy();
+      } else if (b.realPos[0] >= width()) {
+        b.destroy();
+      } else {
+        b.pos.x = b.realPos[0];
+      }
+      ;
+      if (b.realPos[1] <= 0) {
+        b.destroy();
+      } else if (b.realPos[1] >= height()) {
+        b.destroy();
+      } else {
+        b.pos.y = b.realPos[1];
+      }
+      ;
+    });
+    function spawnAlien() {
+      add([
+        sprite("alien"),
+        pos(width() / 2, height() / 2),
+        area(),
+        scale(planetScale / 3),
+        origin("center"),
+        pos(rand(0, numberOfBackTiles * blockSize2), rand(0, numberOfBackTiles * blockSize2)),
+        "alien",
+        {
+          realPos: [rand(0, numberOfBackTiles * blockSize2), rand(0, numberOfBackTiles * blockSize2)]
+        }
+      ]);
+    }
+    __name(spawnAlien, "spawnAlien");
+    collides("bullet", "alien", (bullet, alien) => {
+      earnMoney(player.moneyPerAlien, alien.pos.x, alien.pos.y);
+      destroy(bullet);
+      destroy(alien);
+      player.money += player.moneyPerAlien;
+      spawnAlien();
+    });
+    collides("player", "alien", (playerObj, alien) => {
+      shake();
+      player.health -= 1;
+      if (player.health <= 0) {
+        player.speed = 0;
+        earnMoney(Math.round(-1 * player.money / 2), width() / 2, height() / 2);
+        player.money = Math.round(player.money / 2);
+        player.onPlanet = true;
+        planetUi(true);
+        moveBg(width() / 2, height() / 2, 1);
+      } else {
+        earnMoney(-1 * player.moneyPerAlien, width() / 2, height() / 2);
+        player.money -= player.moneyPerAlien;
+      }
+      destroy(alien);
+      spawnAlien();
+    });
+    action("alien", (b) => {
+      calcRealPos(b);
+      if (b.realPos[0] < width() && b.realPos[0] > 0 && b.realPos[1] < height() && b.realPos[1] > 0 && !player.onPlanet) {
+        b.realPos[0] += Math.cos(player.pos.angle(b.pos) * (Math.PI / 180)) * 50 * dt();
+        b.realPos[1] += Math.sin(player.pos.angle(b.pos) * (Math.PI / 180)) * 50 * dt();
+      }
+      b.pos.x = b.realPos[0];
+      b.pos.y = b.realPos[1];
     });
     function genPrice(item, time) {
       if (item.cost == "max") {
@@ -3228,8 +3424,6 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         storeData[button.idbuy].functionToRun();
         storeData[button.idbuy].amountBought++;
         moneyText.text = largeNumberToConcat(player.money);
-        destroyAll("inStoreButton");
-        storeButtonSprites = [];
         genStoreItems();
       } else {
         shake();
@@ -3365,6 +3559,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         return;
       }
       player.speed = 0;
+      player.health += 2;
+      player.health = Math.min(player.health, 4);
       moveBg(-1 * planet.startingPos[0] + width() / 2, -1 * planet.startingPos[1] + height() / 2, 10);
       player.onPlanet = true;
       player.planetAt = planet.name;
@@ -3480,6 +3676,10 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
           planet.realPos[0] += moveAmountX;
           planet.realPos[1] += moveAmountY;
         });
+        every("alien", (planet) => {
+          planet.realPos[0] += moveAmountX;
+          planet.realPos[1] += moveAmountY;
+        });
         if (++timerreset === slow) {
           window.clearInterval(intervalID);
         }
@@ -3534,7 +3734,12 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
     __name(degToRad, "degToRad");
     function meanAngleDeg(a, offset) {
-      return 180 / Math.PI * Math.atan2(sum(a.map(degToRad).map(Math.sin), offset) / (offset + 1), sum(a.map(degToRad).map(Math.cos), offset) / (offset + 1));
+      let resultAngle = Math.round(180 / Math.PI * Math.atan2(sum(a.map(degToRad).map(Math.sin), offset) / (offset + 1), sum(a.map(degToRad).map(Math.cos), offset) / (offset + 1)) * 1e5) / 1e5;
+      if (isNaN(resultAngle)) {
+        debug.log("nan MeanAngle");
+        return a[0];
+      }
+      return resultAngle;
     }
     __name(meanAngleDeg, "meanAngleDeg");
     keyDown("space", () => {
@@ -3548,7 +3753,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         if (player.boosting) {
           player.speed = Math.min(player.speed + player.acceleration, player.max_thrust);
         } else {
-          player.speed = Math.min(player.speed + player.acceleration, Math.max(player.max_thrust / 2), 500);
+          player.speed = Math.min(player.speed + player.acceleration, Math.max(player.max_thrust / 2), 350);
         }
       }
       speedText.text = Math.round(player.speed);
@@ -3615,6 +3820,9 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       player.onPlanet = true;
       planetUi(true);
       moveBg(width() / 2, height() / 2, 1);
+      for (let i = 0; i < 35; i++) {
+        spawnAlien();
+      }
     }, "onStart");
     onStart();
   });

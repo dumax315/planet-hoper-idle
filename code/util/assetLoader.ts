@@ -35,6 +35,8 @@ export function loadAssets() {
 	
 loadSprite("planetSpikes", "sprites/planetSpikes.png");
 loadSprite("planetFace", "sprites/planetFace.png");
+loadSprite("alien", "sprites/alien.png");
+
 // loadPedit("cargoSpikes", "sprites/cargoSpikes.pedit");
 // loadPedit("cargoFace", "sprites/cargoFace.pedit");
 }

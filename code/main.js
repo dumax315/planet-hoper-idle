@@ -19,7 +19,7 @@ export const k = kaboom({
 
 export default k
 
-export let playerScale = 2*width()/750;
+export let playerScale = Math.min(2*width()/750, 3);
 //for map gen
 let getWW = width();
 export function getWidth() {
@@ -487,16 +487,33 @@ let storeData = [{
 			player.acceleration *= 1.1
 		},
 	},{
-		name:"Upgrade Money/Passenger",
+		name:"Upgrade Bullet Speed",
 		id:4,
+		amountBought:0,
+		cost: 200,
+		max:30,
+		functionToRun: () => {
+			player.bulletSpeed += 30;
+		},
+	},{
+		name:"Upgrade Money/Passenger",
+		id:5,
 		amountBought:0,
 		cost: 100,
 		functionToRun: () => {
 			player.baseMoneyPerPass *= 1.2;
 		},
 	},{
+		name:"Upgrade Money/Alien",
+		id:6,
+		amountBought:0,
+		cost: 200,
+		functionToRun: () => {
+			player.moneyPerAlien *= 1.2;
+		},
+	},{
 		name:"Upgrade Fill Speed",
-		id:5,
+		id:7,
 		amountBought:0,
 		cost: 300,
 		max:20,
@@ -505,7 +522,7 @@ let storeData = [{
 		},
 	},{
 		name:"Unlock Planets",
-		id:6,
+		id:8,
 		amountBought:0,
 		cost: "prog",
 		costProgression: [100, 100, 100,100],
@@ -519,7 +536,8 @@ let storeData = [{
 let storeButtonSprites = [];
 //gereate store item
 function genStoreItems() {
-	
+	destroyAll("inStoreButton");
+	storeButtonSprites = [];
 	//Shows currentMoney in Store 
 	add([
 		z(10),
@@ -734,6 +752,7 @@ function launch() {
 function earnMoney(amount, x, y){
 	let colorto = [255,0,0]
 	let sign = ""
+	moneyText.text = largeNumberToConcat(player.money);
 	if(amount >0){
 		colorto = [0,255,0];
 		sign = "+"
@@ -750,7 +769,7 @@ function earnMoney(amount, x, y){
 		"earnedMon",
     { },
 ]);
-}
+} 
 
 action("earnedMon", (obj) => {
 	obj.move(dir(270).scale(dt()*4000))
@@ -762,12 +781,121 @@ let storeButY = (20+width()/1000*50)*mapScale;
 //its about drive
 //get click for lounch 
 mouseClick( () => {
-	// debug.log(mousePos().x +"+"+storeButX)
-	if(!((mousePos().x > storeButX && mousePos().y < storeButY) && player.onPlanet)){
+	// if(!((mousePos().x > storeButX && mousePos().y < storeButY) && player.onPlanet)){
+	// 	launch()
+	// }
+	// angleOfMovement = movementArrow.angle;
+	spawnBullet(movementArrow.angle);
+});
+keyPress("space", () => {
+  if(!((mousePos().x > storeButX && mousePos().y < storeButY) && player.onPlanet)){
 		launch()
 	}
-	// angleOfMovement = movementArrow.angle;
+});
 
+function spawnBullet(bulletAngleGot) {
+	add([
+		rect(8, 3),
+		scale(playerScale),
+		pos(width()/2,height()/2),
+		area(),
+		rotate(bulletAngleGot-90),
+		origin("center"),
+		// move(bulletAngleGot-90,60),
+		// color(1, 1, 1),
+		"bullet",
+		{
+			bulletAngle: bulletAngleGot+180,
+			realPos: [width()/2,height()/2],
+		}
+	]);
+};
+
+action("bullet", (b) => {
+	calcRealPos(b)
+	b.realPos[0] += (-1 * Math.sin(b.bulletAngle * (Math.PI / 180)) * player.bulletSpeed*dt());
+	b.realPos[1] += (Math.cos(b.bulletAngle * (Math.PI / 180)) * player.bulletSpeed*dt());
+	if (b.realPos[0] <= 0) {
+		b.destroy();
+	} else if (b.realPos[0] >= width()) {
+		b.destroy();
+	} else {
+		b.pos.x = b.realPos[0];
+	};
+
+	if (b.realPos[1] <= 0) {
+		b.destroy();
+	} else if (b.realPos[1] >= height()) {
+		b.destroy();
+	} else {
+		b.pos.y = b.realPos[1];
+	};
+
+});
+
+// collides("bullet","planet", (bullet, platform) =>{
+//     destroy(bullet);
+// });
+
+
+function spawnAlien() {
+	// let xpos = rand(0,numberOfBackTiles * blockSize);
+	// let xpos = rand(0,numberOfBackTiles * blockSize);
+	add([
+		sprite("alien"),
+		pos(width()/2,height()/2),
+		area(),
+		scale(planetScale/3),
+		origin("center"),
+		pos(rand(0,numberOfBackTiles * blockSize),rand(0,numberOfBackTiles * blockSize)),
+		"alien",
+		{
+			realPos: [rand(0,numberOfBackTiles * blockSize),rand(0,numberOfBackTiles * blockSize)]
+		},
+	]);
+}
+
+collides("bullet","alien", (bullet, alien) =>{
+	earnMoney(player.moneyPerAlien,alien.pos.x,alien.pos.y)
+	destroy(bullet);
+	destroy(alien);
+	player.money += player.moneyPerAlien;
+	spawnAlien()
+});
+
+collides("player","alien", (playerObj, alien) =>{
+	shake();
+	player.health -= 1;
+
+	if(player.health <= 0){
+		player.speed = 0;
+		earnMoney(Math.round(-1*player.money/2),width()/2,height()/2)
+
+		player.money = Math.round(player.money /2);
+		player.onPlanet = true;
+		planetUi(true);
+		moveBg(width() / 2, height() / 2, 1)
+	}else{
+		earnMoney(-1*player.moneyPerAlien,width()/2,height()/2)
+		player.money -= player.moneyPerAlien;
+	}
+	destroy(alien);
+	spawnAlien()
+});
+
+action("alien", (b) => {
+	calcRealPos(b)
+	//TODO: make go towards player if close enough
+	if(b.realPos[0] < width() && b.realPos[0] > 0 && b.realPos[1] < height() && b.realPos[1] > 0 && !player.onPlanet){
+		b.realPos[0] += (Math.cos(player.pos.angle(b.pos) * (Math.PI / 180)) * 50*dt());
+		b.realPos[1] += (Math.sin(player.pos.angle(b.pos) * (Math.PI / 180)) * 50*dt());
+	}
+
+	b.pos.x = b.realPos[0];
+	b.pos.y = b.realPos[1];
+	// b.use(move(player.pos.angle(b.pos), 200*dt()));
+	// b.realPos[0] = b.pos.x;
+	// b.realPos[1] = b.pos.y;
 });
 
 //The the price of a thing in the shop
@@ -789,8 +917,6 @@ clicks("inStoreButtonBg", (button) => {
 		storeData[button.idbuy].functionToRun();
 		storeData[button.idbuy].amountBought++;
 		moneyText.text = largeNumberToConcat(player.money);
-		destroyAll("inStoreButton");
-		storeButtonSprites = [];
 		genStoreItems();
 	}else{
 		shake();
@@ -987,7 +1113,8 @@ player.collides("planet", (planet) => {
 		return
 	}
 	player.speed = 0;
-
+	player.health += 2;
+	player.health = Math.min(player.health, 4)
 	//why did -1 work
 	moveBg(-1 * planet.startingPos[0] + width() / 2, -1 * planet.startingPos[1] + height() / 2, 10);
 	player.onPlanet = true;
@@ -1168,6 +1295,13 @@ function moveBg(x, y, slow) {
 			planet.realPos[1] += moveAmountY;
 
 		})
+		every("alien", (planet) => {
+			// planet.pos.x = planet.startingPos[0] + x;
+			// planet.pos.x = planet.startingPos[1] + y;
+			planet.realPos[0] += moveAmountX;
+			planet.realPos[1] += moveAmountY;
+
+		})
 		if (++timerreset === slow) {
 			window.clearInterval(intervalID);
 		}
@@ -1235,10 +1369,19 @@ function degToRad(a) {
 }
 
 function meanAngleDeg(a, offset) {
-	return 180 / Math.PI * Math.atan2(
+	let resultAngle = Math.round((180 / Math.PI * Math.atan2(
 		sum(a.map(degToRad).map(Math.sin), offset) / (offset + 1),
 		sum(a.map(degToRad).map(Math.cos), offset) / (offset + 1)
-	);
+	)) * 100000) / 100000
+	if(isNaN(resultAngle)){
+		debug.log("nan MeanAngle")
+		return a[0]
+	}
+	return resultAngle;
+	// return (180 / Math.PI * Math.atan2(
+	// 	sum(a.map(degToRad).map(Math.sin), offset) / (offset + 1),
+	// 	sum(a.map(degToRad).map(Math.cos), offset) / (offset + 1)
+	// ))
 }
 
 keyDown("space", () => {
@@ -1250,11 +1393,12 @@ keyRelease("space", () => {
 
 
 action("player", () => {
+	// debug.log(angleOfMovement);
 	if (player.speed > 0) {
 		if(player.boosting){
 			player.speed = Math.min(player.speed + player.acceleration, player.max_thrust);			
 		}else{
-			player.speed = Math.min(player.speed + player.acceleration, Math.max(player.max_thrust/2),500);	
+			player.speed = Math.min(player.speed + player.acceleration, Math.max(player.max_thrust/2),350);	
 		}
 
 	}
@@ -1339,6 +1483,9 @@ let onStart = () => {
 	player.onPlanet = true;
 	planetUi(true);
 	moveBg(width() / 2, height() / 2, 1)
+	for(let i = 0; i < 35; i++){
+		spawnAlien()
+	}
 }
 
 

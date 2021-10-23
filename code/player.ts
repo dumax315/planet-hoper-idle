@@ -14,7 +14,7 @@ export function loadPlayer(): void {
     layer("game"),
     origin("center"),
     "player",
-		// z(50),
+		z(2),
     {
       speed: 0,
       max_thrust: 340,
@@ -34,6 +34,9 @@ export function loadPlayer(): void {
       loadSpeed: 400,
       baseMoneyPerPass: 50,
 			handling: 2,
+			bulletSpeed:450,
+			moneyPerAlien:50,
+			health: 3,
     }
   ]);
 }
