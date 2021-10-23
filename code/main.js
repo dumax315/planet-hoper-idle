@@ -31,6 +31,7 @@ import * as colorUtil from "./util/colorUtil";
 import * as planetUtil from "./util/planetUtil";
 import { loadAssets } from "./util/assetLoader";
 
+
 loadAssets();
 
 let fontSize = 2;
@@ -45,6 +46,16 @@ const blockSize = 64 * mapScale;
 const backgroundSize = 64 * mapScale * 6;
 const numberOfBackTiles = 48;
 let passengerScale = width()/750;
+
+import { loadPlayer, loadMovementArrow } from "./player";
+
+import { loadTutorialOne, loadTutorial2 } from "./tutorial";
+
+//ui
+//planet indicator
+let textLeftModifer = width()/1000;
+let textLeftModiferHeight = width()*.025;
+
 
 let planets = [
   "white",
@@ -65,7 +76,12 @@ layers([
 
 import { generateMap } from "./mapGenerator";
 
+
+
+scene("game", () => {
 generateMap();
+
+
 
 // planets
 const planetHome = add([
@@ -284,18 +300,14 @@ function buyPlanets() {
 
 }
 
-import { loadPlayer, loadMovementArrow } from "./player";
 // load objects
 movementArrow = loadMovementArrow();
-player = loadPlayer();
 
+player = loadPlayer();
 movementArrow.play("spin");
 player.play("thrust");
 
-//ui
-//planet indicator
-let textLeftModifer = width()/1000;
-let textLeftModiferHeight = width()*.025;
+
 add([
 	text("Planet: ", 8),
 	scale(fontSize*textLeftModifer),
@@ -374,6 +386,7 @@ add([
 
 //store 
 const storeBg = add([
+	z(5),
 	area(),
 	solid(),
 	color(50,50,50),
@@ -393,18 +406,19 @@ const storeBg = add([
 //buttons at planets
 //store button
 const storeButton = add([
+	z(10),
 	area(),
 	solid(),
 	color(28,71,88),
 	opacity(0),
 	pos(
-		width()-20,
+		width()-width()/6,
 		20),
 	// text("Store"),
 	rect(width()/6, width()/1000*50),
 	scale(mapScale),
 	layer("store"),
-	origin("topright"),
+	origin("top"),
 	"button",
 	"atPanetUi",
 	"storeButton",
@@ -414,21 +428,22 @@ const storeButton = add([
 ]);
 
 const storeText = add([
+	z(10),
   text("Store"),
-  pos(240, 180),
+  pos(
+		width()-width()/6,
+		30),
   // color(0, 0, 0),
 	layer("store"),
 	scale(width()/1000*3*fontSize),
-	origin("topright"),
+	origin("top"),
 	"atPanetUi",
 	"storeButton",
-	pos(
-		width()-20,
-		20),
 	opacity(0),
 ]);
 
 //Todo Add up and Down Arrow or mouse scorll to store
+
 
 let scrollAmount = 0;
 
@@ -467,7 +482,7 @@ let storeData = [{
 		id:3,
 		amountBought:0,
 		cost: 200,
-		max:20,
+		max:25,
 		functionToRun: () => {
 			player.acceleration *= 1.1
 		},
@@ -494,7 +509,7 @@ let storeData = [{
 		amountBought:0,
 		cost: "prog",
 		costProgression: [100, 100, 100,100],
-		costProgression: [5000, 50000, 50000000,50000000000],
+		costProgression: [5000, 500000, 50000000,50000000000],
 		max:3,
 		functionToRun: () => {
 			buyPlanets()
@@ -507,6 +522,7 @@ function genStoreItems() {
 	
 	//Shows currentMoney in Store 
 	add([
+		z(10),
 		text("Money:"),
 		scale(width()/1000*3.5),
 		pos(5, 50+textLeftModiferHeight*5),
@@ -516,6 +532,7 @@ function genStoreItems() {
 		"inStoreButton",
 	]);
 	add([
+		z(10),
 		text(largeNumberToConcat(player.money)),
 		scale(width()/1000*3.5),
 		pos(5, (50+textLeftModiferHeight*5)+width()/1000*2*25),
@@ -534,6 +551,7 @@ function genStoreItems() {
 		}
 		storeButtonSprites.push({
 			bg:add([
+				z(10),
 				area(),
 				solid(),
 				color(bgColor),
@@ -552,6 +570,7 @@ function genStoreItems() {
 				},
 			]),
 			title:  add([
+				z(10),
 				text(storeData[i].name),
 				// color(0, 0, 0),
 				layer("store"),
@@ -563,6 +582,7 @@ function genStoreItems() {
 					20+i*(width()/1000*100+30)+scrollAmount),
 			]),
 			boughtTextDis: add([
+				z(10),
 				text("bought:"),
 				// color(0, 0, 0),
 				layer("store"),
@@ -574,6 +594,7 @@ function genStoreItems() {
 					15+width()/1000*35+i*(width()/1000*100+30)+scrollAmount),
 			]),
 			boughtText: add([
+				z(10),
 				text(storeData[i].amountBought),
 				// color(0, 0, 0),
 				layer("store"),
@@ -585,6 +606,7 @@ function genStoreItems() {
 					15+width()/1000*35+i*(width()/1000*100+30)+scrollAmount),
 			]),
 			costText: add([
+				z(10),
 				text("cost:"),
 				// color(0, 0, 0),
 				layer("store"),
@@ -596,6 +618,7 @@ function genStoreItems() {
 					15+2*width()/1000*35+i*(width()/1000*100+30)+scrollAmount),
 			]),
 			cost: add([
+				z(10),
 				text(largeNumberToConcat(genPrice(storeData[i],storeData[i].amountBought))),
 				// color(0, 0, 0),
 				layer("store"),
@@ -628,6 +651,10 @@ function largeNumberToConcat(value){
     }
     return newValue;
 }
+
+//loading the tutorials
+loadTutorialOne();
+
 
 
 function showStore(){
@@ -718,7 +745,7 @@ function earnMoney(amount, x, y){
 		color(colorto[0],colorto[1],colorto[2]),
 		origin("center"),
 		layer("earnMoney"),
-		z(0),
+		z(100),
 		lifespan(2, { fade: 0.5 }),
 		"earnedMon",
     { },
@@ -871,6 +898,7 @@ function refomatePassOnShip() {
 			color(newPassDataShip.color[0], newPassDataShip.color[1], newPassDataShip.color[2]),
 			origin("center"),
 			area(),
+			z(0),
 			scale(passengerScale),
 			// debug.log(passengerScale),
 			layer("game"),
@@ -987,7 +1015,7 @@ player.collides("planet", (planet) => {
 				player.passengersSprite[i].moving = true;
 				// debug.log(player.passengersSprite[i])
 				// move(player.pos.angle(todestroy.pos), 1000*dt())
-				player.passengersSprite[i].use(move(player.pos.angle(player.passengersSprite[i].pos), 300))
+				player.passengersSprite[i].use(move(player.pos.angle(player.passengersSprite[i].pos), 500))
 				player.passengersSprite[i].use("moveMeToCenter");
 				// debug.log(player.passengersSprite[i].moving)
 				playerPassesToRemove.push(i);
@@ -1213,10 +1241,22 @@ function meanAngleDeg(a, offset) {
 	);
 }
 
+keyDown("space", () => {
+  player.boosting = true;
+});
+keyRelease("space", () => {
+  player.boosting = false;
+});
+
 
 action("player", () => {
 	if (player.speed > 0) {
-		player.speed = Math.min(player.speed + player.acceleration, player.max_thrust);
+		if(player.boosting){
+			player.speed = Math.min(player.speed + player.acceleration, player.max_thrust);			
+		}else{
+			player.speed = Math.min(player.speed + player.acceleration, Math.max(player.max_thrust/2),500);	
+		}
+
 	}
 	speedText.text = Math.round(player.speed);
 	//new movement system
@@ -1288,7 +1328,7 @@ function generatePassengers(planet, ammount) {
 
 }
 
-export let onStart = () => {
+let onStart = () => {
 	every("background", (background) => {
 		background.startingPos[0] = background.pos.x;
 		background.startingPos[1] = background.pos.y;
@@ -1304,3 +1344,92 @@ export let onStart = () => {
 
 
 onStart()
+
+});
+
+
+scene("menu", () => {
+	add([
+		area(),
+		solid(),
+		color(50,50,50),
+		pos(
+			0,
+			0),
+		z(0),
+		rect(width(), height()),
+		scale(mapScale),
+		layer("store"),
+		origin("topleft"),
+		{
+			storeOpen: false,
+		},
+	]);
+	add([
+		text("Solar Taxicab"),
+		pos(width()/2, fontSize*textLeftModifer*20),
+		origin("top"),
+		scale(fontSize*textLeftModifer*4),
+	]);
+
+	add([
+		rect(width()/3, fontSize*textLeftModifer*30),
+		area(),
+		pos(width()/2, fontSize*textLeftModifer*100),
+		origin("top"),
+		color(0,0,0,),
+		"button",
+		{
+			clickAction: () => go('game'),
+		},
+	]);
+
+	add([
+		text("Play game"),
+		origin("top"),
+		pos(width()/2, fontSize*textLeftModifer*108),
+		scale(fontSize*textLeftModifer*1.2),
+	]);
+
+	add([
+		rect(width()/3, fontSize*textLeftModifer*30),
+		area(),
+		pos(width()/2, fontSize*textLeftModifer*150),
+		origin("center"),
+		"button",
+		{
+			clickAction: () => window.open('https://replit.com/@theohalpern/Solar-Taxicab?v=1',"_blank"),
+		},
+	]);
+
+	add([
+		text("See on Repl.it"),
+		scale(fontSize*textLeftModifer*1.2),
+		pos(width()/2, fontSize*textLeftModifer*150),
+		origin("center"),
+	]);
+
+	action("button", (b) => {
+	// 	  "zest": [233, 216, 166],
+  // 		"orange": [238, 155, 0],
+  // 		"rust":[202, 103, 2],
+		if (b.isHovering()) {
+			b.use(color(202, 103, 2));
+		} else {
+			b.use(color(238, 155, 0));
+		}
+
+		// if (b.isClicked()) {
+		// 	b.clickAction();
+		// }
+
+	});
+
+	clicks("button", b => {
+		b.clickAction();
+	});
+
+
+});
+
+go("menu");
