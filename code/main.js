@@ -1,7 +1,7 @@
 import kaboom from "kaboom";
 
 
-(function() { var script = document.createElement('script'); script.onload = function() { var stats = new Stats(); document.body.appendChild(stats.dom); requestAnimationFrame(function loop() { stats.update(); requestAnimationFrame(loop) }); }; script.src = '//mrdoob.github.io/stats.js/build/stats.min.js'; document.head.appendChild(script); })()
+// (function() { var script = document.createElement('script'); script.onload = function() { var stats = new Stats(); document.body.appendChild(stats.dom); requestAnimationFrame(function loop() { stats.update(); requestAnimationFrame(loop) }); }; script.src = '//mrdoob.github.io/stats.js/build/stats.min.js'; document.head.appendChild(script); })()
 
 // initialize context
 
@@ -13,6 +13,7 @@ export const k = kaboom({
     // stretch: true,
     // letterbox: true,
     font: "sinko",
+		background: [ 0, 0, 0, ],
 		// crips: true,
     // background: [ 0, 0, 255, ],
 });
@@ -41,19 +42,19 @@ let planetsVars = [];
 let angleOfMovement = 0;
 // scale by screen size
 const mapScale = 1.5;
-const planetScale = 1.5*width()/750;
+const planetScale = Math.min(1.5*width()/750,2.5);
 const blockSize = 64 * mapScale;
 const backgroundSize = 64 * mapScale * 6;
 const numberOfBackTiles = 48;
-let passengerScale = width()/750;
+let passengerScale = Math.min(width()/750,2);
 
 import { loadPlayer, loadMovementArrow } from "./player";
 
-import { loadTutorialOne, loadTutorial2 } from "./tutorial";
+import { loadTutorialOne} from "./tutorial";
 
 //ui
 //planet indicator
-let textLeftModifer = width()/1000;
+let textLeftModifer = Math.min(width()/1000,3);
 let textLeftModiferHeight = width()*.025;
 
 
@@ -501,7 +502,7 @@ let storeData = [{
 		amountBought:0,
 		cost: 100,
 		functionToRun: () => {
-			player.baseMoneyPerPass *= 1.2;
+			player.baseMoneyPerPass *= 1.15;
 		},
 	},{
 		name:"Upgrade Money/Alien",
@@ -536,13 +537,14 @@ let storeData = [{
 let storeButtonSprites = [];
 //gereate store item
 function genStoreItems() {
+	let maxWidthA = Math.min(width(), 1200)
 	destroyAll("inStoreButton");
 	storeButtonSprites = [];
 	//Shows currentMoney in Store 
 	add([
 		z(10),
 		text("Money:"),
-		scale(width()/1000*3.5),
+		scale(maxWidthA/1000*3.5),
 		pos(5, 50+textLeftModiferHeight*5),
 		origin("topleft"),
 		layer("store"),
@@ -552,14 +554,13 @@ function genStoreItems() {
 	add([
 		z(10),
 		text(largeNumberToConcat(player.money)),
-		scale(width()/1000*3.5),
-		pos(5, (50+textLeftModiferHeight*5)+width()/1000*2*25),
+		scale(maxWidthA/1000*3.5),
+		pos(5, (50+textLeftModiferHeight*5)+maxWidthA/1000*2*25),
 		origin("topleft"),
 		layer("store"),
 		"currentMoneyInStore",
 		"inStoreButton",
 	]);
-
 
 	for(let i = 0; i < storeData.length; i++){
 		let bgColor = colorUtil.ColorPaletteAlias.orange;
@@ -575,8 +576,8 @@ function genStoreItems() {
 				color(bgColor),
 				pos(
 					width()/2,
-					15+i*(width()/1000*100+30)+scrollAmount),
-				rect(width()/2.5, width()/1000*100),
+					15+i*(maxWidthA/1000*100+30)+scrollAmount),
+				rect(maxWidthA/2.5, maxWidthA/1000*100),
 				layer("store"),
 				origin("top"),
 				"button",
@@ -593,11 +594,11 @@ function genStoreItems() {
 				// color(0, 0, 0),
 				layer("store"),
 				origin("top"),
-				scale(width()/1000*2),
+				scale(maxWidthA/1000*2),
 				"inStoreButton",
 				pos(
 					width()/2,
-					20+i*(width()/1000*100+30)+scrollAmount),
+					20+i*(maxWidthA/1000*100+30)+scrollAmount),
 			]),
 			boughtTextDis: add([
 				z(10),
@@ -605,11 +606,11 @@ function genStoreItems() {
 				// color(0, 0, 0),
 				layer("store"),
 				origin("topleft"),
-				scale(width()/1000*2),
+				scale(maxWidthA/1000*2),
 				"inStoreButton",
 				pos(
-					width()/2-(width()/6)+5,
-					15+width()/1000*35+i*(width()/1000*100+30)+scrollAmount),
+					width()/2-(maxWidthA/6)+5,
+					15+maxWidthA/1000*35+i*(maxWidthA/1000*100+30)+scrollAmount),
 			]),
 			boughtText: add([
 				z(10),
@@ -617,11 +618,11 @@ function genStoreItems() {
 				// color(0, 0, 0),
 				layer("store"),
 				origin("topleft"),
-				scale(width()/1000*2),
+				scale(maxWidthA/1000*2),
 				"inStoreButton",
 				pos(
-					width()/2-(width()/24),
-					15+width()/1000*35+i*(width()/1000*100+30)+scrollAmount),
+					width()/2-(maxWidthA/24),
+					15+maxWidthA/1000*35+i*(maxWidthA/1000*100+30)+scrollAmount),
 			]),
 			costText: add([
 				z(10),
@@ -629,11 +630,11 @@ function genStoreItems() {
 				// color(0, 0, 0),
 				layer("store"),
 				origin("topleft"),
-				scale(width()/1000*2),
+				scale(maxWidthA/1000*2),
 				"inStoreButton",
 				pos(
-					width()/2-(width()/6)+5,
-					15+2*width()/1000*35+i*(width()/1000*100+30)+scrollAmount),
+					width()/2-(maxWidthA/6)+5,
+					15+2*maxWidthA/1000*35+i*(maxWidthA/1000*100+30)+scrollAmount),
 			]),
 			cost: add([
 				z(10),
@@ -641,11 +642,11 @@ function genStoreItems() {
 				// color(0, 0, 0),
 				layer("store"),
 				origin("topleft"),
-				scale(width()/1000*2),
+				scale(maxWidthA/1000*2),
 				"inStoreButton",
 				pos(
-					width()/2-(width()/24),
-					15+2*width()/1000*35+i*(width()/1000*100+30)+scrollAmount),
+					width()/2-(maxWidthA/24),
+					15+2*maxWidthA/1000*35+i*(maxWidthA/1000*100+30)+scrollAmount),
 			]),
 			}
 		);
@@ -670,8 +671,7 @@ function largeNumberToConcat(value){
     return newValue;
 }
 
-//loading the tutorials
-loadTutorialOne();
+
 
 
 
@@ -775,6 +775,39 @@ action("earnedMon", (obj) => {
 	obj.move(dir(270).scale(dt()*4000))
 })
 
+//saving data to storeage
+function saveDataToLocalStorage(){
+	localStorage.setItem('player', JSON.stringify(player))
+	localStorage.setItem('shop', JSON.stringify(storeData))
+
+}
+function loadDataInLocalStorage(){
+	let playerFromStorage = JSON.parse(localStorage.getItem('player'));
+	let shopFromStorage = JSON.parse(localStorage.getItem('shop'));
+	if(shopFromStorage != null){
+		player.money = playerFromStorage.money;
+		// storeData = shopFromStorage;
+		for(let i = 0; i < storeData.length;i++){
+			// debug.log(storeData[i].name)
+			shopFromStorage[i].functionToRun = storeData[i].functionToRun
+			for(let j = 0; j < shopFromStorage[i].amountBought;j++){
+				storeData[i].functionToRun()
+				
+			}
+		}
+		storeData = shopFromStorage;
+		moneyText.text =  largeNumberToConcat(player.money);
+		return true;
+	}
+	else{
+		return false;
+	}
+
+}
+//saving every 15 seccond
+setInterval(function(){saveDataToLocalStorage()}, 1500);
+
+
 
 let storeButX = (width()-20)-(width()/6)*mapScale;
 let storeButY = (20+width()/1000*50)*mapScale;
@@ -795,7 +828,7 @@ keyPress("space", () => {
 
 function spawnBullet(bulletAngleGot) {
 	add([
-		rect(8, 3),
+		rect(10, 6),
 		scale(playerScale),
 		pos(width()/2,height()/2),
 		area(),
@@ -1374,7 +1407,7 @@ function meanAngleDeg(a, offset) {
 		sum(a.map(degToRad).map(Math.cos), offset) / (offset + 1)
 	)) * 100000) / 100000
 	if(isNaN(resultAngle)){
-		debug.log("nan MeanAngle")
+		console.log("nan MeanAngle")
 		return a[0]
 	}
 	return resultAngle;
@@ -1482,7 +1515,10 @@ let onStart = () => {
 	})
 	player.onPlanet = true;
 	planetUi(true);
+	loadDataInLocalStorage()
 	moveBg(width() / 2, height() / 2, 1)
+	//loading the tutorials
+	loadTutorialOne();
 	for(let i = 0; i < 35; i++){
 		spawnAlien()
 	}
@@ -1499,13 +1535,14 @@ scene("menu", () => {
 	add([
 		area(),
 		solid(),
-		color(50,50,50),
+		// color(50,50,50),
 		pos(
 			0,
 			0),
 		z(0),
-		rect(width(), height()),
-		scale(mapScale),
+		sprite("stars"),
+		// rect(width(), height()),
+		scale(width()/800),
 		layer("store"),
 		origin("topleft"),
 		{

@@ -48,7 +48,12 @@ export function generateMap () {
         rect(backgroundSize, backgroundSize),
         sprite("stars"),
         // scale(400 * mapScale),
-        scale(0.5484 * mapScale),
+				//repeting stars 1
+        // scale(0.5484 * mapScale),
+				//repeting stars 2
+				// scale(.703 * mapScale),
+				//repeting stars 8bit
+				scale(1 * mapScale),
         // color(0,0,0),
         area(),
         origin("center"),

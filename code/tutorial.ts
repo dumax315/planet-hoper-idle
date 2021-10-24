@@ -16,7 +16,7 @@ export function loadTutorialOne(): void {
   ]);
 	add([
     pos(width() / 2, height()*.8),
-		text("Click space to launch"),
+		text("Press space to launch"),
 		scale(width()/400),
     rotate(0),
     area(),

@@ -8,7 +8,7 @@ export function loadAssets() {
   loadSprite("arrow", "sprites/arrow.png");
   loadSprite("planet1", "sprites/planet1.png");
   loadSprite("planet2", "sprites/planet 2.png");
-  loadSprite("stars", "sprites/stars repeting.jpg");
+  loadSprite("stars", "sprites/8bitstars.jpg");
   loadSprite("planetWhite", "sprites/planetWhite.png");
 
   loadPedit("arrow_1", "sprites/arrow_1.pedit");

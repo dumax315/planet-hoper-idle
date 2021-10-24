@@ -2371,7 +2371,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     loadSprite("arrow", "sprites/arrow.png");
     loadSprite("planet1", "sprites/planet1.png");
     loadSprite("planet2", "sprites/planet 2.png");
-    loadSprite("stars", "sprites/stars repeting.jpg");
+    loadSprite("stars", "sprites/8bitstars.jpg");
     loadSprite("planetWhite", "sprites/planetWhite.png");
     loadPedit("arrow_1", "sprites/arrow_1.pedit");
     loadPedit("passenger", "sprites/cargo.pedit");
@@ -2464,7 +2464,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     ]);
     add([
       pos(width() / 2, height() * 0.8),
-      text("Click space to launch"),
+      text("Press space to launch"),
       scale(width() / 400),
       rotate(0),
       area(),
@@ -2656,7 +2656,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       " ": () => [
         rect(backgroundSize, backgroundSize),
         sprite("stars"),
-        scale(0.5484 * mapScale),
+        scale(1 * mapScale),
         area(),
         origin("center"),
         layer("bg"),
@@ -2670,21 +2670,9 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   __name(generateMap, "generateMap");
 
   // code/main.js
-  (function() {
-    var script = document.createElement("script");
-    script.onload = function() {
-      var stats = new Stats();
-      document.body.appendChild(stats.dom);
-      requestAnimationFrame(/* @__PURE__ */ __name(function loop() {
-        stats.update();
-        requestAnimationFrame(loop);
-      }, "loop"));
-    };
-    script.src = "//mrdoob.github.io/stats.js/build/stats.min.js";
-    document.head.appendChild(script);
-  })();
   var k = kaboom_default({
-    font: "sinko"
+    font: "sinko",
+    background: [0, 0, 0]
   });
   var main_default = k;
   var playerScale = Math.min(2 * width() / 750, 3);
@@ -2698,12 +2686,12 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   var planetsVars = [];
   var angleOfMovement = 0;
   var mapScale2 = 1.5;
-  var planetScale = 1.5 * width() / 750;
+  var planetScale = Math.min(1.5 * width() / 750, 2.5);
   var blockSize2 = 64 * mapScale2;
   var backgroundSize2 = 64 * mapScale2 * 6;
   var numberOfBackTiles = 48;
-  var passengerScale = width() / 750;
-  var textLeftModifer = width() / 1e3;
+  var passengerScale = Math.min(width() / 750, 2);
+  var textLeftModifer = Math.min(width() / 1e3, 3);
   var textLeftModiferHeight = width() * 0.025;
   var planets = [
     "white",
@@ -3082,7 +3070,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         amountBought: 0,
         cost: 100,
         functionToRun: () => {
-          player.baseMoneyPerPass *= 1.2;
+          player.baseMoneyPerPass *= 1.15;
         }
       },
       {
@@ -3119,12 +3107,13 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     ];
     let storeButtonSprites = [];
     function genStoreItems() {
+      let maxWidthA = Math.min(width(), 1200);
       destroyAll("inStoreButton");
       storeButtonSprites = [];
       add([
         z(10),
         text("Money:"),
-        scale(width() / 1e3 * 3.5),
+        scale(maxWidthA / 1e3 * 3.5),
         pos(5, 50 + textLeftModiferHeight * 5),
         origin("topleft"),
         layer("store"),
@@ -3134,8 +3123,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       add([
         z(10),
         text(largeNumberToConcat(player.money)),
-        scale(width() / 1e3 * 3.5),
-        pos(5, 50 + textLeftModiferHeight * 5 + width() / 1e3 * 2 * 25),
+        scale(maxWidthA / 1e3 * 3.5),
+        pos(5, 50 + textLeftModiferHeight * 5 + maxWidthA / 1e3 * 2 * 25),
         origin("topleft"),
         layer("store"),
         "currentMoneyInStore",
@@ -3153,8 +3142,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
             area(),
             solid(),
             color(bgColor),
-            pos(width() / 2, 15 + i * (width() / 1e3 * 100 + 30) + scrollAmount),
-            rect(width() / 2.5, width() / 1e3 * 100),
+            pos(width() / 2, 15 + i * (maxWidthA / 1e3 * 100 + 30) + scrollAmount),
+            rect(maxWidthA / 2.5, maxWidthA / 1e3 * 100),
             layer("store"),
             origin("top"),
             "button",
@@ -3170,45 +3159,45 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
             text(storeData[i].name),
             layer("store"),
             origin("top"),
-            scale(width() / 1e3 * 2),
+            scale(maxWidthA / 1e3 * 2),
             "inStoreButton",
-            pos(width() / 2, 20 + i * (width() / 1e3 * 100 + 30) + scrollAmount)
+            pos(width() / 2, 20 + i * (maxWidthA / 1e3 * 100 + 30) + scrollAmount)
           ]),
           boughtTextDis: add([
             z(10),
             text("bought:"),
             layer("store"),
             origin("topleft"),
-            scale(width() / 1e3 * 2),
+            scale(maxWidthA / 1e3 * 2),
             "inStoreButton",
-            pos(width() / 2 - width() / 6 + 5, 15 + width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30) + scrollAmount)
+            pos(width() / 2 - maxWidthA / 6 + 5, 15 + maxWidthA / 1e3 * 35 + i * (maxWidthA / 1e3 * 100 + 30) + scrollAmount)
           ]),
           boughtText: add([
             z(10),
             text(storeData[i].amountBought),
             layer("store"),
             origin("topleft"),
-            scale(width() / 1e3 * 2),
+            scale(maxWidthA / 1e3 * 2),
             "inStoreButton",
-            pos(width() / 2 - width() / 24, 15 + width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30) + scrollAmount)
+            pos(width() / 2 - maxWidthA / 24, 15 + maxWidthA / 1e3 * 35 + i * (maxWidthA / 1e3 * 100 + 30) + scrollAmount)
           ]),
           costText: add([
             z(10),
             text("cost:"),
             layer("store"),
             origin("topleft"),
-            scale(width() / 1e3 * 2),
+            scale(maxWidthA / 1e3 * 2),
             "inStoreButton",
-            pos(width() / 2 - width() / 6 + 5, 15 + 2 * width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30) + scrollAmount)
+            pos(width() / 2 - maxWidthA / 6 + 5, 15 + 2 * maxWidthA / 1e3 * 35 + i * (maxWidthA / 1e3 * 100 + 30) + scrollAmount)
           ]),
           cost: add([
             z(10),
             text(largeNumberToConcat(genPrice(storeData[i], storeData[i].amountBought))),
             layer("store"),
             origin("topleft"),
-            scale(width() / 1e3 * 2),
+            scale(maxWidthA / 1e3 * 2),
             "inStoreButton",
-            pos(width() / 2 - width() / 24, 15 + 2 * width() / 1e3 * 35 + i * (width() / 1e3 * 100 + 30) + scrollAmount)
+            pos(width() / 2 - maxWidthA / 24, 15 + 2 * maxWidthA / 1e3 * 35 + i * (maxWidthA / 1e3 * 100 + 30) + scrollAmount)
           ])
         });
       }
@@ -3234,7 +3223,6 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       return newValue;
     }
     __name(largeNumberToConcat, "largeNumberToConcat");
-    loadTutorialOne();
     function showStore() {
       if (!storeBg.storeOpen) {
         storeBg.opacity = 0.8;
@@ -3311,6 +3299,33 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     action("earnedMon", (obj) => {
       obj.move(dir(270).scale(dt() * 4e3));
     });
+    function saveDataToLocalStorage() {
+      localStorage.setItem("player", JSON.stringify(player));
+      localStorage.setItem("shop", JSON.stringify(storeData));
+    }
+    __name(saveDataToLocalStorage, "saveDataToLocalStorage");
+    function loadDataInLocalStorage() {
+      let playerFromStorage = JSON.parse(localStorage.getItem("player"));
+      let shopFromStorage = JSON.parse(localStorage.getItem("shop"));
+      if (shopFromStorage != null) {
+        player.money = playerFromStorage.money;
+        for (let i = 0; i < storeData.length; i++) {
+          shopFromStorage[i].functionToRun = storeData[i].functionToRun;
+          for (let j = 0; j < shopFromStorage[i].amountBought; j++) {
+            storeData[i].functionToRun();
+          }
+        }
+        storeData = shopFromStorage;
+        moneyText.text = largeNumberToConcat(player.money);
+        return true;
+      } else {
+        return false;
+      }
+    }
+    __name(loadDataInLocalStorage, "loadDataInLocalStorage");
+    setInterval(function() {
+      saveDataToLocalStorage();
+    }, 1500);
     let storeButX = width() - 20 - width() / 6 * mapScale2;
     let storeButY = (20 + width() / 1e3 * 50) * mapScale2;
     mouseClick(() => {
@@ -3323,7 +3338,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     });
     function spawnBullet(bulletAngleGot) {
       add([
-        rect(8, 3),
+        rect(10, 6),
         scale(playerScale),
         pos(width() / 2, height() / 2),
         area(),
@@ -3736,7 +3751,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     function meanAngleDeg(a, offset) {
       let resultAngle = Math.round(180 / Math.PI * Math.atan2(sum(a.map(degToRad).map(Math.sin), offset) / (offset + 1), sum(a.map(degToRad).map(Math.cos), offset) / (offset + 1)) * 1e5) / 1e5;
       if (isNaN(resultAngle)) {
-        debug.log("nan MeanAngle");
+        console.log("nan MeanAngle");
         return a[0];
       }
       return resultAngle;
@@ -3819,7 +3834,9 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       });
       player.onPlanet = true;
       planetUi(true);
+      loadDataInLocalStorage();
       moveBg(width() / 2, height() / 2, 1);
+      loadTutorialOne();
       for (let i = 0; i < 35; i++) {
         spawnAlien();
       }
@@ -3830,11 +3847,10 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     add([
       area(),
       solid(),
-      color(50, 50, 50),
       pos(0, 0),
       z(0),
-      rect(width(), height()),
-      scale(mapScale2),
+      sprite("stars"),
+      scale(width() / 800),
       layer("store"),
       origin("topleft"),
       {
