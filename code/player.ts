@@ -37,6 +37,8 @@ export function loadPlayer(): void {
 			bulletSpeed:450,
 			moneyPerAlien:50,
 			health: 3,
+			buyTimeout: true,
+			bulletTimeout: true,
     }
   ]);
 }

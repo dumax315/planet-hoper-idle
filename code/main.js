@@ -292,6 +292,36 @@ function buyPlanets() {
 		]));
 		planets.push("spikes");
 	}
+	else if(planetsVars.length == 7){
+		planetsVars.push(add([
+		sprite("planetCookie"),
+		area(),
+		solid(),
+		// color(0, 255, 0),
+		// rotate(90),
+		// debug.log(main.player.realPos),
+		pos(
+			1 * blockSize,
+			16 * blockSize),
+		scale(planetScale),
+		layer("game"),
+		origin("center"),
+		"planet",
+		z(0),
+		{
+			realPos: [
+				30 * blockSize+player.realPos[0],
+				20 * blockSize+player.realPos[1]],
+			startingPos: [
+				30 * blockSize,
+				20 * blockSize],
+			name: "cookie",
+			passengers: [],
+			size: 1,
+		},
+		]));
+		planets.push("cookie");
+	}
 	generatePassengers(planetsVars[planetsVars.length-1], 10);
 	player.z = 100;
 	every("planet", (planet) => {
@@ -517,7 +547,7 @@ let storeData = [{
 		id:7,
 		amountBought:0,
 		cost: 300,
-		max:20,
+		max: 30,
 		functionToRun: () => {
 			player.loadSpeed = Math.round(player.loadSpeed*1.2);
 		},
@@ -526,11 +556,23 @@ let storeData = [{
 		id:8,
 		amountBought:0,
 		cost: "prog",
-		costProgression: [100, 100, 100,100],
-		costProgression: [5000, 500000, 50000000,50000000000],
-		max:3,
+		// costProgression: [100, 100, 100,100],
+		costProgression: [5000, 500000, 50000000,500000000000],
+		max:4,
 		functionToRun: () => {
 			buyPlanets()
+		},
+	},{
+		name:"Double Capacity",
+		id:8,
+		amountBought:0,
+		cost: "prog",
+		costProgression: [10000000, 10000000000000, 10000000000000],
+		max:5,
+		functionToRun: () => {
+			// debug.log(player.capacity*1.5)
+			player.capacity = Math.floor((player.capacity+player.passengers.length)*2);
+			capacityText.text = player.capacity;
 		},
 	},
 ];
@@ -653,24 +695,39 @@ function genStoreItems() {
 	}
 }
 
-//https://stackoverflow.com/questions/10599933/convert-long-number-into-abbreviated-string-in-javascript-with-a-special-shortn
-function largeNumberToConcat(value){
-	var newValue = value;
-    if (value >= 1000) {
-        var suffixes = ["", "k", "m", "b","t","Quad","Quint","Sext","Sept","Oct","Nov"];
-        var suffixNum = Math.floor( (""+value).length/3 );
-        var shortValue = '';
-        for (var precision = 2; precision >= 1; precision--) {
-            shortValue = parseFloat( (suffixNum != 0 ? (value / Math.pow(1000,suffixNum) ) : value).toPrecision(precision));
-            var dotLessShortValue = (shortValue + '').replace(/[^a-zA-Z 0-9]+/g,'');
-            if (dotLessShortValue.length <= 2) { break; }
-        }
-        if (shortValue % 1 != 0)  shortValue = shortValue.toFixed(1);
-        newValue = shortValue+suffixes[suffixNum];
-    }
-    return newValue;
+// Calculates significant figures with suffixes K/M/B/T, e.g. 1234 = 1.23K
+function largeNumberToConcat(num) {
+  // Set default sigfigs to 3
+  let sigfigs_opt = 3;
+	let sign = "";
+	if (typeof num == "string") return num;
+  // Only assigns sig figs and suffixes for numbers > 1
+	if (num == 0) return num;
+  if (num < 0) {
+		sign = "-";
+		num *= -1;
+	}
+  // Calculate for numbers > 1
+  var power10 = log10(num);
+  var power10ceiling = Math.floor(power10) + 1;
+  // 0 = '', 1 = 'K', 2 = 'M', 3 = 'B', 4 = 'T'
+  var SUFFIXES = ['', 'Thousand', 'Million', 'Billion', 'Trillion',"Quadrillion","Quintillion","Sextillion","Septillion","Octillion","Nonillion","Decillion","Undecillion","Duodecillion","Tredecillion","Quattuordecillion","Quindecillion"];
+  // 100: power10 = 2, suffixNum = 0, suffix = ''
+  // 1000: power10 = 3, suffixNum = 1, suffix = 'K'
+  var suffixNum = Math.floor(power10 / 3);
+  var suffix = SUFFIXES[suffixNum];
+  // Would be 1 for '', 1000 for 'K', 1000000 for 'M', etc.
+  var suffixPower10 = Math.pow(10, suffixNum * 3);
+  var base = num / suffixPower10;
+  var baseRound = base.toPrecision(sigfigs_opt);
+  return sign+baseRound + suffix;
 }
 
+function log10(num) {
+  // Per http://stackoverflow.com/questions/3019278/how-can-i-specify-the-base-for-math-log-in-javascript#comment29970629_16868744
+  // Handles floating-point errors log10(1000) otherwise fails at (2.99999996)
+  return (Math.round(Math.log(num) / Math.LN10 * 1e6) / 1e6);
+}
 
 
 
@@ -787,15 +844,17 @@ function loadDataInLocalStorage(){
 	if(shopFromStorage != null){
 		player.money = playerFromStorage.money;
 		// storeData = shopFromStorage;
-		for(let i = 0; i < storeData.length;i++){
+		for(let i = 0; i < shopFromStorage.length;i++){
 			// debug.log(storeData[i].name)
 			shopFromStorage[i].functionToRun = storeData[i].functionToRun
 			for(let j = 0; j < shopFromStorage[i].amountBought;j++){
 				storeData[i].functionToRun()
 				
 			}
+			storeData[i].amountBought = shopFromStorage[i].amountBought;
+			// storeData[i].cost = shopFromStorage[i].cost;
+			// storeData[i].cost = shopFromStorage[i].cost;
 		}
-		storeData = shopFromStorage;
 		moneyText.text =  largeNumberToConcat(player.money);
 		return true;
 	}
@@ -813,12 +872,19 @@ let storeButX = (width()-20)-(width()/6)*mapScale;
 let storeButY = (20+width()/1000*50)*mapScale;
 //its about drive
 //get click for lounch 
-mouseClick( () => {
+mouseDown( () => {
 	// if(!((mousePos().x > storeButX && mousePos().y < storeButY) && player.onPlanet)){
 	// 	launch()
 	// }
 	// angleOfMovement = movementArrow.angle;
-	spawnBullet(movementArrow.angle);
+	if(player.bulletTimeout){
+		spawnBullet(movementArrow.angle);
+		player.bulletTimeout = false;
+		setTimeout(function(){
+			player.bulletTimeout = true;
+		}, 150);
+	}
+
 });
 keyPress("space", () => {
   if(!((mousePos().x > storeButX && mousePos().y < storeButY) && player.onPlanet)){
@@ -883,7 +949,9 @@ function spawnAlien() {
 		pos(rand(0,numberOfBackTiles * blockSize),rand(0,numberOfBackTiles * blockSize)),
 		"alien",
 		{
-			realPos: [rand(0,numberOfBackTiles * blockSize),rand(0,numberOfBackTiles * blockSize)]
+			realPos: [rand(0,numberOfBackTiles * blockSize),rand(0,numberOfBackTiles * blockSize)],
+			offScreenTooLong: false,
+			offScreenTooLongTimer: null,
 		},
 	]);
 }
@@ -922,6 +990,17 @@ action("alien", (b) => {
 	if(b.realPos[0] < width() && b.realPos[0] > 0 && b.realPos[1] < height() && b.realPos[1] > 0 && !player.onPlanet){
 		b.realPos[0] += (Math.cos(player.pos.angle(b.pos) * (Math.PI / 180)) * 50*dt());
 		b.realPos[1] += (Math.sin(player.pos.angle(b.pos) * (Math.PI / 180)) * 50*dt());
+		b.offScreenTooLong = false;
+		clearTimeout(b.offScreenTooLongTimer);
+	} else{
+		if(b.offScreenTooLong == false){
+			// debug.log("ASdf")
+			// b.offScreenTooLongTimer = setTimeout(function(){
+			// 	b.destroy;
+			// 	spawnAlien();
+			// }, rand(5000,20000));
+		}
+		b.offScreenTooLong = true;
 	}
 
 	b.pos.x = b.realPos[0];
@@ -929,6 +1008,10 @@ action("alien", (b) => {
 	// b.use(move(player.pos.angle(b.pos), 200*dt()));
 	// b.realPos[0] = b.pos.x;
 	// b.realPos[1] = b.pos.y;
+	// if(b.offScreenTooLong){
+		// b.destroy;
+		// spawnAlien();
+	// }
 });
 
 //The the price of a thing in the shop
@@ -943,18 +1026,24 @@ function genPrice(item, time){
 }
 
 //Clicks button in the store run sthe function
-clicks("inStoreButtonBg", (button) => {
-	if(player.money >= genPrice(storeData[button.idbuy],storeData[button.idbuy].amountBought)){
-		player.money -= genPrice(storeData[button.idbuy],storeData[button.idbuy].amountBought);
-		earnMoney(-1*genPrice(storeData[button.idbuy],storeData[button.idbuy].amountBought),mousePos().x,mousePos().y)
-		storeData[button.idbuy].functionToRun();
-		storeData[button.idbuy].amountBought++;
-		moneyText.text = largeNumberToConcat(player.money);
-		genStoreItems();
-	}else{
-		shake();
+hovers("inStoreButtonBg", (button) => {
+	if(mouseIsDown() && player.buyTimeout){
+		if(player.money >= genPrice(storeData[button.idbuy],storeData[button.idbuy].amountBought)){
+			player.money -= genPrice(storeData[button.idbuy],storeData[button.idbuy].amountBought);
+			earnMoney(-1*genPrice(storeData[button.idbuy],storeData[button.idbuy].amountBought),mousePos().x,mousePos().y)
+			storeData[button.idbuy].functionToRun();
+			storeData[button.idbuy].amountBought++;
+			moneyText.text = largeNumberToConcat(player.money);
+			genStoreItems();
+		}else{
+			shake();
+		}
+		// debug.log(button.idbuy);
+		player.buyTimeout = false;
+		setTimeout(function(){
+			player.buyTimeout = true;
+		}, 200);
 	}
-  // debug.log(button.idbuy);
 });
 
 //hover
@@ -1077,6 +1166,7 @@ function refomatePassOnShip() {
 		face:0,
 		rainbow:0,
 		spikes:0,
+		cookie:0,
 	};
 	for (let i = 18; i < player.passengers.length; i++) {
 		passToRenderMany[player.passengers[i].destanation] += 1;
@@ -1110,6 +1200,10 @@ function refomatePassOnShip() {
 					break;
 				case "spikes":
 					genPassSprite = "cargoSpikes";
+					genPassColor = [255, 255, 255];
+					break;
+				case "cookie":
+					genPassSprite = "cargoCookie";
 					genPassColor = [255, 255, 255];
 					break;
 			}
@@ -1490,7 +1584,12 @@ function generatePassengers(planet, ammount) {
 				case "spikes":
 					genPassSprite = "cargoSpikes";
 					genPassColor = [255, 255, 255];
-					genPassFare = 500;
+					genPassFare = 200;
+					break;
+				case "cookie":
+					genPassSprite = "cargoCookie";
+					genPassColor = [255, 255, 255];
+					genPassFare = 1000;
 					break;
 			}
 			planet.passengers.push({

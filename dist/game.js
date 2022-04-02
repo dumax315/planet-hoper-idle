@@ -2391,6 +2391,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     loadSprite("planetSpikes", "sprites/planetSpikes.png");
     loadSprite("planetFace", "sprites/planetFace.png");
     loadSprite("alien", "sprites/alien.png");
+    loadSprite("planetCookie", "sprites/planetCookie.png");
+    loadPedit("cargoCookie", "sprites/cargoCook.pedit");
   }
   __name(loadAssets, "loadAssets");
 
@@ -2427,7 +2429,9 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         handling: 2,
         bulletSpeed: 450,
         moneyPerAlien: 50,
-        health: 3
+        health: 3,
+        buyTimeout: true,
+        bulletTimeout: true
       }
     ]);
   }
@@ -2894,6 +2898,32 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
           }
         ]));
         planets.push("spikes");
+      } else if (planetsVars.length == 7) {
+        planetsVars.push(add([
+          sprite("planetCookie"),
+          area(),
+          solid(),
+          pos(1 * blockSize2, 16 * blockSize2),
+          scale(planetScale),
+          layer("game"),
+          origin("center"),
+          "planet",
+          z(0),
+          {
+            realPos: [
+              30 * blockSize2 + player.realPos[0],
+              20 * blockSize2 + player.realPos[1]
+            ],
+            startingPos: [
+              30 * blockSize2,
+              20 * blockSize2
+            ],
+            name: "cookie",
+            passengers: [],
+            size: 1
+          }
+        ]));
+        planets.push("cookie");
       }
       generatePassengers(planetsVars[planetsVars.length - 1], 10);
       player.z = 100;
@@ -3087,7 +3117,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         id: 7,
         amountBought: 0,
         cost: 300,
-        max: 20,
+        max: 30,
         functionToRun: () => {
           player.loadSpeed = Math.round(player.loadSpeed * 1.2);
         }
@@ -3097,11 +3127,22 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         id: 8,
         amountBought: 0,
         cost: "prog",
-        costProgression: [100, 100, 100, 100],
-        costProgression: [5e3, 5e5, 5e7, 5e10],
-        max: 3,
+        costProgression: [5e3, 5e5, 5e7, 5e11],
+        max: 4,
         functionToRun: () => {
           buyPlanets();
+        }
+      },
+      {
+        name: "Double Capacity",
+        id: 8,
+        amountBought: 0,
+        cost: "prog",
+        costProgression: [1e7, 1e13, 1e13],
+        max: 5,
+        functionToRun: () => {
+          player.capacity = Math.floor((player.capacity + player.passengers.length) * 2);
+          capacityText.text = player.capacity;
         }
       }
     ];
@@ -3203,26 +3244,32 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       }
     }
     __name(genStoreItems, "genStoreItems");
-    function largeNumberToConcat(value) {
-      var newValue = value;
-      if (value >= 1e3) {
-        var suffixes = ["", "k", "m", "b", "t", "Quad", "Quint", "Sext", "Sept", "Oct", "Nov"];
-        var suffixNum = Math.floor(("" + value).length / 3);
-        var shortValue = "";
-        for (var precision = 2; precision >= 1; precision--) {
-          shortValue = parseFloat((suffixNum != 0 ? value / Math.pow(1e3, suffixNum) : value).toPrecision(precision));
-          var dotLessShortValue = (shortValue + "").replace(/[^a-zA-Z 0-9]+/g, "");
-          if (dotLessShortValue.length <= 2) {
-            break;
-          }
-        }
-        if (shortValue % 1 != 0)
-          shortValue = shortValue.toFixed(1);
-        newValue = shortValue + suffixes[suffixNum];
+    function largeNumberToConcat(num) {
+      let sigfigs_opt = 3;
+      let sign = "";
+      if (typeof num == "string")
+        return num;
+      if (num == 0)
+        return num;
+      if (num < 0) {
+        sign = "-";
+        num *= -1;
       }
-      return newValue;
+      var power10 = log10(num);
+      var power10ceiling = Math.floor(power10) + 1;
+      var SUFFIXES = ["", "Thousand", "Million", "Billion", "Trillion", "Quadrillion", "Quintillion", "Sextillion", "Septillion", "Octillion", "Nonillion", "Decillion", "Undecillion", "Duodecillion", "Tredecillion", "Quattuordecillion", "Quindecillion"];
+      var suffixNum = Math.floor(power10 / 3);
+      var suffix = SUFFIXES[suffixNum];
+      var suffixPower10 = Math.pow(10, suffixNum * 3);
+      var base = num / suffixPower10;
+      var baseRound = base.toPrecision(sigfigs_opt);
+      return sign + baseRound + suffix;
     }
     __name(largeNumberToConcat, "largeNumberToConcat");
+    function log10(num) {
+      return Math.round(Math.log(num) / Math.LN10 * 1e6) / 1e6;
+    }
+    __name(log10, "log10");
     function showStore() {
       if (!storeBg.storeOpen) {
         storeBg.opacity = 0.8;
@@ -3309,13 +3356,13 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       let shopFromStorage = JSON.parse(localStorage.getItem("shop"));
       if (shopFromStorage != null) {
         player.money = playerFromStorage.money;
-        for (let i = 0; i < storeData.length; i++) {
+        for (let i = 0; i < shopFromStorage.length; i++) {
           shopFromStorage[i].functionToRun = storeData[i].functionToRun;
           for (let j = 0; j < shopFromStorage[i].amountBought; j++) {
             storeData[i].functionToRun();
           }
+          storeData[i].amountBought = shopFromStorage[i].amountBought;
         }
-        storeData = shopFromStorage;
         moneyText.text = largeNumberToConcat(player.money);
         return true;
       } else {
@@ -3328,8 +3375,14 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }, 1500);
     let storeButX = width() - 20 - width() / 6 * mapScale2;
     let storeButY = (20 + width() / 1e3 * 50) * mapScale2;
-    mouseClick(() => {
-      spawnBullet(movementArrow.angle);
+    mouseDown(() => {
+      if (player.bulletTimeout) {
+        spawnBullet(movementArrow.angle);
+        player.bulletTimeout = false;
+        setTimeout(function() {
+          player.bulletTimeout = true;
+        }, 150);
+      }
     });
     keyPress("space", () => {
       if (!(mousePos().x > storeButX && mousePos().y < storeButY && player.onPlanet)) {
@@ -3384,7 +3437,9 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         pos(rand(0, numberOfBackTiles * blockSize2), rand(0, numberOfBackTiles * blockSize2)),
         "alien",
         {
-          realPos: [rand(0, numberOfBackTiles * blockSize2), rand(0, numberOfBackTiles * blockSize2)]
+          realPos: [rand(0, numberOfBackTiles * blockSize2), rand(0, numberOfBackTiles * blockSize2)],
+          offScreenTooLong: false,
+          offScreenTooLongTimer: null
         }
       ]);
     }
@@ -3418,6 +3473,12 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       if (b.realPos[0] < width() && b.realPos[0] > 0 && b.realPos[1] < height() && b.realPos[1] > 0 && !player.onPlanet) {
         b.realPos[0] += Math.cos(player.pos.angle(b.pos) * (Math.PI / 180)) * 50 * dt();
         b.realPos[1] += Math.sin(player.pos.angle(b.pos) * (Math.PI / 180)) * 50 * dt();
+        b.offScreenTooLong = false;
+        clearTimeout(b.offScreenTooLongTimer);
+      } else {
+        if (b.offScreenTooLong == false) {
+        }
+        b.offScreenTooLong = true;
       }
       b.pos.x = b.realPos[0];
       b.pos.y = b.realPos[1];
@@ -3432,16 +3493,22 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       return Math.round(__pow(item.cost, (time + 20) / 20));
     }
     __name(genPrice, "genPrice");
-    clicks("inStoreButtonBg", (button) => {
-      if (player.money >= genPrice(storeData[button.idbuy], storeData[button.idbuy].amountBought)) {
-        player.money -= genPrice(storeData[button.idbuy], storeData[button.idbuy].amountBought);
-        earnMoney(-1 * genPrice(storeData[button.idbuy], storeData[button.idbuy].amountBought), mousePos().x, mousePos().y);
-        storeData[button.idbuy].functionToRun();
-        storeData[button.idbuy].amountBought++;
-        moneyText.text = largeNumberToConcat(player.money);
-        genStoreItems();
-      } else {
-        shake();
+    hovers("inStoreButtonBg", (button) => {
+      if (mouseIsDown() && player.buyTimeout) {
+        if (player.money >= genPrice(storeData[button.idbuy], storeData[button.idbuy].amountBought)) {
+          player.money -= genPrice(storeData[button.idbuy], storeData[button.idbuy].amountBought);
+          earnMoney(-1 * genPrice(storeData[button.idbuy], storeData[button.idbuy].amountBought), mousePos().x, mousePos().y);
+          storeData[button.idbuy].functionToRun();
+          storeData[button.idbuy].amountBought++;
+          moneyText.text = largeNumberToConcat(player.money);
+          genStoreItems();
+        } else {
+          shake();
+        }
+        player.buyTimeout = false;
+        setTimeout(function() {
+          player.buyTimeout = true;
+        }, 200);
       }
     });
     document.addEventListener("wheel", (event) => {
@@ -3508,7 +3575,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         green: 0,
         face: 0,
         rainbow: 0,
-        spikes: 0
+        spikes: 0,
+        cookie: 0
       };
       for (let i = 18; i < player.passengers.length; i++) {
         passToRenderMany[player.passengers[i].destanation] += 1;
@@ -3541,6 +3609,10 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
               break;
             case "spikes":
               genPassSprite = "cargoSpikes";
+              genPassColor = [255, 255, 255];
+              break;
+            case "cookie":
+              genPassSprite = "cargoCookie";
               genPassColor = [255, 255, 255];
               break;
           }
@@ -3811,7 +3883,12 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
             case "spikes":
               genPassSprite = "cargoSpikes";
               genPassColor = [255, 255, 255];
-              genPassFare = 500;
+              genPassFare = 200;
+              break;
+            case "cookie":
+              genPassSprite = "cargoCookie";
+              genPassColor = [255, 255, 255];
+              genPassFare = 1e3;
               break;
           }
           planet.passengers.push({
